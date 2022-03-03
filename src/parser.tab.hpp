@@ -34,8 +34,8 @@
 /* Undocumented macros, especially those whose name start with YY_,
    are private implementation details.  Do not rely on them.  */
 
-#ifndef YY_YY_SRC_MATHS_PARSER_TAB_HPP_INCLUDED
-# define YY_YY_SRC_MATHS_PARSER_TAB_HPP_INCLUDED
+#ifndef YY_YY_SRC_PARSER_TAB_HPP_INCLUDED
+# define YY_YY_SRC_PARSER_TAB_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -44,53 +44,92 @@
 extern int yydebug;
 #endif
 /* "%code requires" blocks.  */
-#line 1 "src/maths_parser.y"
+#line 1 "src/parser.y"
 
-#include "ast.hpp"
+  #include "ast.hpp"
 
-#include <cassert>
+  #include <cassert>
 
-extern const Expression *g_root; // A way of getting the AST out
+  extern const Expression *g_root; // A way of getting the AST out
 
-//! This is to fix problems when generating C++
-// We are declaring the functions provided by Flex, so
-// that Bison generated code can call them.
-int yylex(void);
-void yyerror(const char *);
+  //! This is to fix problems when generating C++
+  // We are declaring the functions provided by Flex, so
+  // that Bison generated code can call them.
+  int yylex(void);
+  void yyerror(const char *);
 
-#line 62 "src/maths_parser.tab.hpp"
+#line 62 "src/parser.tab.hpp"
 
 /* Token type.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-enum yytokentype
-{
-    T_TIMES = 258,
-    T_DIVIDE = 259,
-    T_PLUS = 260,
-    T_MINUS = 261,
-    T_EXPONENT = 262,
-    T_LBRACKET = 263,
-    T_RBRACKET = 264,
-    T_LOG = 265,
-    T_EXP = 266,
-    T_SQRT = 267,
-    T_NUMBER = 268,
-    T_VARIABLE = 269
-};
+  enum yytokentype
+  {
+    IDENTIFIER = 258,
+    CONSTANT = 259,
+    STRING_LITERAL = 260,
+    SIZEOF = 261,
+    PTR_OP = 262,
+    INC_OP = 263,
+    DEC_OP = 264,
+    LEFT_OP = 265,
+    RIGHT_OP = 266,
+    LE_OP = 267,
+    GE_OP = 268,
+    EQ_OP = 269,
+    NE_OP = 270,
+    AND_OP = 271,
+    OR_OP = 272,
+    MUL_ASSIGN = 273,
+    DIV_ASSIGN = 274,
+    MOD_ASSIGN = 275,
+    ADD_ASSIGN = 276,
+    SUB_ASSIGN = 277,
+    LEFT_ASSIGN = 278,
+    RIGHT_ASSIGN = 279,
+    AND_ASSIGN = 280,
+    XOR_ASSIGN = 281,
+    OR_ASSIGN = 282,
+    TYPE_NAME = 283,
+    TYPEDEF = 284,
+    CHAR = 285,
+    SHORT = 286,
+    INT = 287,
+    LONG = 288,
+    SIGNED = 289,
+    UNSIGNED = 290,
+    FLOAT = 291,
+    DOUBLE = 292,
+    VOLATILE = 293,
+    VOID = 294,
+    STRUCT = 295,
+    UNION = 296,
+    ENUM = 297,
+    CASE = 298,
+    DEFAULT = 299,
+    IF = 300,
+    ELSE = 301,
+    SWITCH = 302,
+    WHILE = 303,
+    DO = 304,
+    FOR = 305,
+    CONTINUE = 306,
+    BREAK = 307,
+    RETURN = 308
+  };
 #endif
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 17 "src/maths_parser.y"
+#line 18 "src/parser.y"
 
-    const Expression *expr;
-    double number;
-    std::string *string;
+  const Expression *expr;
+  double number;
+  std::string *string;
 
-#line 94 "src/maths_parser.tab.hpp"
+#line 133 "src/parser.tab.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -103,4 +142,4 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_SRC_MATHS_PARSER_TAB_HPP_INCLUDED  */
+#endif /* !YY_YY_SRC_PARSER_TAB_HPP_INCLUDED  */
