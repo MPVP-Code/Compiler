@@ -51,5 +51,8 @@ Vagrant.configure(2) do |config|
       # QEMU run-time emulator
       sudo apt-get -y install qemu
 
+      # CMake for unit tests
+      sudo apt-get -y install cmake
+
    SHELL
 end
