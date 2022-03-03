@@ -1,5 +1,5 @@
 #include <limits.h>
-#include "../src/lexer.h"
+#include "../src/sample1.h"
 #include "gtest/gtest.h"
 
 namespace {

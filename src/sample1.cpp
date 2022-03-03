@@ -1,4 +1,4 @@
-#include "lexer.h"
+#include "sample1.h"
 
 int Factorial(int n) {
     int result = 1;

@@ -15,15 +15,15 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(
-        lexer_test
-        src/lexer.cpp
-        src/lexer.h
-        test/lexer_unittest.cpp
+        sample1_test
+        src/sample1.cpp
+        src/sample1.h
+        test/sample1_unittest.cpp
 )
 target_link_libraries(
-        lexer_test
+        sample1_test
         gtest_main
 )
 
 include(GoogleTest)
-gtest_discover_tests(lexer_test)
+gtest_discover_tests(sample1_test)
