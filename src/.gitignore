@@ -1,0 +1,6 @@
+#Ignore parser, lexer, gcc generated files
+*.tab.cpp
+*.tab.hpp
+*.o
+*.yy.cpp
+*.output
