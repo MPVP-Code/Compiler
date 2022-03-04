@@ -66,3 +66,5 @@ fabric.properties
 /.vagrant
 /bin
 /test_lexer/out
+
+*.log

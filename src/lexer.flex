@@ -7,8 +7,10 @@
 
 /* Bring in our declarations for token types and
    the yylval variable. */
-#include "lexer.hpp"
-
+// for parser
+#include "parser.tab.hpp"
+// for lexer
+// #include "lexer.hpp"
 
 // This is to work around an irritating bug in Flex
 // https://stackoverflow.com/questions/46213840/get-rid-of-warning-implicit-declaration-of-function-fileno-in-flex
@@ -19,13 +21,13 @@ extern "C" int fileno(FILE *stream);
 
 %%
 
-[a-zA-Z]+       { fprintf(stderr, "variable\n"); return VARIABLE; }
+[a-zA-Z]+       { fprintf(stderr, "variable\n"); yylval.string=new std::string(yytext); /* TODO: check deallocation of this */ return VARIABLE; }
 
-[\-]?[0-9]+     { fprintf(stderr, "number\n"); return NUMBER; }
+[\-]?[0-9]+     { fprintf(stderr, "number %f\n", std::stod(yytext, 0)); yylval.number=std::stod(yytext, 0); return NUMBER; }
 
 =               { fprintf(stderr, "equals\n"); return EQUALS_SIGN; }
 
-\n              { fprintf(stderr, "Newline, \n"); }
+\n              { ; }
 
 .   { fprintf(stderr, "All other chars, \n"); }
 
