@@ -1,9 +1,9 @@
 %code requires{
-  #include "ast.hpp"
+  #include "../include/ast.hpp"
 
   #include <cassert>
 
-  extern const Expression *g_root; // A way of getting the AST out
+  extern const Expression *global_root; // A way of getting the AST out
 
   //! This is to fix problems when generating C++
   // We are declaring the functions provided by Flex, so
@@ -16,8 +16,8 @@
 // AST node.
 
 %union{
-  const Expression *expr;
-  double number;
+  //const Expression *expr;
+  int number;
   std::string *string;
 }
 

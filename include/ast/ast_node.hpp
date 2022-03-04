@@ -1,8 +1,8 @@
 //
 // Created by michal on 3. 3. 2022.
 //
-#ifndef ast_node_hpp
-#define ast_node_hpp
+#ifndef AST_NODE_H
+#define AST_NODE_H
 
 #include <memory>
 #include <vector>
@@ -20,14 +20,16 @@ public:
         this->type = "Node";
     }
 
-    virtual ~Node() {}
-
-    virtual std::string type(){
+    virtual std::string get_type(){
         return this->type;
     }
 
     virtual double compile() const {
-        throw std::runtime_error("Not implemented.");
+        throw std::runtime_error("Node compile not implemented.");
+    }
+
+    virtual double print() const {
+        throw std::runtime_error("Node print not implemented.");
     }
 };
 

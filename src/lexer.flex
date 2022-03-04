@@ -41,18 +41,18 @@ IS			(u|U|l|L)*
 
 
 
-{L}({L}|{D})*		    {return(check_type()); }
+{L}({L}|{D})*		    {YYSTYPE-> new std::string(yytext); return(IDENTIFIER); //valid identifier name}
 
-0[xX]{H}+{IS}?		    {return(CONSTANT); }
+0[xX]{H}+{IS}?		    {return(CONSTANT); //Hex constant e.g.0xff}
 0{D}+{IS}?		        {return(CONSTANT); }
 {D}+{IS}?		        {return(CONSTANT); }
 L?'(\\.|[^\\'])+'	    {return(CONSTANT); }
 
-{D}+{E}{FS}?		    {return(CONSTANT); }
-{D}*"."{D}+({E})?{FS}?	{return(CONSTANT); }
-{D}+"."{D}*({E})?{FS}?	{return(CONSTANT); }
+{D}+{E}{FS}?		    {YYSTYPE->number = (int) strtod(yytext, 0); return(CONSTANT); }
+{D}*"."{D}+({E})?{FS}?	{YYSTYPE->number = (int) strtod(yytext, 0); return(CONSTANT); }
+{D}+"."{D}*({E})?{FS}?	{YYSTYPE->number = (int) strtod(yytext, 0); return(CONSTANT); }
 
-L?\"(\\.|[^\\"])*\"	    {return(STRING_LITERAL); }
+L?\"(\\.|[^\\"])*\"	    {YYSTYPE-> new std::string(yytext); return(STRING_LITERAL);  }
 
 ">>="			{return(RIGHT_ASSIGN); }
 "<<="			{return(LEFT_ASSIGN); }
@@ -111,39 +111,22 @@ yywrap()
 }
 
 
-comment()
-{
-	char c, c1;
 
-loop:
-	while ((c = input()) != '*' && c != 0)
-		putchar(c);
-
-	if ((c1 = input()) != '/' && c != 0)
-	{
-		unput(c1);
-		goto loop;
-	}
-
-	if (c != 0)
-		putchar(c1);
-}
-
-int check_type()
-{
-/*
-* pseudo code --- this is what it should check
-*
-*	if (yytext == type_name)
-*		return(TYPE_NAME);
-*
-*	return(IDENTIFIER);
-*/
-
-/*
-*	it actually will only return IDENTIFIER
-*/
-
-	return(IDENTIFIER);
-}
+//int check_type()
+//{
+///*
+//* pseudo code --- this is what it should check
+//*
+//*	if (yytext == type_name)
+//*		return(TYPE_NAME);
+//*
+//*	return(IDENTIFIER);
+//*/
+//
+///*
+//*	it actually will only return IDENTIFIER
+//*/
+//
+//	return(IDENTIFIER);
+//}
 
