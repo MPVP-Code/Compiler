@@ -1,0 +1,19 @@
+//
+// Created by michal on 3. 3. 2022.
+//
+
+#ifndef ast_hpp
+#define ast_hpp
+
+#include "ast/ast_node.hpp"
+#include "ast/ast_func.hpp"
+#include "ast/ast_assignment.hpp"
+#include "ast/ast_flow_control.hpp"
+
+
+#include "ast/ast_functions.hpp"
+
+
+//extern const Expression *parseAST();
+
+#endif

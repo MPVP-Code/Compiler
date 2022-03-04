@@ -1,6 +1,8 @@
   
-CPPFLAGS += -std=c++17 -W -Wall -g -Wno-unused-parameter
+CPPFLAGS += -std=c++2a -W -Wall -g -Wno-unused-parameter
 CPPFLAGS += -I inc
+
+all : bin/c_compiler src/lexer.yy.cpp src/parser.tab.cpp
 
 bin/c_compiler : bin/compiler src/wrapper.sh
 	cp src/wrapper.sh bin/c_compiler
@@ -18,8 +20,14 @@ lexer : src/lexer.flex test/lexer_main.cpp src/lexer.hpp
 	g++ $(CPPFLAGS) -c test/lexer_main.cpp -o bin/lexer_main.o
 	g++ $(CPPFLAGS) -o bin/lexer bin/lexer.yy.o bin/lexer_main.o
 
+src/parser.tab.cpp src/parser.tab.hpp : src/parser.y
+	bison -v -d src/parser.y -o src/parser.tab.cpp
+
 clean :
-	rm -f */*.yy.cpp
-	rm -f test/out/*
 	rm -f src/*.o
 	rm -f bin/*
+	rm -f src/*.tab.cpp
+	rm -f src/*.tab.hpp
+	rm -f src/*.yy.cpp
+	rm -f src/*.output
+	rm -f test/out/*

@@ -1,39 +1,132 @@
-%option noyywrap
+
+ANSI C grammar, Lex specification
+Jutta Degener, 1995 ; Reduced and adapted , Michal Palic, Vaclav Pavlicek 2022
+
+
+D			[0-9]
+L			[a-zA-Z_]
+H			[a-fA-F0-9]
+E			[Ee][+-]?{D}+
+FS			(f|F|l|L)
+IS			(u|U|l|L)*
 
 %{
-/* Now in a section of C that will be embedded
-   into the auto-generated code. Flex will not
-   try to interpret code surrounded by %{ ... %} */
-
-/* Bring in our declarations for token types and
-   the yylval variable. */
-#include "lexer.hpp"
-
-
-// This is to work around an irritating bug in Flex
-// https://stackoverflow.com/questions/46213840/get-rid-of-warning-implicit-declaration-of-function-fileno-in-flex
-extern "C" int fileno(FILE *stream);
+#include <stdio.h>
+#include "parser.tab.hpp"
 
 %}
 
+%%
+
+"void"			{return(VOID); }
+"int"			{return(INT); }
+"enum"			{return(ENUM); }
+"double"		{return(DOUBLE); }
+"float"			{return(FLOAT); }
+"char"			{return(CHAR); }
+"unsigned"		{return(UNSIGNED); }
+"typedef"		{return(TYPEDEF); }
+"sizeof"		{return(SIZEOF); }
+"struct"		{return(STRUCT); }
+
+"if"			{return(IF); }
+"else"			{return(ELSE); }
+"return"		{return(RETURN); }
+"while"			{return(WHILE); }
+"for"			{return(FOR); }
+"switch"		{return(SWITCH); }
+"case"			{return(CASE); }
+"break"			{return(BREAK); }
+"continue"		{return(CONTINUE); }
+
+
+
+{L}({L}|{D})*		    {YYSTYPE-> new std::string(yytext); return(IDENTIFIER); //valid identifier name}
+
+0[xX]{H}+{IS}?		    {return(CONSTANT); //Hex constant e.g.0xff}
+0{D}+{IS}?		        {return(CONSTANT); }
+{D}+{IS}?		        {return(CONSTANT); }
+L?'(\\.|[^\\'])+'	    {return(CONSTANT); }
+
+{D}+{E}{FS}?		    {YYSTYPE->number = (int) strtod(yytext, 0); return(CONSTANT); }
+{D}*"."{D}+({E})?{FS}?	{YYSTYPE->number = (int) strtod(yytext, 0); return(CONSTANT); }
+{D}+"."{D}*({E})?{FS}?	{YYSTYPE->number = (int) strtod(yytext, 0); return(CONSTANT); }
+
+L?\"(\\.|[^\\"])*\"	    {YYSTYPE-> new std::string(yytext); return(STRING_LITERAL);  }
+
+">>="			{return(RIGHT_ASSIGN); }
+"<<="			{return(LEFT_ASSIGN); }
+"+="			{return(ADD_ASSIGN); }
+"-="			{return(SUB_ASSIGN); }
+"*="			{return(MUL_ASSIGN); }
+"/="			{return(DIV_ASSIGN); }
+"%="			{return(MOD_ASSIGN); }
+"&="			{return(AND_ASSIGN); }
+"^="			{return(XOR_ASSIGN); }
+"|="			{return(OR_ASSIGN); }
+">>"			{return(RIGHT_OP); }
+"<<"			{return(LEFT_OP); }
+"++"			{return(INC_OP); }
+"--"			{return(DEC_OP); }
+"->"			{return(PTR_OP); }
+"&&"			{return(AND_OP); }
+"||"			{return(OR_OP); }
+"<="			{return(LE_OP); }
+">="			{return(GE_OP); }
+"=="			{return(EQ_OP); }
+"!="			{return(NE_OP); }
+";"			    {return(';'); }
+("{"|"<%")		{return('{'); }
+("}"|"%>")		{return('}'); }
+","			    {return(','); }
+":"			    {return(':'); }
+"="			    {return('='); }
+"("			    {return('('); }
+")"			    {return(')'); }
+("["|"<:")		{return('['); }
+("]"|":>")		{return(']'); }
+"."			    {return('.'); }
+"&"			    {return('&'); }
+"!"			    {return('!'); }
+"~"			    {return('~'); }
+"-"			    {return('-'); }
+"+"			    {return('+'); }
+"*"			    {return('*'); }
+"/"			    {return('/'); }
+"%"			    {return('%'); }
+"<"			    {return('<'); }
+">"			    {return('>'); }
+"^"			    {return('^'); }
+"|"			    {return('|'); }
+"?"			    {return('?'); }
+
+[ \t\v\n\f]		{}
+.			{ /* ignore bad characters */ }
 
 %%
 
-[a-zA-Z]+       { fprintf(stderr, "variable\n"); return VARIABLE; }
-
-[\-]?[0-9]+     { fprintf(stderr, "number\n"); return NUMBER; }
-
-=               { fprintf(stderr, "equals\n"); return EQUALS_SIGN; }
-
-\n              { fprintf(stderr, "Newline, \n"); }
-
-.   { fprintf(stderr, "All other chars, \n"); }
-
-%%
-
-/* Error handler. This will get called if none of the rules match. */
-void yyerror (char const *s)
+yywrap()
 {
-  fprintf (stderr, "Flex Error: %s\n", s); /* s is the text that wasn't matched */
-  exit(1);
+	return(1);
 }
+
+
+
+//int check_type()
+//{
+///*
+//* pseudo code --- this is what it should check
+//*
+//*	if (yytext == type_name)
+//*		return(TYPE_NAME);
+//*
+//*	return(IDENTIFIER);
+//*/
+//
+///*
+//*	it actually will only return IDENTIFIER
+//*/
+//
+//	return(IDENTIFIER);
+//}
+
