@@ -15,14 +15,21 @@ fi
 
 echo "========================================"
 echo " Cleaning the temporaries and outputs"
+
+#Go up level to read makefile
+cd ../
 make clean
 echo " Force building lexer"
-make lexer -B
+make lexertest -B
 if [[ "$?" -ne 0 ]]; then
     echo "Build failed.";
 fi
 echo ""
-mkdir -p test/out
+
+#Go down to test directory
+cd test_lexer
+
+mkdir -p test_lexer/out
 
 echo "========================================="
 

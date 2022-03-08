@@ -8,14 +8,14 @@
 #include <string>
 #include <vector>
 
-#include "ast_node.hpp"
+//#include "ast_node.hpp"
 
-class Variable : Node {
+class Variable : public Node {
 public:
     std::string type;
 };
 
-class Integer : Variable{
+class Integer : public Variable{
 public:
     int value;
     Integer(){
@@ -23,7 +23,7 @@ public:
     }
 };
 
-class Struct : Variable{
+class Struct : public Variable{
 public:
     std::vector<Variable> members;
 };

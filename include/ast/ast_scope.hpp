@@ -7,15 +7,17 @@
 
 #include "ast_node.hpp"
 #include "ast_type.hpp"
+
 #include <map>
 #include <string>
+#include <vector>
 
 class Scope : public Node
 {
 public:
     //Inherits branches & type
     std::vector<std::shared_ptr<Scope>> parent_scope;
-    std::map<std::string,Variable> var_map;
+    //std::map<std::string,Variable> var_map;
 
     Scope(){
         this->type = "Scope";

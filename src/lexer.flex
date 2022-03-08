@@ -1,6 +1,5 @@
+%option noyywrap
 
-ANSI C grammar, Lex specification
-Jutta Degener, 1995 ; Reduced and adapted , Michal Palic, Vaclav Pavlicek 2022
 
 
 D			[0-9]
@@ -11,9 +10,12 @@ FS			(f|F|l|L)
 IS			(u|U|l|L)*
 
 %{
+// Avoid error "error: `fileno' was not declared in this scope"
+extern "C" int fileno(FILE *stream);
+
 #include <stdio.h>
 #include "parser.tab.hpp"
-
+YYSTYPE yylval;
 %}
 
 %%
@@ -41,18 +43,18 @@ IS			(u|U|l|L)*
 
 
 
-{L}({L}|{D})*		    {YYSTYPE-> new std::string(yytext); return(IDENTIFIER); //valid identifier name}
+{L}({L}|{D})*		    { yylval.string = new std::string(yytext); return(IDENTIFIER); }
 
-0[xX]{H}+{IS}?		    {return(CONSTANT); //Hex constant e.g.0xff}
+0[xX]{H}+{IS}?		    {return(CONSTANT); }
 0{D}+{IS}?		        {return(CONSTANT); }
 {D}+{IS}?		        {return(CONSTANT); }
 L?'(\\.|[^\\'])+'	    {return(CONSTANT); }
 
-{D}+{E}{FS}?		    {YYSTYPE->number = (int) strtod(yytext, 0); return(CONSTANT); }
-{D}*"."{D}+({E})?{FS}?	{YYSTYPE->number = (int) strtod(yytext, 0); return(CONSTANT); }
-{D}+"."{D}*({E})?{FS}?	{YYSTYPE->number = (int) strtod(yytext, 0); return(CONSTANT); }
+{D}+{E}{FS}?		    {yylval.number = (int) strtod(yytext, 0); return(CONSTANT); }
+{D}*"."{D}+({E})?{FS}?	{yylval.number = (int) strtod(yytext, 0); return(CONSTANT); }
+{D}+"."{D}*({E})?{FS}?	{yylval.number = (int) strtod(yytext, 0); return(CONSTANT); }
 
-L?\"(\\.|[^\\"])*\"	    {YYSTYPE-> new std::string(yytext); return(STRING_LITERAL);  }
+L?\"(\\.|[^\\"])*\"	    {yylval.string =  new std::string(yytext); return(STRING_LITERAL);  }
 
 ">>="			{return(RIGHT_ASSIGN); }
 "<<="			{return(LEFT_ASSIGN); }
@@ -105,12 +107,10 @@ L?\"(\\.|[^\\"])*\"	    {YYSTYPE-> new std::string(yytext); return(STRING_LITERA
 
 %%
 
-yywrap()
-{
-	return(1);
-}
-
-
+//yywrap()
+//{
+//	return(1);
+//}
 
 //int check_type()
 //{

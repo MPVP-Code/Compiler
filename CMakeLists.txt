@@ -18,7 +18,7 @@ add_executable(
         sample1_test
         src/sample1.cpp
         src/sample1.h
-        test/sample1_unittest.cpp
+        test_unit/sample1_unittest.cpp
 )
 target_link_libraries(
         sample1_test

@@ -8,36 +8,23 @@ bin/c_compiler : bin/compiler src/wrapper.sh
 	cp src/wrapper.sh bin/c_compiler
 	chmod u+x bin/c_compiler
 
-bin/compiler : src/compiler.cpp
+bin/compiler : src/compiler.cpp lexer parser
 	mkdir -p bin
-	g++ $(CPPFLAGS) -o bin/compiler $^
+	g++ $(CPPFLAGS) -c src/compiler.cpp -o build/compiler.o
+	g++ $(CPPFLAGS) -o bin/compiler build/lexer.yy.o build/parser.tab.o build/compiler.o
 
-lexer : src/lexer.flex test/lexer_main.cpp src/lexer.hpp
-	mkdir -p bin
-	flex -o bin/lexer.yy.cpp src/lexer.flex
-	cp -r src/lexer.hpp bin/lexer.hpp
-	g++ $(CPPFLAGS) -c bin/lexer.yy.cpp -o bin/lexer.yy.o
-	g++ $(CPPFLAGS) -c test/lexer_main.cpp -o bin/lexer_main.o
-	g++ $(CPPFLAGS) -o bin/lexer bin/lexer.yy.o bin/lexer_main.o
+lexer : src/lexer.flex parser
+	mkdir -p build
+	flex -o build/lexer.yy.cpp src/lexer.flex
+	g++ $(CPPFLAGS) -c build/lexer.yy.cpp -o build/lexer.yy.o
 
-src/maths_parser.tab.cpp src/maths_parser.tab.hpp : src/maths_parser.y
-	bison -v -d src/maths_parser.y -o src/maths_parser.tab.cpp
+parser : src/parser.y  include/ast.hpp
+	mkdir -p build
+	bison -v -d src/parser.y -o build/parser.tab.cpp
+	g++ $(CPPFLAGS) -c build/parser.tab.cpp -o build/parser.tab.o
 
-src/maths_lexer.yy.cpp : src/maths_lexer.flex src/maths_parser.tab.hpp
-	flex -o src/maths_lexer.yy.cpp  src/maths_lexer.flex
-
-parser : src/lexer.flex src/lexer.hpp test/parser_test.cpp src/ast.hpp src/ast
-	mkdir -p bin
-	flex -o bin/lexer.yy.cpp src/lexer.flex
-	cp -r src/lexer.hpp bin/lexer.hpp
-	cp -r src/ast.hpp bin/ast.hpp
-	cp -r src/ast bin/ast
-	cp -r test/parser_test.cpp bin/parser_test.cpp
-	bison -v -d src/parser.y -o bin/parser.tab.cpp
-	g++ $(CPPFLAGS) -c bin/lexer.yy.cpp -o bin/lexer.yy.o
-	g++ $(CPPFLAGS) -c bin/parser.tab.cpp -o bin/parser.tab.o
-	g++ $(CPPFLAGS) -c bin/parser_test.cpp -o bin/parser_test.o
-	g++ $(CPPFLAGS) -o bin/parser bin/parser_test.o bin/parser.tab.o bin/lexer.yy.o
+lexertest : parser lexer test_lexer/src/lexer_main.cpp
+	g++ $(CPPFLAGS) -o test_lexer/bin/lexer_test.o test_lexer/src/lexer_main.cpp build/lexer.yy.o
 
 clean :
 	rm -f src/*.o

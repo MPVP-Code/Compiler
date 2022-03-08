@@ -1,22 +1,18 @@
 %code requires{
-  #include "../include/ast.hpp"
+#include "../include/ast.hpp"
 
-  #include <cassert>
+#include <cassert>
 
-  extern const Expression *global_root; // A way of getting the AST out
+extern const Node* global_root; // A way of getting the AST out
 
-  //! This is to fix problems when generating C++
-  // We are declaring the functions provided by Flex, so
-  // that Bison generated code can call them.
-  int yylex(void);
-  void yyerror(const char *);
+int yylex(void);
+void yyerror(const char *);
+
 }
 
-// Represents the value associated with any kind of
-// AST node.
 
 %union{
-  //const Expression *expr;
+  //const Node *node;
   int number;
   std::string *string;
 }
@@ -412,14 +408,15 @@ function_definition
 	;
 
 %%
-#include <stdio.h>
 
-extern char yytext[];
-extern int column;
-
-yyerror(s)
-char *s;
-{
-	fflush(stdout);
-	printf("\n%*s\n%*s\n", column, "^", column, s);
-}
+//#include <stdio.h>
+//
+//extern char yytext[];
+//extern int column;
+//
+//yyerror(s)
+//char *s;
+//{
+//	fflush(stdout);
+//	printf("\n%*s\n%*s\n", column, "^", column, s);
+//}

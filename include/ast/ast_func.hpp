@@ -32,4 +32,4 @@ public:
     }
 };
 
-#endif AST_FUNC_H
+#endif
