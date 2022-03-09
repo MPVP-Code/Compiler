@@ -1,1 +1,1 @@
-Assignment => ( Variable => ( "a" ) Number => ( 1.000000 ) )
+Declaration => ( Variable => ( "a" ) Number => ( 1.000000 ) )

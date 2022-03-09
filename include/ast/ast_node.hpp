@@ -10,17 +10,16 @@
 #include <iostream>
 
 
-class Node
-{
+class Node {
 public:
     std::vector<std::shared_ptr<Node>> branches;
     std::string type;
 
-    Node(){
+    Node() {
         this->type = "Node";
     }
 
-    virtual std::string get_type(){
+    virtual std::string get_type() {
         return this->type;
     }
 
@@ -29,6 +28,10 @@ public:
     }
 
     virtual double print() const {
+        throw std::runtime_error("Node print not implemented.");
+    }
+
+    virtual std::string to_string() const {
         throw std::runtime_error("Node print not implemented.");
     }
 };

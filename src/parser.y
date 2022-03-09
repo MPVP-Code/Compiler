@@ -29,18 +29,23 @@ void yyerror(const char *);
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR CONTINUE BREAK RETURN
 
+%type <expression> primary_expression postfix_expression unary_expression cast_expression multiplicative_expression additive_expression shift_expression relational_expression equality_expression and_expression exclusive_or_expression inclusive_or_expression logical_and_expression conditional_expression assignment_expression declaration declaration_specifiers init_declarator_list init_declarator logical_or_expression type_specifier declarator initializer direct_declarator translation_unit
+%type <expression> external_declaration expression
+%type <number> CONSTANT
+%type <string> IDENTIFIER
+
 %start translation_unit
 %%
 
 primary_expression
 	: IDENTIFIER {}
-	| CONSTANT {}
+	| CONSTANT { $$ = new Constant($1); }
 	| STRING_LITERAL {}
 	| '(' expression ')' {}
 	;
 
 postfix_expression
-	: primary_expression {}
+	: primary_expression { $$ = $1; }
 	| postfix_expression '[' expression ']' {}
 	| postfix_expression '(' ')' {}
 	| postfix_expression '(' argument_expression_list ')' {}
@@ -56,7 +61,7 @@ argument_expression_list
 	;
 
 unary_expression
-	: postfix_expression {}
+	: postfix_expression { $$ = $1; }
 	| INC_OP unary_expression {}
 	| DEC_OP unary_expression {}
 	| unary_operator cast_expression {}
@@ -74,31 +79,31 @@ unary_operator
 	;
 
 cast_expression
-	: unary_expression {}
+	: unary_expression { $$ = $1; }
 	| '(' type_name ')' cast_expression {}
 	;
 
 multiplicative_expression
-	: cast_expression {}
+	: cast_expression { $$ = $1; }
 	| multiplicative_expression '*' cast_expression {}
 	| multiplicative_expression '/' cast_expression {}
 	| multiplicative_expression '%' cast_expression {}
 	;
 
 additive_expression
-	: multiplicative_expression {}
+	: multiplicative_expression { $$ = $1; }
 	| additive_expression '+' multiplicative_expression {}
 	| additive_expression '-' multiplicative_expression {}
 	;
 
 shift_expression
-	: additive_expression {}
+	: additive_expression { $$ = $1; }
 	| shift_expression LEFT_OP additive_expression {}
 	| shift_expression RIGHT_OP additive_expression {}
 	;
 
 relational_expression
-	: shift_expression {}
+	: shift_expression { $$ = $1; }
 	| relational_expression '<' shift_expression {}
 	| relational_expression '>' shift_expression {}
 	| relational_expression LE_OP shift_expression {}
@@ -106,44 +111,44 @@ relational_expression
 	;
 
 equality_expression
-	: relational_expression {}
+	: relational_expression { $$ = $1; }
 	| equality_expression EQ_OP relational_expression {}
 	| equality_expression NE_OP relational_expression {}
 	;
 
 and_expression
-	: equality_expression {}
+	: equality_expression { $$ = $1; }
 	| and_expression '&' equality_expression {}
 	;
 
 exclusive_or_expression
-	: and_expression {}
+	: and_expression { $$ = $1; }
 	| exclusive_or_expression '^' and_expression {}
 	;
 
 inclusive_or_expression
-	: exclusive_or_expression {}
+	: exclusive_or_expression { $$ = $1; }
 	| inclusive_or_expression '|' exclusive_or_expression {}
 	;
 
 logical_and_expression
-	: inclusive_or_expression {}
+	: inclusive_or_expression { $$ = $1; }
 	| logical_and_expression AND_OP inclusive_or_expression {}
 	;
 
 logical_or_expression
-	: logical_and_expression {}
+	: logical_and_expression { $$ = $1; }
 	| logical_or_expression OR_OP logical_and_expression {}
 	;
 
 conditional_expression
-	: logical_or_expression {}
+	: logical_or_expression { $$ = $1; }
 	| logical_or_expression '?' expression ':' conditional_expression {}
 	;
 
 assignment_expression
-	: conditional_expression {}
-	| unary_expression assignment_operator assignment_expression {}
+	: conditional_expression { $$ = $1; }
+	| unary_expression assignment_operator assignment_expression { $$ = new AssignmentExpression(new Variable("int", "test"), $3); }
 	;
 
 assignment_operator
@@ -170,25 +175,25 @@ constant_expression
 	;
 
 declaration
-	: declaration_specifiers ';' {}
-	| declaration_specifiers init_declarator_list ';' {}
+	: declaration_specifiers ';' { $$ = $1; }
+	| declaration_specifiers init_declarator_list ';' { $$ = new Declaration($1, $2); }
 	;
 
 declaration_specifiers
 	: storage_class_specifier {}
 	| storage_class_specifier declaration_specifiers  {}
-	| type_specifier {}
+	| type_specifier { $$ = $1; }
 	| type_specifier declaration_specifiers {}
 	;
 
 init_declarator_list
-	: init_declarator {}
+	: init_declarator { $$ = $1; }
 	| init_declarator_list ',' init_declarator {}
 	;
 
 init_declarator
 	: declarator {}
-	| declarator '=' initializer {}
+	| declarator '=' initializer { $$ = new InitDeclarator($1, $3); }
 	;
 
 storage_class_specifier
@@ -198,7 +203,7 @@ storage_class_specifier
 type_specifier
 	: VOID {}
 	| CHAR {}
-	| INT {}
+	| INT { $$ = new TypeSpecifier("int"); }
 	| FLOAT {}
 	| DOUBLE {}
 	| UNSIGNED {}
@@ -261,11 +266,11 @@ enumerator
 
 declarator
 	: pointer direct_declarator {}
-	| direct_declarator {}
+	| direct_declarator { $$ = $1; }
 	;
 
 direct_declarator
-	: IDENTIFIER {}
+	: IDENTIFIER { $$ = new Identifier($1); }
 	| '(' declarator ')' {}
 	| direct_declarator '[' constant_expression ']' {}
 	| direct_declarator '[' ']' {}
@@ -323,7 +328,7 @@ direct_abstract_declarator
 	;
 
 initializer
-	: assignment_expression {}
+	: assignment_expression { $$ = $1; }
 	| '{' initializer_list '}' {}
 	| '{' initializer_list ',' '}' {}
 	;
@@ -391,13 +396,13 @@ jump_statement
 	;
 
 translation_unit
-	: external_declaration {}
+	: external_declaration { g_root = $1; }
 	| translation_unit external_declaration {}
 	;
 
 external_declaration
 	: function_definition {}
-	| declaration {}
+	| declaration { $$ = $1; }
 	;
 
 function_definition
@@ -408,6 +413,13 @@ function_definition
 	;
 
 %%
+
+const Node *parseAST()
+{
+	global_root=0;
+  	yyparse();
+  	return global_root;
+}
 
 //#include <stdio.h>
 //
