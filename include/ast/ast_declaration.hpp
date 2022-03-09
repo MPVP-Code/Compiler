@@ -35,7 +35,7 @@ private:
     Initializer *initializer;
 };
 
-class Identifier : DirectDeclarator {
+class Identifier : Node {
 private:
     const std::string *identifier;
 public:

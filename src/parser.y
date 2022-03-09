@@ -12,7 +12,7 @@ void yyerror(const char *);
 
 
 %union{
-  //const Node *node;
+  const Node *node;
   int number;
   std::string *string;
 }
@@ -29,8 +29,8 @@ void yyerror(const char *);
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR CONTINUE BREAK RETURN
 
-%type <expression> primary_expression postfix_expression unary_expression cast_expression multiplicative_expression additive_expression shift_expression relational_expression equality_expression and_expression exclusive_or_expression inclusive_or_expression logical_and_expression conditional_expression assignment_expression declaration declaration_specifiers init_declarator_list init_declarator logical_or_expression type_specifier declarator initializer direct_declarator translation_unit
-%type <expression> external_declaration expression
+%type <node> primary_expression postfix_expression unary_expression cast_expression multiplicative_expression additive_expression shift_expression relational_expression equality_expression and_expression exclusive_or_expression inclusive_or_expression logical_and_expression conditional_expression assignment_expression declaration declaration_specifiers init_declarator_list init_declarator logical_or_expression type_specifier declarator initializer direct_declarator translation_unit
+%type <node> external_declaration expression
 %type <number> CONSTANT
 %type <string> IDENTIFIER
 
@@ -148,7 +148,7 @@ conditional_expression
 
 assignment_expression
 	: conditional_expression { $$ = $1; }
-	| unary_expression assignment_operator assignment_expression { $$ = new AssignmentExpression(new Variable("int", "test"), $3); }
+	| unary_expression assignment_operator assignment_expression { }
 	;
 
 assignment_operator
@@ -396,7 +396,7 @@ jump_statement
 	;
 
 translation_unit
-	: external_declaration { g_root = $1; }
+	: external_declaration { global_root = $1; }
 	| translation_unit external_declaration {}
 	;
 
