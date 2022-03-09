@@ -69,3 +69,7 @@ fabric.properties
 /test_lexer/out
 
 *.log
+
+/test_compiler/*.s
+/test_compiler/*.o
+/test_compiler/test_ADD0
