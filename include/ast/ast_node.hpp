@@ -14,6 +14,7 @@ class Node
 {
 public:
     std::vector<std::shared_ptr<Node>> branches;
+    std::vector<int> allocated_branch_reg;
     std::string type;
 
     Node(){
@@ -25,11 +26,11 @@ public:
     }
 
     virtual double compile() const {
-        throw std::runtime_error("Node compile not implemented.");
+        throw std::runtime_error( this->type + "compile not implemented.");
     }
 
     virtual double print() const {
-        throw std::runtime_error("Node print not implemented.");
+        throw std::runtime_error(  this->type + " print not implemented.");
     }
 };
 

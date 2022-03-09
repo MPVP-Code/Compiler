@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CLionExternalBuildManager">
+    <target id="6e18ee70-19b1-41e8-8751-d6d73f67d3ab" name="lexertest" defaultType="MAKE">
+      <configuration id="3c5c9739-593f-41fb-a1f4-d328622e34d7" name="lexertest" toolchainName="Default">
+        <build type="MAKE">
+          <make targetName="lexertest" />
+        </build>
+        <clean type="MAKE">
+          <make targetName="clean" />
+        </clean>
+      </configuration>
+    </target>
+  </component>
+</project>
