@@ -52,6 +52,8 @@ public:
     virtual double print() const override{
         throw std::runtime_error("Global print not implemented.");
     }
+
+
 };
 
 #endif
