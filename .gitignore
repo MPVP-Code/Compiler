@@ -70,6 +70,5 @@ fabric.properties
 
 *.log
 
-/test_compiler/*.s
-/test_compiler/*.o
-/test_compiler/test_ADD0
+compiler_tests/*/*
+!compiler_tests/*/*.c
