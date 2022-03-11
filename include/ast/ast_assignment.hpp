@@ -16,7 +16,8 @@ public:
         this->type = "Assign";
     }
 };
-class Declare : Node {
+
+/*class Declare : Node {
 
 public:
     Variable *destination;
@@ -27,7 +28,7 @@ public:
         this->source = src;
         this->type = "Assign";
     }
-};
+};*/
 
 /*class Add : Node {
 private:

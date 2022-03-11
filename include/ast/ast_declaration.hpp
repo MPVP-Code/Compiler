@@ -12,10 +12,10 @@
 class Declarator : public Node {
 public:
     std::string *name;
-    Declarator(std::string *_name){
+
+    Declarator(std::string *_name) {
         this->name = _name;
         this->type = "declarator";
-
     }
 };
 

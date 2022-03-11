@@ -6,32 +6,17 @@
 
 #include "ast_node.hpp"
 
-class Type {
-    public:
-        std::string identifier;
-        int size;
-        Type(std::string _identifier, int _size){
-            this->identifier = _identifier;
-            this->size = _size;
-        }
-};
 
 class Variable : Node {
 protected:
-    Type* type;
+    std::string type;
     std::string name;
-
-public:
-    Variable(const std::string &_type, const std::string &_name) : type(_type), name(_name) {}
-};
-
-class Integer : Variable {
-private:
     int value;
 
 public:
-    Integer(const std::string &_name, int _value) : Variable("int", _name), value(_value) {}
+    Variable(const std::string &_type, const std::string &_name, int _value) : type(_type), name(_name), value(_value) {}
 };
+
 
 //class Struct : Variable {
 //public:

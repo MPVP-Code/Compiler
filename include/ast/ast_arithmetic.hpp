@@ -7,54 +7,50 @@
 
 #include "ast_node.hpp"
 
-class Addition : public Node
-{
+class Addition : public Node {
 public:
+    Node *R;
+    Node *L;
 
-    Addition(std::shared_ptr<Node> L, std::shared_ptr<Node> R){
+    Addition(Node *L, Node *R) {
         this->type = "Addition";
-        this->branches.push_back(L);
-        this->branches.push_back(R);
-
+        this->L = L;
+        this->R = R;
     }
 
 };
 
-class Subtraction : public Node
-{
+class Subtraction : public Node {
 public:
+    Node *R;
+    Node *L;
 
-    Subtraction(std::shared_ptr<Node> L, std::shared_ptr<Node> R){
+    Subtraction(Node *L, Node *R) {
         this->type = "Subtraction";
-        this->branches.push_back(L);
-        this->branches.push_back(R);
-
+        this->L = L;
+        this->R = R;
     }
 
 };
 
-class Multiplication : public Node
-{
+class Multiplication : public Node {
 public:
+    Node *R;
+    Node *L;
 
-    Multiplication(std::shared_ptr<Node> L, std::shared_ptr<Node> R){
-        this->type = "Addition";
-        this->branches.push_back(L);
-        this->branches.push_back(R);
-
+    Multiplication(Node *_L, Node *_R) : L(_L), R(_R) {
+        this->type = "Multiplication";
     }
 
 };
 
-class Division : public Node
-{
+class Division : public Node {
 public:
+    Node *R;
+    Node *L;
 
-    Division(std::shared_ptr<Node> L, std::shared_ptr<Node> R){
+    Division(Node *_L, Node *_R) : L(_L), R(_R) {
         this->type = "Division";
-        this->branches.push_back(L);
-        this->branches.push_back(R);
-
     }
 
 };

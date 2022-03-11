@@ -11,12 +11,12 @@
 class Function : public Scope
 {
 public:
-    Node *statements;
+    std::vector<Node*> statements;
     std::string return_type;
     std::string name;
 
 
-    Function(std::string _return_type, std::string _name, Node* _statements){
+    Function(std::string _return_type, std::string _name, std::vector<Node*> _statements){
         this->statements = _statements;
         this->type = "Function";
         this->name = _name;
