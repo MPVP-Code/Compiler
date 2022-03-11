@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
+#include <iomanip>
 
 class Scope : public Node
 {
@@ -77,7 +78,7 @@ public:
     static std::string intToHex(int i)
     {
         std::stringstream stream;
-        stream << "0x" << std::setfill ('0') << std::setw(sizeof(i) * 2) << std::hex << i;
+        stream << "0x" << std::setfill ('0') << std::setw(sizeof(i)) << std::hex << i;
         return stream.str();
     }
 

@@ -38,7 +38,7 @@ public:
     }
 
     virtual std::string compileToMIPS() const {
-        std::string result = this->name + "():\\n";
+        std::string result = this->name + "():\n";
 
         for (Node *statement : statements) {
             result += statement->compileToMIPS();

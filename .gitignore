@@ -72,3 +72,5 @@ fabric.properties
 
 compiler_tests/*/*
 !compiler_tests/*/*.c
+
+test_codegen/bin/*
