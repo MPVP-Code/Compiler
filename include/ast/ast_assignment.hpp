@@ -10,10 +10,20 @@ private:
     Node *source;
 
 public:
-    Assign(Variable *dest, Node *src){
+    Assign(Variable *dest, Node *src) {
         this->destination = dest;
         this->source = src;
         this->type = "Assign";
+    }
+};
+
+class Constant : Node {
+private:
+    int value;
+
+public:
+    Constant(int _value) : value(_value) {
+        this->type = "Constant";
     }
 };
 

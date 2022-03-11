@@ -11,10 +11,9 @@ class Variable : Node {
 protected:
     std::string type;
     std::string name;
-    int value;
 
 public:
-    Variable(const std::string &_type, const std::string &_name, int _value) : type(_type), name(_name), value(_value) {}
+    Variable(const std::string &_type, const std::string &_name) : type(_type), name(_name) {}
 };
 
 
