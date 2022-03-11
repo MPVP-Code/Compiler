@@ -8,12 +8,16 @@
 
 
 class Variable : Node {
-protected:
+private:
     std::string type;
     std::string name;
 
 public:
     Variable(const std::string &_type, const std::string &_name) : type(_type), name(_name) {}
+
+    std::string* getName() {
+        return &(this->name);
+    }
 };
 
 

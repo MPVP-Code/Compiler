@@ -15,15 +15,13 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(
-        sample1_test
-        src/sample1.cpp
-        src/sample1.h
-        test_unit/sample1_unittest.cpp
+        codegen_test
+        test_unit/codegen_test.cpp
 )
 target_link_libraries(
-        sample1_test
+        codegen_test
         gtest_main
 )
 
 include(GoogleTest)
-gtest_discover_tests(sample1_test)
+gtest_discover_tests(codegen_test)
