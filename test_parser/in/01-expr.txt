@@ -1,3 +1,9 @@
-int main {
+int main() {
 a = 49;
+b = 44;
+}
+
+int notmain() {
+c = 41;
+d = 40;
 }

@@ -276,7 +276,7 @@ declarator
 
 direct_declarator
 	: IDENTIFIER { $$ = $1;	}
-	//| direct_declarator '(' ')' {std::cout << "dd()";}
+	| direct_declarator '(' ')' {$$ = $1;}
 	//| '(' declarator ')' {}
 	//| direct_declarator '[' constant_expression ']' {}
 	//| direct_declarator '[' ']' {}
@@ -334,8 +334,8 @@ direct_abstract_declarator
 
 initializer
 	: assignment_expression {}
-	| '{' initializer_list '}' {}
-	| '{' initializer_list ',' '}' {}
+//	| '{' initializer_list '}' {}  //Array stuff
+//	| '{' initializer_list ',' '}' {}
 	;
 
 initializer_list
@@ -345,18 +345,18 @@ initializer_list
 
 statement
 	: expression_statement {$$ = $1; }
-//	| compound_statement {}
+	//| compound_statement {}
 //	| labeled_statement {}
 //	| selection_statement {}
 //	| iteration_statement {}
 //	| jump_statement {}
 	;
 
-labeled_statement
-	: IDENTIFIER ':' statement {}
-	| CASE constant_expression ':' statement {}
-	| DEFAULT ':' statement {}
-	;
+//labeled_statement
+//	: IDENTIFIER ':' statement {}
+//	| CASE constant_expression ':' statement {}
+//	| DEFAULT ':' statement {}
+//	;
 
 compound_statement
 	: '{' '}' { $$ = new std::vector<Node*>(); std::cout << "found empty statement\n";	}
@@ -378,10 +378,10 @@ statement_list
 					$$->push_back($1);
 				}
 			}
-//	| statement_list statement {
-//		$1->push_back($2);
-//		$$ = $1;
-//	}
+	| statement_list statement {
+		$1->push_back($2);
+		$$ = $1;
+	}
 
 	;
 
@@ -412,10 +412,11 @@ jump_statement
 
 translation_unit
 	: external_declaration { global_root = new Global();
+				$$ = global_root;
 				global_root->branches.push_back($1);
 				std::cout << "Found function\n";
 	 			}
-	// | translation_unit external_declaration {$2->push_branch($1);	std::cout << "Found another";	}
+	| translation_unit external_declaration {$1->branches.push_back($2);	std::cout << "Found another";	}
 	;
 
 external_declaration
@@ -425,7 +426,8 @@ external_declaration
 	;
 
 function_definition
-	: declaration_specifiers declarator compound_statement { std::cout<<"found function";
+	: declaration_specifiers declarator compound_statement {
+	std::cout<<"found function";
 	$$ = new Function(*$1,*$2,*$3);
 	}
 	//| declaration_specifiers declarator declaration_list compound_statement {}
