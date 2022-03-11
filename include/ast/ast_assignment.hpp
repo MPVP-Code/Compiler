@@ -4,7 +4,7 @@
 #include "ast_node.hpp"
 #include "ast_type.hpp"
 
-class Assign : Node {
+class Assign : public Node {
 private:
     Variable *destination;
     Node *source;
@@ -17,7 +17,7 @@ public:
     }
 };
 
-class Constant : Node {
+class Constant : public Node {
 private:
     int value;
 

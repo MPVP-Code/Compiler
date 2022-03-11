@@ -12,6 +12,7 @@
 #include "ast/ast_flow_control.hpp"
 #include "ast/ast_scope.hpp"
 #include "ast/ast_type.hpp"
+#include "ast/ast_arithmetic.hpp"
 
 
 extern const Node *parseAST();

@@ -20,7 +20,7 @@ public:
         this->statements = _statements;
         this->type = "Function";
         this->name = _name;
-        this->return_type = return_type;
+        this->return_type = _return_type;
     }
 
     virtual ~Function() {}

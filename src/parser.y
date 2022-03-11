@@ -12,10 +12,10 @@ void yyerror(const char *);
 
 
 %union{
-  const Node *node;
+  Node *node;
   int number;
   std::string *string;
-  Type* type;
+  std::vector<Node*>* statements;
 }
 
 %token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF
@@ -30,31 +30,34 @@ void yyerror(const char *);
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR CONTINUE BREAK RETURN
 
-%type <node> primary_expression postfix_expression unary_expression cast_expression multiplicative_expression additive_expression shift_expression relational_expression equality_expression and_expression exclusive_or_expression inclusive_or_expression logical_and_expression conditional_expression assignment_expression declaration declaration_specifiers init_declarator_list init_declarator logical_or_expression declarator initializer direct_declarator translation_unit
-%type <node> external_declaration expression function_definition compound_statement
-%type <number> CONSTANT
+%type <node>    multiplicative_expression additive_expression shift_expression relational_expression equality_expression and_expression exclusive_or_expression inclusive_or_expression logical_and_expression conditional_expression assignment_expression declaration init_declarator_list init_declarator logical_or_expression initializer translation_unit
+%type <node> external_declaration expression function_definition
+%type <node> statement expression_statement
+%type <string> CONSTANT
 %type <string> IDENTIFIER
-%type <type> type_specifier
+%type <string> type_specifier declaration_specifiers primary_expression postfix_expression direct_declarator declarator unary_expression
+%type <statements> compound_statement statement_list
+
 
 %start translation_unit
 %%
 
 primary_expression
-	: IDENTIFIER {}
-	| CONSTANT {}
-	| STRING_LITERAL {}
-	| '(' expression ')' {}
+	: IDENTIFIER { $$ = $1; std::cout << "found identifier\n" << *$1 << std::endl;}
+	| CONSTANT { $$ = $1; std::cout<<"Found const \n" << *$1 << std::endl;}
+//	| STRING_LITERAL {}
+//	| '(' expression ')' {}
 	;
 
 postfix_expression
-	: primary_expression {}
-	| postfix_expression '[' expression ']' {}
-	| postfix_expression '(' ')' {}
-	| postfix_expression '(' argument_expression_list ')' {}
-	| postfix_expression '.' IDENTIFIER {}
-	| postfix_expression PTR_OP IDENTIFIER {}
-	| postfix_expression INC_OP {}
-	| postfix_expression DEC_OP {}
+	: primary_expression {$$ = $1; }
+//	| postfix_expression '[' expression ']' {}
+//	| postfix_expression '(' ')' {}
+//	| postfix_expression '(' argument_expression_list ')' {}
+//	| postfix_expression '.' IDENTIFIER {}
+//	| postfix_expression PTR_OP IDENTIFIER {}
+//	| postfix_expression INC_OP {}
+//	| postfix_expression DEC_OP {}
 	;
 
 argument_expression_list
@@ -63,12 +66,12 @@ argument_expression_list
 	;
 
 unary_expression
-	: postfix_expression {}
-	| INC_OP unary_expression {}
-	| DEC_OP unary_expression {}
-	| unary_operator cast_expression {}
-	| SIZEOF unary_expression {}
-	| SIZEOF '(' type_name ')' {}
+	: postfix_expression {$$ = $1; std::cout<< "unary postfix expression\n";}
+//	| INC_OP unary_expression {}
+//	| DEC_OP unary_expression {}
+//	| unary_operator cast_expression {}
+//	| SIZEOF unary_expression {}
+//	| SIZEOF '(' type_name ')' {}
 	;
 
 unary_operator
@@ -80,96 +83,96 @@ unary_operator
 	| '!' {}
 	;
 
-cast_expression
-	: unary_expression {}
-	| '(' type_name ')' cast_expression {}
-	;
 
 multiplicative_expression
-	: cast_expression {}
-	| multiplicative_expression '*' cast_expression {}
-	| multiplicative_expression '/' cast_expression {}
-	| multiplicative_expression '%' cast_expression {}
+	: unary_expression {std::cout<< "unaryexp";
+	$$ = new Constant(std::stoi(*$1));}
+//	| multiplicative_expression '*' unary_expression {}
+//	| multiplicative_expression '/' unary_expression {}
+//	| multiplicative_expression '%' unary_expression {}
 	;
 
 additive_expression
-	: multiplicative_expression {}
-	| additive_expression '+' multiplicative_expression {}
-	| additive_expression '-' multiplicative_expression {}
+	: multiplicative_expression {$$ = $1;}
+	| additive_expression '+' multiplicative_expression {$$ = new Addition ($1, $3); }
+	| additive_expression '-' multiplicative_expression {$$ = new Subtraction ($1, $3);}
 	;
 
 shift_expression
-	: additive_expression {}
-	| shift_expression LEFT_OP additive_expression {}
-	| shift_expression RIGHT_OP additive_expression {}
+	: additive_expression {$$ = $1;}
+//	| shift_expression LEFT_OP additive_expression {}
+//	| shift_expression RIGHT_OP additive_expression {}
 	;
 
 relational_expression
-	: shift_expression {}
-	| relational_expression '<' shift_expression {}
-	| relational_expression '>' shift_expression {}
-	| relational_expression LE_OP shift_expression {}
-	| relational_expression GE_OP shift_expression {}
+	: shift_expression {$$ =$1;}
+//	| relational_expression '<' shift_expression {}
+//	| relational_expression '>' shift_expression {}
+//	| relational_expression LE_OP shift_expression {}
+//	| relational_expression GE_OP shift_expression {}
 	;
 
 equality_expression
-	: relational_expression {}
-	| equality_expression EQ_OP relational_expression {}
-	| equality_expression NE_OP relational_expression {}
+	: relational_expression {$$ = $1;}
+//	| equality_expression EQ_OP relational_expression {}
+//	| equality_expression NE_OP relational_expression {}
 	;
 
 and_expression
-	: equality_expression {}
+	: equality_expression {$$ = $1;}
 	| and_expression '&' equality_expression {}
 	;
 
 exclusive_or_expression
-	: and_expression {}
+	: and_expression {$$ = $1;}
 	| exclusive_or_expression '^' and_expression {}
 	;
 
 inclusive_or_expression
-	: exclusive_or_expression {}
+	: exclusive_or_expression {$$ = $1;}
 	| inclusive_or_expression '|' exclusive_or_expression {}
 	;
 
 logical_and_expression
-	: inclusive_or_expression {}
+	: inclusive_or_expression {$$ = $1;}
 	| logical_and_expression AND_OP inclusive_or_expression {}
 	;
 
 logical_or_expression
-	: logical_and_expression {}
+	: logical_and_expression {$$ = $1;}
 	| logical_or_expression OR_OP logical_and_expression {}
 	;
 
 conditional_expression
-	: logical_or_expression {}
-	| logical_or_expression '?' expression ':' conditional_expression {}
+	: logical_or_expression {$$ = $1; std::cout<< "found conditional expression\n"; }
+	//| logical_or_expression '?' expression ':' conditional_expression {}
 	;
 
 assignment_expression
-	: conditional_expression {}
-	| unary_expression assignment_operator assignment_expression { }
+	: unary_expression assignment_operator assignment_expression {
+		auto temp = new Variable("int", *$1);
+		$$ = new Assign(temp, $3);
+	 }
+	| conditional_expression {$$ = $1; }
 	;
 
 assignment_operator
-	: '=' {}
-	| MUL_ASSIGN {}
-	| DIV_ASSIGN {}
-	| MOD_ASSIGN {}
-	| ADD_ASSIGN {}
-	| SUB_ASSIGN {}
-	| LEFT_ASSIGN {}
-	| RIGHT_ASSIGN {}
-	| AND_ASSIGN {}
-	| XOR_ASSIGN {}
-	| OR_ASSIGN {}
+	: '=' { std::cout<<"Found = \n";}
+//	| MUL_ASSIGN {}
+//	| DIV_ASSIGN {}
+//	| MOD_ASSIGN {}
+//	| ADD_ASSIGN {}
+//	| SUB_ASSIGN {}
+//	| LEFT_ASSIGN {}
+//	| RIGHT_ASSIGN {}
+//	| AND_ASSIGN {}
+//	| XOR_ASSIGN {}
+//	| OR_ASSIGN {}
 	;
 
 expression
-	: assignment_expression {}
-	| expression ',' assignment_expression {}
+	: assignment_expression {$$ = $1;}
+	//| expression ',' assignment_expression {}
 	;
 
 constant_expression
@@ -182,10 +185,10 @@ declaration
 	;
 
 declaration_specifiers
-	: storage_class_specifier {}
-	| storage_class_specifier declaration_specifiers  {}
-	| type_specifier {$$ = $1;}
-	| type_specifier declaration_specifiers {}
+	: type_specifier {$$ = $1; std::cout<< "found type specifier\n"; }
+//	| storage_class_specifier declaration_specifiers  {}
+//	| storage_class_specifier {}
+//	| type_specifier declaration_specifiers {}
 	;
 
 init_declarator_list
@@ -203,16 +206,15 @@ storage_class_specifier
 	;
 
 type_specifier
-	: VOID {}
-	//| CHAR {}
-	| INT { $$ = new Type("int",4);
-	std::cout << "found typespecifier";}
-	//| FLOAT {}
-	//| DOUBLE {}
-	//| UNSIGNED {}
-	//| struct_or_union_specifier {}
-	//| enum_specifier {}
-	//| TYPE_NAME {}
+	: INT { $$ = new std::string("int");}
+//	| CHAR {}
+//	| VOID {}
+//	| FLOAT {}
+//	| DOUBLE {}
+//	| UNSIGNED {}
+//	| struct_or_union_specifier {}
+//	| enum_specifier {}
+//	| TYPE_NAME {}
 	;
 
 struct_or_union_specifier
@@ -268,22 +270,19 @@ enumerator
 	;
 
 declarator
-	: direct_declarator { std::cout << "declarator"; }
+	: direct_declarator { $$ = $1; std::cout << "found directcdeclarator\n"; }
 	//|  pointer direct_declarator {}
 	;
 
 direct_declarator
-	: IDENTIFIER { std::cout << "found identifier";
-		std::string *a = yylval.string;
-		$$ = new Declarator(a);
-	}
-		| direct_declarator '(' ')' {std::cout << "dd()";}
-		//| '(' declarator ')' {}
-		//| direct_declarator '[' constant_expression ']' {}
-		//| direct_declarator '[' ']' {}
-		//| direct_declarator '(' parameter_type_list ')' {}
-		//| direct_declarator '(' identifier_list ')' {}
-		;
+	: IDENTIFIER { $$ = $1;	}
+	//| direct_declarator '(' ')' {std::cout << "dd()";}
+	//| '(' declarator ')' {}
+	//| direct_declarator '[' constant_expression ']' {}
+	//| direct_declarator '[' ']' {}
+	//| direct_declarator '(' parameter_type_list ')' {}
+	//| direct_declarator '(' identifier_list ')' {}
+	;
 
 pointer
 	: '*' {}
@@ -345,12 +344,12 @@ initializer_list
 	;
 
 statement
-	: labeled_statement {}
-	| compound_statement {}
-	| expression_statement {}
-	| selection_statement {}
-	| iteration_statement {}
-	| jump_statement {}
+	: expression_statement {$$ = $1; }
+//	| compound_statement {}
+//	| labeled_statement {}
+//	| selection_statement {}
+//	| iteration_statement {}
+//	| jump_statement {}
 	;
 
 labeled_statement
@@ -360,8 +359,8 @@ labeled_statement
 	;
 
 compound_statement
-	: '{' '}' { std::cout << "declaratorxxxx"; }
-	| '{' statement_list '}' {std::cout << "declarator";}
+	: '{' '}' { $$ = new std::vector<Node*>(); std::cout << "found empty statement\n";	}
+	| '{' statement_list '}' {$$ = $2; std::cout << "found statement list\n"; }
 	//| '{' declaration_list '}' {}
 	//| '{' declaration_list statement_list '}' {}
 	;
@@ -372,13 +371,23 @@ declaration_list
 	;
 
 statement_list
-	: statement {std::cout << "statement";}
-	| statement_list statement {}
+	: statement {
+	std::cout << "found statement\n";
+		$$ = new std::vector<Node*>();
+				if ($1 != 0){
+					$$->push_back($1);
+				}
+			}
+//	| statement_list statement {
+//		$1->push_back($2);
+//		$$ = $1;
+//	}
+
 	;
 
 expression_statement
-	: ';' {std::cout << "exprstatement";}
-	| expression ';' {}
+	: ';' {$$ = 0;}
+	| expression ';' {$$ = $1;}
 	;
 
 selection_statement
@@ -402,9 +411,9 @@ jump_statement
 	;
 
 translation_unit
-	: external_declaration { //global_root = new Global();
-				//global_root->push_branch($1);
-				std::cout << "Found function";
+	: external_declaration { global_root = new Global();
+				global_root->branches.push_back($1);
+				std::cout << "Found function\n";
 	 			}
 	// | translation_unit external_declaration {$2->push_branch($1);	std::cout << "Found another";	}
 	;
@@ -416,8 +425,8 @@ external_declaration
 	;
 
 function_definition
-	: declaration_specifiers declarator compound_statement { std::cout<<"found func";
-	//$$ = new Function($2,$3);
+	: declaration_specifiers declarator compound_statement { std::cout<<"found function";
+	$$ = new Function(*$1,*$2,*$3);
 	}
 	//| declaration_specifiers declarator declaration_list compound_statement {}
 	//| declarator declaration_list compound_statement {}

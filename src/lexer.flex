@@ -45,14 +45,14 @@ extern "C" int fileno(FILE *stream);
 
 {L}({L}|{D})*		    { yylval.string = new std::string(yytext); return(IDENTIFIER); }
 
-0[xX]{H}+{IS}?		    {return(CONSTANT); }
-0{D}+{IS}?		        {return(CONSTANT); }
-{D}+{IS}?		        {return(CONSTANT); }
-L?'(\\.|[^\\'])+'	    {return(CONSTANT); }
+0[xX]{H}+{IS}?		    {std::cout<< "lexmatch 1\n"; yylval.string = new std::string(yytext); return(CONSTANT);  }
+0{D}+{IS}?		        { std::cout<< "lexmatch 2\n"; yylval.string = new std::string(yytext); return(CONSTANT);}
+{D}+{IS}?		        { std::cout<< "lexmatch 3\n"; yylval.string = new std::string(yytext); return(CONSTANT);}
+L?'(\\.|[^\\'])+'	    { std::cout<< "lexmatch 4\n"; yylval.string = new std::string(yytext); return(CONSTANT);}
 
-{D}+{E}{FS}?		    {yylval.number = (int) strtod(yytext, 0); return(CONSTANT); }
-{D}*"."{D}+({E})?{FS}?	{yylval.number = (int) strtod(yytext, 0); return(CONSTANT); }
-{D}+"."{D}*({E})?{FS}?	{yylval.number = (int) strtod(yytext, 0); return(CONSTANT); }
+{D}+{E}{FS}?		    {yylval.string = new std::string(yytext); return(CONSTANT); }
+{D}*"."{D}+({E})?{FS}?	{yylval.string = new std::string(yytext); return(CONSTANT); }
+{D}+"."{D}*({E})?{FS}?	{yylval.string = new std::string(yytext); return(CONSTANT); }
 
 L?\"(\\.|[^\\"])*\"	    {yylval.string =  new std::string(yytext); return(STRING_LITERAL);  }
 
