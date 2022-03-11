@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
 
 while (1){
     int s = yylex();
+    if
     std::cout << s << std::endl;
 }
 }

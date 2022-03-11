@@ -14,7 +14,7 @@ public:
     Addition(std::shared_ptr<Node> L, std::shared_ptr<Node> R){
         this->type = "Addition";
         this->branches.push_back(L);
-        this->branches.push_back(L);
+        this->branches.push_back(R);
 
     }
 
@@ -27,7 +27,7 @@ public:
     Subtraction(std::shared_ptr<Node> L, std::shared_ptr<Node> R){
         this->type = "Subtraction";
         this->branches.push_back(L);
-        this->branches.push_back(L);
+        this->branches.push_back(R);
 
     }
 
@@ -40,7 +40,7 @@ public:
     Multiplication(std::shared_ptr<Node> L, std::shared_ptr<Node> R){
         this->type = "Addition";
         this->branches.push_back(L);
-        this->branches.push_back(L);
+        this->branches.push_back(R);
 
     }
 
@@ -53,7 +53,7 @@ public:
     Division(std::shared_ptr<Node> L, std::shared_ptr<Node> R){
         this->type = "Division";
         this->branches.push_back(L);
-        this->branches.push_back(L);
+        this->branches.push_back(R);
 
     }
 

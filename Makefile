@@ -26,9 +26,14 @@ parser : src/parser.y  include/ast.hpp
 lexertest : parser lexer test_lexer/src/lexer_main.cpp
 	g++ $(CPPFLAGS) -o test_lexer/bin/lexer_test.o test_lexer/src/lexer_main.cpp build/lexer.yy.o
 
+parsertest : parser lexer test_parser/src/parser_main.cpp
+	g++ $(CPPFLAGS) -o test_parser/bin/parser_test.o test_parser/src/parser_main.cpp build/lexer.yy.o build/parser.tab.o
+
+
 clean :
 	rm -f src/*.o
 	rm -f bin/*
+	rm -f build/*
 	rm -f src/*.tab.cpp
 	rm -f src/*.tab.hpp
 	rm -f src/*.yy.cpp

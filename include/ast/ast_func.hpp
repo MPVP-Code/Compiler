@@ -6,15 +6,21 @@
 #define AST_FUNC_H
 
 #include "ast_node.hpp"
+#include "ast_scope.hpp"
 
-class Function : public Node
+class Function : public Scope
 {
 public:
-    std::vector<std::shared_ptr<Node>> parent_scope;
+    Node *statements;
+    std::string return_type;
+    std::string name;
 
 
-    Function(){
-        this->type = "Node";
+    Function(std::string _return_type, std::string _name, Node* _statements){
+        this->statements = _statements;
+        this->type = "Function";
+        this->name = _name;
+        this->return_type = return_type;
     }
 
     virtual ~Function() {}

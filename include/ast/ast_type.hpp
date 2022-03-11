@@ -6,20 +6,19 @@
 
 #include "ast_node.hpp"
 
-class TypeSpecifier : DeclarationSpecifiers {
-protected:
-    const std::string* name;
-public:
-    TypeSpecifier(const std::string* _name): name(_name) {}
-
-    virtual std::string to_string() const {
-        return "TypeSpecifier => (" + *this->name + ")";
-    }
+class Type {
+    public:
+        std::string identifier;
+        int size;
+        Type(std::string _identifier, int _size){
+            this->identifier = _identifier;
+            this->size = _size;
+        }
 };
 
 class Variable : Node {
 protected:
-    std::string type;
+    Type* type;
     std::string name;
 
 public:
@@ -34,10 +33,10 @@ public:
     Integer(const std::string &_name, int _value) : Variable("int", _name), value(_value) {}
 };
 
-class Struct : Variable {
-public:
-    std::vector<Variable> members;
-};
+//class Struct : Variable {
+//public:
+//    std::vector<Variable> members;
+//};
 
 
 #endif

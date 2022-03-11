@@ -4,6 +4,7 @@
 #include <vector>
 
 int yylex(void);
+YYSTYPE yylval;
 
 std::string token_to_string(yytokentype token){
     switch (token){

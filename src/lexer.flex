@@ -15,7 +15,7 @@ extern "C" int fileno(FILE *stream);
 
 #include <stdio.h>
 #include "parser.tab.hpp"
-YYSTYPE yylval;
+//YYSTYPE yylval;
 %}
 
 %%
@@ -107,10 +107,9 @@ L?\"(\\.|[^\\"])*\"	    {yylval.string =  new std::string(yytext); return(STRING
 
 %%
 
-//yywrap()
-//{
-//	return(1);
-//}
+//Bison needs yyerror to work
+void yyerror(char const* in){}
+
 
 //int check_type()
 //{

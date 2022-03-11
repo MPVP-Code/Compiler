@@ -12,12 +12,17 @@
 
 class Node {
 public:
-    std::vector<std::shared_ptr<Node>> branches;
+    std::vector<Node*>* branches;
     std::vector<int> allocated_branch_reg;
     std::string type;
 
     Node() {
         this->type = "Node";
+    }
+
+    //Casting may or may not result in a bad time
+    virtual void push_branch(const Node* in) const {
+        this->branches->push_back(const_cast<Node *>(in));
     }
 
     virtual std::string get_type() {

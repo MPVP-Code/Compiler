@@ -11,5 +11,15 @@
         </clean>
       </configuration>
     </target>
+    <target id="9fdf075f-9908-4bcd-8e8a-750ee7c92b52" name="parsertest" defaultType="MAKE">
+      <configuration id="a94647a7-864c-4902-bb34-8bb5d8432b24" name="parsertest" toolchainName="Default">
+        <build type="MAKE">
+          <make targetName="parsertest" />
+        </build>
+        <clean type="MAKE">
+          <make targetName="clean" />
+        </clean>
+      </configuration>
+    </target>
   </component>
 </project>

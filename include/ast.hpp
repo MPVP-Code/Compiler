@@ -14,6 +14,7 @@
 #include "ast/ast_type.hpp"
 
 
-//extern const Expression *parseAST();
+extern const Node *parseAST();
+//extern Node *global_root;
 
 #endif

@@ -7,10 +7,24 @@
 class Assign : Node {
 private:
     Variable *destination;
-    Node *value;
+    Node *source;
 
 public:
-    Assign(Variable *_destination, Node *_value) : destination(_destination), value(_value) {
+    Assign(Variable *dest, Node *src){
+        this->destination = dest;
+        this->source = src;
+        this->type = "Assign";
+    }
+};
+class Declare : Node {
+
+public:
+    Variable *destination;
+    Node *source;
+
+    Declare(Variable *dest, Node *src){
+        this->destination = dest;
+        this->source = src;
         this->type = "Assign";
     }
 };

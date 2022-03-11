@@ -21,6 +21,7 @@ public:
 
     Scope(){
         this->type = "Scope";
+        this->branches={};
     }
 
     //Has gettype

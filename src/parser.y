@@ -3,7 +3,7 @@
 
 #include <cassert>
 
-extern const Node* global_root; // A way of getting the AST out
+extern Node* global_root; // A way of getting the AST out
 
 int yylex(void);
 void yyerror(const char *);
@@ -15,6 +15,7 @@ void yyerror(const char *);
   const Node *node;
   int number;
   std::string *string;
+  Type* type;
 }
 
 %token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF
@@ -29,23 +30,24 @@ void yyerror(const char *);
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR CONTINUE BREAK RETURN
 
-%type <node> primary_expression postfix_expression unary_expression cast_expression multiplicative_expression additive_expression shift_expression relational_expression equality_expression and_expression exclusive_or_expression inclusive_or_expression logical_and_expression conditional_expression assignment_expression declaration declaration_specifiers init_declarator_list init_declarator logical_or_expression type_specifier declarator initializer direct_declarator translation_unit
-%type <node> external_declaration expression
+%type <node> primary_expression postfix_expression unary_expression cast_expression multiplicative_expression additive_expression shift_expression relational_expression equality_expression and_expression exclusive_or_expression inclusive_or_expression logical_and_expression conditional_expression assignment_expression declaration declaration_specifiers init_declarator_list init_declarator logical_or_expression declarator initializer direct_declarator translation_unit
+%type <node> external_declaration expression function_definition compound_statement
 %type <number> CONSTANT
 %type <string> IDENTIFIER
+%type <type> type_specifier
 
 %start translation_unit
 %%
 
 primary_expression
 	: IDENTIFIER {}
-	| CONSTANT { $$ = new Constant($1); }
+	| CONSTANT {}
 	| STRING_LITERAL {}
 	| '(' expression ')' {}
 	;
 
 postfix_expression
-	: primary_expression { $$ = $1; }
+	: primary_expression {}
 	| postfix_expression '[' expression ']' {}
 	| postfix_expression '(' ')' {}
 	| postfix_expression '(' argument_expression_list ')' {}
@@ -61,7 +63,7 @@ argument_expression_list
 	;
 
 unary_expression
-	: postfix_expression { $$ = $1; }
+	: postfix_expression {}
 	| INC_OP unary_expression {}
 	| DEC_OP unary_expression {}
 	| unary_operator cast_expression {}
@@ -79,31 +81,31 @@ unary_operator
 	;
 
 cast_expression
-	: unary_expression { $$ = $1; }
+	: unary_expression {}
 	| '(' type_name ')' cast_expression {}
 	;
 
 multiplicative_expression
-	: cast_expression { $$ = $1; }
+	: cast_expression {}
 	| multiplicative_expression '*' cast_expression {}
 	| multiplicative_expression '/' cast_expression {}
 	| multiplicative_expression '%' cast_expression {}
 	;
 
 additive_expression
-	: multiplicative_expression { $$ = $1; }
+	: multiplicative_expression {}
 	| additive_expression '+' multiplicative_expression {}
 	| additive_expression '-' multiplicative_expression {}
 	;
 
 shift_expression
-	: additive_expression { $$ = $1; }
+	: additive_expression {}
 	| shift_expression LEFT_OP additive_expression {}
 	| shift_expression RIGHT_OP additive_expression {}
 	;
 
 relational_expression
-	: shift_expression { $$ = $1; }
+	: shift_expression {}
 	| relational_expression '<' shift_expression {}
 	| relational_expression '>' shift_expression {}
 	| relational_expression LE_OP shift_expression {}
@@ -111,43 +113,43 @@ relational_expression
 	;
 
 equality_expression
-	: relational_expression { $$ = $1; }
+	: relational_expression {}
 	| equality_expression EQ_OP relational_expression {}
 	| equality_expression NE_OP relational_expression {}
 	;
 
 and_expression
-	: equality_expression { $$ = $1; }
+	: equality_expression {}
 	| and_expression '&' equality_expression {}
 	;
 
 exclusive_or_expression
-	: and_expression { $$ = $1; }
+	: and_expression {}
 	| exclusive_or_expression '^' and_expression {}
 	;
 
 inclusive_or_expression
-	: exclusive_or_expression { $$ = $1; }
+	: exclusive_or_expression {}
 	| inclusive_or_expression '|' exclusive_or_expression {}
 	;
 
 logical_and_expression
-	: inclusive_or_expression { $$ = $1; }
+	: inclusive_or_expression {}
 	| logical_and_expression AND_OP inclusive_or_expression {}
 	;
 
 logical_or_expression
-	: logical_and_expression { $$ = $1; }
+	: logical_and_expression {}
 	| logical_or_expression OR_OP logical_and_expression {}
 	;
 
 conditional_expression
-	: logical_or_expression { $$ = $1; }
+	: logical_or_expression {}
 	| logical_or_expression '?' expression ':' conditional_expression {}
 	;
 
 assignment_expression
-	: conditional_expression { $$ = $1; }
+	: conditional_expression {}
 	| unary_expression assignment_operator assignment_expression { }
 	;
 
@@ -175,25 +177,25 @@ constant_expression
 	;
 
 declaration
-	: declaration_specifiers ';' { $$ = $1; }
-	| declaration_specifiers init_declarator_list ';' { $$ = new Declaration($1, $2); }
+	: declaration_specifiers ';' {}
+	| declaration_specifiers init_declarator_list ';' {}
 	;
 
 declaration_specifiers
 	: storage_class_specifier {}
 	| storage_class_specifier declaration_specifiers  {}
-	| type_specifier { $$ = $1; }
+	| type_specifier {$$ = $1;}
 	| type_specifier declaration_specifiers {}
 	;
 
 init_declarator_list
-	: init_declarator { $$ = $1; }
+	: init_declarator {}
 	| init_declarator_list ',' init_declarator {}
 	;
 
 init_declarator
 	: declarator {}
-	| declarator '=' initializer { $$ = new InitDeclarator($1, $3); }
+	| declarator '=' initializer {}
 	;
 
 storage_class_specifier
@@ -202,14 +204,15 @@ storage_class_specifier
 
 type_specifier
 	: VOID {}
-	| CHAR {}
-	| INT { $$ = new TypeSpecifier("int"); }
-	| FLOAT {}
-	| DOUBLE {}
-	| UNSIGNED {}
-	| struct_or_union_specifier {}
-	| enum_specifier {}
-	| TYPE_NAME {}
+	//| CHAR {}
+	| INT { $$ = new Type("int",4);
+	std::cout << "found typespecifier";}
+	//| FLOAT {}
+	//| DOUBLE {}
+	//| UNSIGNED {}
+	//| struct_or_union_specifier {}
+	//| enum_specifier {}
+	//| TYPE_NAME {}
 	;
 
 struct_or_union_specifier
@@ -265,19 +268,22 @@ enumerator
 	;
 
 declarator
-	: pointer direct_declarator {}
-	| direct_declarator { $$ = $1; }
+	: direct_declarator { std::cout << "declarator"; }
+	//|  pointer direct_declarator {}
 	;
 
 direct_declarator
-	: IDENTIFIER { $$ = new Identifier($1); }
-	| '(' declarator ')' {}
-	| direct_declarator '[' constant_expression ']' {}
-	| direct_declarator '[' ']' {}
-	| direct_declarator '(' parameter_type_list ')' {}
-	| direct_declarator '(' identifier_list ')' {}
-	| direct_declarator '(' ')' {}
-	;
+	: IDENTIFIER { std::cout << "found identifier";
+		std::string *a = yylval.string;
+		$$ = new Declarator(a);
+	}
+		| direct_declarator '(' ')' {std::cout << "dd()";}
+		//| '(' declarator ')' {}
+		//| direct_declarator '[' constant_expression ']' {}
+		//| direct_declarator '[' ']' {}
+		//| direct_declarator '(' parameter_type_list ')' {}
+		//| direct_declarator '(' identifier_list ')' {}
+		;
 
 pointer
 	: '*' {}
@@ -328,7 +334,7 @@ direct_abstract_declarator
 	;
 
 initializer
-	: assignment_expression { $$ = $1; }
+	: assignment_expression {}
 	| '{' initializer_list '}' {}
 	| '{' initializer_list ',' '}' {}
 	;
@@ -354,10 +360,10 @@ labeled_statement
 	;
 
 compound_statement
-	: '{' '}' {}
-	| '{' statement_list '}' {}
-	| '{' declaration_list '}' {}
-	| '{' declaration_list statement_list '}' {}
+	: '{' '}' { std::cout << "declaratorxxxx"; }
+	| '{' statement_list '}' {std::cout << "declarator";}
+	//| '{' declaration_list '}' {}
+	//| '{' declaration_list statement_list '}' {}
 	;
 
 declaration_list
@@ -366,12 +372,12 @@ declaration_list
 	;
 
 statement_list
-	: statement {}
+	: statement {std::cout << "statement";}
 	| statement_list statement {}
 	;
 
 expression_statement
-	: ';' {}
+	: ';' {std::cout << "exprstatement";}
 	| expression ';' {}
 	;
 
@@ -396,23 +402,34 @@ jump_statement
 	;
 
 translation_unit
-	: external_declaration { global_root = $1; }
-	| translation_unit external_declaration {}
+	: external_declaration { //global_root = new Global();
+				//global_root->push_branch($1);
+				std::cout << "Found function";
+	 			}
+	// | translation_unit external_declaration {$2->push_branch($1);	std::cout << "Found another";	}
 	;
 
 external_declaration
-	: function_definition {}
-	| declaration { $$ = $1; }
+	: function_definition { std::cout << "found funcdef";
+	$$ = $1;}
+	//| declaration {$$ = $1;}
 	;
 
 function_definition
-	: declaration_specifiers declarator declaration_list compound_statement {}
-	| declaration_specifiers declarator compound_statement {}
-	| declarator declaration_list compound_statement {}
-	| declarator compound_statement {}
+	: declaration_specifiers declarator compound_statement { std::cout<<"found func";
+	//$$ = new Function($2,$3);
+	}
+	//| declaration_specifiers declarator declaration_list compound_statement {}
+	//| declarator declaration_list compound_statement {}
+	//| declarator compound_statement {}
 	;
 
 %%
+#include <stdio.h>
+
+extern char yytext[];
+
+Node* global_root;
 
 const Node *parseAST()
 {
@@ -421,14 +438,8 @@ const Node *parseAST()
   	return global_root;
 }
 
-//#include <stdio.h>
-//
-//extern char yytext[];
-//extern int column;
-//
-//yyerror(s)
-//char *s;
-//{
-//	fflush(stdout);
-//	printf("\n%*s\n%*s\n", column, "^", column, s);
-//}
+
+void yyerror(char *s){
+	fflush(stdout);
+	printf("\n%*s\n%*s\n", "^", s);
+}
