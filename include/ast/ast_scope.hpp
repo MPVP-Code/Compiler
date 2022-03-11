@@ -60,19 +60,19 @@ public:
     }
 
     static void initCurrentRegister() {
-        Global::currentRegister = 2;
+        currentRegister = 2;
     }
 
     static int getRegisterNumberForVariable(std::string *variable) {
-        return 2;
-        /*auto iterator = registersMapping.find(*variable);
+        int result = currentRegister;
+        auto iterator = registersMapping.find(*variable);
         if (iterator == registersMapping.end()) {
             registersMapping.insert(std::pair<std::string, int>(*variable, currentRegister));
-            currentRegister++;
         } else {
             result = iterator->second;
         }
-        return result;*/
+        currentRegister++;
+        return result;
     }
 
     static std::string intToHex(int i)
@@ -84,6 +84,9 @@ public:
 
 };
 
+int Global::currentRegister = 0;
+std::unordered_map<std::string, int> map;
+std::unordered_map<std::string, int> Global::registersMapping = map;
 #endif
 
 
