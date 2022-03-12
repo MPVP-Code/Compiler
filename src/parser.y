@@ -30,13 +30,13 @@ void yyerror(const char *);
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR CONTINUE BREAK RETURN
 
-%type <node>    multiplicative_expression additive_expression shift_expression relational_expression equality_expression and_expression exclusive_or_expression inclusive_or_expression logical_and_expression conditional_expression assignment_expression declaration init_declarator_list init_declarator logical_or_expression initializer translation_unit
-%type <node> external_declaration expression function_definition
+%type <node>  multiplicative_expression additive_expression shift_expression relational_expression equality_expression and_expression exclusive_or_expression inclusive_or_expression logical_and_expression conditional_expression assignment_expression logical_or_expression initializer translation_unit
+%type <node>  expression function_definition
 %type <node> statement expression_statement
 %type <string> CONSTANT
 %type <string> IDENTIFIER
 %type <string> type_specifier declaration_specifiers primary_expression postfix_expression direct_declarator declarator unary_expression
-%type <statements> compound_statement statement_list
+%type <statements> compound_statement statement_list external_declaration declaration init_declarator_list init_declarator
 
 
 %start translation_unit
@@ -150,7 +150,7 @@ conditional_expression
 
 assignment_expression
 	: unary_expression assignment_operator assignment_expression {
-		auto temp = new Variable("int", *$1);
+		auto temp = new Variable("int", *$1, false);
 		$$ = new Assign(temp, $3);
 	 }
 	| conditional_expression {$$ = $1; }
@@ -180,25 +180,48 @@ constant_expression
 	;
 
 declaration
-	: declaration_specifiers ';' {}
-	| declaration_specifiers init_declarator_list ';' {}
+	: declaration_specifiers init_declarator_list ';' { // Set type of all assignments
+		for (auto statement : *$2){
+			if(statement -> type == "Variable"){
+				auto temp = (Variable*) statement;
+				if (temp->declaration){
+					temp->variable_type = *$1;
+				}
+			}
+		}
+		$$ = $2;
+
+	}
+//	| declaration_specifiers ';' {}
 	;
 
 declaration_specifiers
 	: type_specifier {$$ = $1; std::cout<< "found type specifier\n"; }
+	| type_specifier declaration_specifiers {}
 //	| storage_class_specifier declaration_specifiers  {}
 //	| storage_class_specifier {}
-//	| type_specifier declaration_specifiers {}
 	;
 
 init_declarator_list
-	: init_declarator {}
-	| init_declarator_list ',' init_declarator {}
+	: init_declarator {$$ = $1;}
+	| init_declarator_list ',' init_declarator {$1->insert($1->end(), $3->begin(), $3->end());
+						delete $3;
+						}
 	;
 
 init_declarator
-	: declarator {}
-	| declarator '=' initializer {}
+	: declarator {$$ = new std::vector<Node*>;
+			auto temp = new Variable("None", *$1, true);
+			$$-> push_back(temp);
+	}
+	| declarator '=' initializer {
+			$$ = new std::vector<Node*>;
+			auto temp = new Variable("None", *$1, true);
+			$$-> push_back(temp);
+			auto temp2 = new Assign(temp, $3);
+			$$-> push_back(temp2);
+
+	}
 	;
 
 storage_class_specifier
@@ -412,23 +435,27 @@ jump_statement
 
 translation_unit
 	: external_declaration { global_root = new Global();
-				$$ = global_root;
-				global_root->branches.push_back($1);
+				global_root->branches.insert(global_root->branches.end(), $1->begin(), $1->end());
 				std::cout << "Found function\n";
 	 			}
-	| translation_unit external_declaration {$1->branches.push_back($2);	std::cout << "Found another";	}
+	| translation_unit external_declaration {
+				global_root->branches.insert(global_root->branches.end(), $2->begin(), $2->end());
+				std::cout << "Found another";
+				}
 	;
 
 external_declaration
-	: function_definition { std::cout << "found funcdef";
+	: function_definition { $$ = new std::vector<Node*>();
+	$$->push_back($1);
+	std::cout << "found funcdef\n";}
+	| declaration {
 	$$ = $1;}
-	//| declaration {$$ = $1;}
 	;
 
 function_definition
 	: declaration_specifiers declarator compound_statement {
 	std::cout<<"found function";
-	$$ = new Function(*$1,*$2,*$3);
+	$$ = new FunctionDeclaration(*$1,*$2,*$3);
 	}
 	//| declaration_specifiers declarator declaration_list compound_statement {}
 	//| declarator declaration_list compound_statement {}

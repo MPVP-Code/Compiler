@@ -8,7 +8,7 @@
 #include "ast_node.hpp"
 #include "ast_scope.hpp"
 
-class Function : public Scope
+class FunctionDeclaration : public Scope
 {
 public:
     std::vector<Node*> statements;
@@ -16,14 +16,14 @@ public:
     std::string name;
 
 
-    Function(std::string _return_type, std::string _name, std::vector<Node*> _statements){
+    FunctionDeclaration(std::string _return_type, std::string _name, std::vector<Node*> _statements){
         this->statements = _statements;
         this->type = "Function";
         this->name = _name;
         this->return_type = _return_type;
     }
 
-    virtual ~Function() {}
+    virtual ~FunctionDeclaration() {}
 
     virtual std::string get_type(){
         return this->type;
@@ -45,6 +45,17 @@ public:
         }
 
         return result;
+    }
+};
+
+class FunctionCall : public Node {
+public:
+    std::string function_name;
+
+    FunctionCall(std::string _function_name, std::vector<Node*> arguments){
+        this->function_name =  function_name;
+        this->branches  =  arguments;
+
     }
 };
 

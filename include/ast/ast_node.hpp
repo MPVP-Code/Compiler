@@ -15,6 +15,7 @@ public:
     std::vector<Node*> branches;
     std::vector<int> allocated_branch_reg;
     std::string type;
+    std::string data_type;
 
     Node() {
         this->type = "Node";
@@ -38,6 +39,10 @@ public:
 
     virtual std::string compileToMIPS() const {
         throw std::runtime_error(  this->type + " compileToMIPS not implemented.");
+    }
+
+    void virtual generate_var_maps(){
+        std::cout<<"gen varmaps not overridden\n";
     }
 };
 

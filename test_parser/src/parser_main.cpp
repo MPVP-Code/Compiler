@@ -1,5 +1,5 @@
 //
-// Created by michal on 9. 3. 2022.
+// Created by Michal on 9. 3. 2022.
 //
 #include "../../include/ast.hpp"
 int main(){

@@ -29,36 +29,17 @@ public:
         this->type = "Assign";
     }
 
-    std::string compileToMIPS() const override {
-        std::string result = "";
-        if (source->type == "Constant") {
-            Constant *constant = (Constant*) source;
-            std::string hexValue = Global::intToHex(constant->getValue());
-            int registerNumber = Global::getRegisterNumberForVariable(destination->getName());
-            result = "li $" + std::to_string(registerNumber) + ", " + hexValue;
-        }
-
-        return result;
-    }
+//    std::string compileToMIPS() const override {
+//        std::string result = "";
+//        if (source->type == "Constant") {
+//            Constant *constant = (Constant*) source;
+//            std::string hexValue = Global::intToHex(constant->getValue());
+//            int registerNumber = Global::getRegisterNumberForVariable(destination->getName());
+//            result = "li $" + std::to_string(registerNumber) + ", " + hexValue;
+//        }
+//
+//        return result;
+//    }
 };
-
-/*class Declare : Node {
-
-public:
-    Variable *destination;
-    Node *source;
-
-    Declare(Variable *dest, Node *src){
-        this->destination = dest;
-        this->source = src;
-        this->type = "Assign";
-    }
-};*/
-
-/*class Add : Node {
-private:
-    Variable *destination;
-    Node *value;
-};*/
 
 #endif

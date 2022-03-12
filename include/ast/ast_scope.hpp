@@ -35,13 +35,15 @@ public:
     virtual double print() const override{
         throw std::runtime_error("Scope compile print not implemented.");
     }
+
+
 };
 
 class Global : public Scope
 {
-private:
-    static std::unordered_map<std::string, int> registersMapping;
-    static int currentRegister;
+//private:
+//    static std::unordered_map<std::string, int> registersMapping;
+//    static int currentRegister;
 public:
     //Inherits branches & type
 
@@ -49,44 +51,44 @@ public:
         this->type = "Global";
     }
 
-    //Has gettype
+//    //Has gettype
+//
+//    virtual double compile() const override{
+//        throw std::runtime_error("Global compile not implemented.");
+//    }
+//
+//    virtual double print() const override{
+//        throw std::runtime_error("Global print not implemented.");
+//    }
+//
+//    static void initCurrentRegister() {
+//        currentRegister = 2;
+//    }
 
-    virtual double compile() const override{
-        throw std::runtime_error("Global compile not implemented.");
-    }
+//    static int getRegisterNumberForVariable(std::string *variable) {
+//        int result = currentRegister;
+//        auto iterator = registersMapping.find(*variable);
+//        if (iterator == registersMapping.end()) {
+//            registersMapping.insert(std::pair<std::string, int>(*variable, currentRegister));
+//        } else {
+//            result = iterator->second;
+//        }
+//        currentRegister++;
+//        return result;
+//    }
 
-    virtual double print() const override{
-        throw std::runtime_error("Global print not implemented.");
-    }
-
-    static void initCurrentRegister() {
-        currentRegister = 2;
-    }
-
-    static int getRegisterNumberForVariable(std::string *variable) {
-        int result = currentRegister;
-        auto iterator = registersMapping.find(*variable);
-        if (iterator == registersMapping.end()) {
-            registersMapping.insert(std::pair<std::string, int>(*variable, currentRegister));
-        } else {
-            result = iterator->second;
-        }
-        currentRegister++;
-        return result;
-    }
-
-    static std::string intToHex(int i)
-    {
-        std::stringstream stream;
-        stream << "0x" << std::setfill ('0') << std::setw(sizeof(i)) << std::hex << i;
-        return stream.str();
-    }
+//    static std::string intToHex(int i)
+//    {
+//        std::stringstream stream;
+//        stream << "0x" << std::setfill ('0') << std::setw(sizeof(i)) << std::hex << i;
+//        return stream.str();
+//    }
 
 };
 
-int Global::currentRegister = 0;
-std::unordered_map<std::string, int> map;
-std::unordered_map<std::string, int> Global::registersMapping = map;
+//int Global::currentRegister = 0;
+//std::unordered_map<std::string, int> map;
+//std::unordered_map<std::string, int> Global::registersMapping = map;
 #endif
 
 
