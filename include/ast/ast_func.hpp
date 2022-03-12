@@ -36,6 +36,16 @@ public:
     virtual double print() const {
         throw std::runtime_error("Print not implemented.");
     }
+
+    virtual std::string compileToMIPS() const {
+        std::string result = this->name + "():\n";
+
+        for (Node *statement : statements) {
+            result += statement->compileToMIPS();
+        }
+
+        return result;
+    }
 };
 
 #endif

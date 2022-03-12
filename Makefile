@@ -29,6 +29,8 @@ lexertest : parser lexer test_lexer/src/lexer_main.cpp
 parsertest : parser lexer test_parser/src/parser_main.cpp
 	g++ $(CPPFLAGS) -o test_parser/bin/parser_test.o test_parser/src/parser_main.cpp build/lexer.yy.o build/parser.tab.o
 
+codegentest : test_codegen/src/codegen_main.cpp
+	g++ $(CPPFLAGS) -o test_codegen/bin/codegen_main test_codegen/src/codegen_main.cpp
 
 clean :
 	rm -f src/*.o

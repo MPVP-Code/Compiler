@@ -35,6 +35,10 @@ public:
     virtual std::string to_string() const {
         throw std::runtime_error("Node print not implemented.");
     }
+
+    virtual std::string compileToMIPS() const {
+        throw std::runtime_error(  this->type + " compileToMIPS not implemented.");
+    }
 };
 
 #endif
