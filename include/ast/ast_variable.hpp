@@ -7,7 +7,6 @@
 #include "ast_node.hpp"
 
 
-
 class Variable : public Node {
 public:
     std::string variable_type;
@@ -18,9 +17,9 @@ public:
         this->type = "Variable";
     }
 
-//    std::string* getName() {
-//        return &(this->name);
-//    }
+    std::string* getName() {
+        return &(this->name);
+    }
 
 
 

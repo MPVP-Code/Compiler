@@ -45,9 +45,10 @@ public:
         std::string result = this->name + "():\n";
 
         for (Node *statement : statements) {
-            result += statement->compileToMIPS();
+            result += statement->compileToMIPS() + "\n";
         }
 
+        result += "jr $31\nnop";
         return result;
     }
 };

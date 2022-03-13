@@ -1,11 +1,10 @@
 #ifndef AST_ASSIGNMENT_H
 #define AST_ASSIGNMENT_H
 
-//#include "../ast.hpp"
 #include "ast_variable.hpp"
 #include "ast_scope.hpp"
+#include "../register_allocator.hpp"
 #include <string>
-
 
 
 class Constant : public Node {
@@ -32,29 +31,29 @@ public:
         this->type = "Assign";
     }
 
-    void generate_var_maps(Scope* parent) override {
+    void generate_var_maps(Scope *parent) override {
         if (this->destination->declaration) {
             parent->var_map[destination->name] = destination;
 
         } else {
-            Variable* old_destination = this->destination;
+            Variable *old_destination = this->destination;
             this->destination = parent->var_map[old_destination->name];
             delete old_destination;
         }
         source->generate_var_maps(parent);
     }
 
-//    std::string compileToMIPS() const override {
-//        std::string result = "";
-//        if (source->type == "Constant") {
-//            Constant *constant = (Constant*) source;
-//            std::string hexValue = Global::intToHex(constant->getValue());
-//            int registerNumber = Global::getRegisterNumberForVariable(destination->getName());
-//            result = "li $" + std::to_string(registerNumber) + ", " + hexValue;
-//        }
-//
-//        return result;
-//    }
+    std::string compileToMIPS() const override {
+        std::string result = "";
+        if (source->type == "Constant") {
+            Constant *constant = (Constant *) source;
+            std::string hexValue = RegisterAllocator::intToHex(constant->getValue());
+            int registerNumber = RegisterAllocator::getRegisterNumberForVariable(destination->getName());
+            result = "li $" + std::to_string(registerNumber) + ", " + hexValue;
+        } else if (source->type == "Addition")
+
+        return result;
+    }
 };
 
 #endif

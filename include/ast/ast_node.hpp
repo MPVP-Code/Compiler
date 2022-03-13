@@ -16,7 +16,7 @@ class Scope;
 
 class Node {
 public:
-    std::vector<Node*> branches;
+    std::vector<Node *> branches;
     std::string data_type;
 
     //Node disambiguation for pointer casting
@@ -33,11 +33,11 @@ public:
     }
 
     virtual double compile() const {
-        throw std::runtime_error( this->type + "compile not implemented.");
+        throw std::runtime_error(this->type + "compile not implemented.");
     }
 
     virtual double print() const {
-        throw std::runtime_error(  this->type + " print not implemented.");
+        throw std::runtime_error(this->type + " print not implemented.");
     }
 
     virtual std::string to_string() const {
@@ -45,15 +45,13 @@ public:
     }
 
     virtual std::string compileToMIPS() const {
-        throw std::runtime_error(  this->type + " compileToMIPS not implemented.");
+        throw std::runtime_error(this->type + " compileToMIPS not implemented.");
     }
 
-    virtual void generate_var_maps(Scope* parent){
-        std::cout<<"gen varmaps not overridden\n";
+    virtual void generate_var_maps(Scope *parent) {
+        std::cout << "gen varmaps not overridden\n";
     }
 };
-
-
 
 
 #endif
