@@ -3,7 +3,7 @@
 
 #include <cassert>
 
-extern Node* global_root; // A way of getting the AST out
+extern Global* global_root; // A way of getting the AST out
 
 int yylex(void);
 void yyerror(const char *);
@@ -33,9 +33,10 @@ void yyerror(const char *);
 %type <node>  multiplicative_expression additive_expression shift_expression relational_expression equality_expression and_expression exclusive_or_expression inclusive_or_expression logical_and_expression conditional_expression assignment_expression logical_or_expression initializer translation_unit
 %type <node>  expression function_definition
 %type <node> statement expression_statement
+%type <node> primary_expression postfix_expression unary_expression
 %type <string> CONSTANT
 %type <string> IDENTIFIER
-%type <string> type_specifier declaration_specifiers primary_expression postfix_expression direct_declarator declarator unary_expression
+%type <string> type_specifier declaration_specifiers  direct_declarator declarator
 %type <statements> compound_statement statement_list external_declaration declaration init_declarator_list init_declarator
 
 
@@ -43,8 +44,8 @@ void yyerror(const char *);
 %%
 
 primary_expression
-	: IDENTIFIER { $$ = $1; std::cout << "found identifier\n" << *$1 << std::endl;}
-	| CONSTANT { $$ = $1; std::cout<<"Found const \n" << *$1 << std::endl;}
+	: IDENTIFIER { $$ = new Identifier(*$1); std::cout << "found identifier\n" << *$1 << std::endl;}
+	| CONSTANT { $$ = new Constant(std::stoi(*$1)); std::cout<<"Found const \n" << *$1 << std::endl;}
 //	| STRING_LITERAL {}
 //	| '(' expression ')' {}
 	;
@@ -85,8 +86,10 @@ unary_operator
 
 
 multiplicative_expression
-	: unary_expression {std::cout<< "unaryexp";
-	$$ = new Constant(std::stoi(*$1));}
+	: unary_expression {
+		if($1->type == "Identifier"){
+		$$ = new Variable ("None", ((Identifier*)$1)->identifier, false); }
+		}
 //	| multiplicative_expression '*' unary_expression {}
 //	| multiplicative_expression '/' unary_expression {}
 //	| multiplicative_expression '%' unary_expression {}
@@ -120,27 +123,27 @@ equality_expression
 
 and_expression
 	: equality_expression {$$ = $1;}
-	| and_expression '&' equality_expression {}
+	//| and_expression '&' equality_expression {}
 	;
 
 exclusive_or_expression
 	: and_expression {$$ = $1;}
-	| exclusive_or_expression '^' and_expression {}
+	//| exclusive_or_expression '^' and_expression {}
 	;
 
 inclusive_or_expression
 	: exclusive_or_expression {$$ = $1;}
-	| inclusive_or_expression '|' exclusive_or_expression {}
+	//| inclusive_or_expression '|' exclusive_or_expression {}
 	;
 
 logical_and_expression
 	: inclusive_or_expression {$$ = $1;}
-	| logical_and_expression AND_OP inclusive_or_expression {}
+	//| logical_and_expression AND_OP inclusive_or_expression {}
 	;
 
 logical_or_expression
 	: logical_and_expression {$$ = $1;}
-	| logical_or_expression OR_OP logical_and_expression {}
+	//| logical_or_expression OR_OP logical_and_expression {}
 	;
 
 conditional_expression
@@ -150,7 +153,7 @@ conditional_expression
 
 assignment_expression
 	: unary_expression assignment_operator assignment_expression {
-		auto temp = new Variable("int", *$1, false);
+		auto temp = new Variable("int", ((Identifier*)$1)->identifier, false);
 		$$ = new Assign(temp, $3);
 	 }
 	| conditional_expression {$$ = $1; }
@@ -467,12 +470,13 @@ function_definition
 
 extern char yytext[];
 
-Node* global_root;
+Global* global_root;
 
 const Node *parseAST()
 {
 	global_root=0;
   	yyparse();
+  	(*global_root).generate_var_maps(global_root);
   	return global_root;
 }
 

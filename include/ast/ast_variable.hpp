@@ -1,10 +1,11 @@
-#ifndef AST_TYPE_H
-#define AST_TYPE_H
+#ifndef AST_VARIABLE_H
+#define AST_VARIABLE_H
 
 #include <string>
 #include <vector>
 
 #include "ast_node.hpp"
+
 
 
 class Variable : public Node {
@@ -17,9 +18,12 @@ public:
         this->type = "Variable";
     }
 
-    std::string* getName() {
-        return &(this->name);
-    }
+//    std::string* getName() {
+//        return &(this->name);
+//    }
+
+
+
 };
 
 

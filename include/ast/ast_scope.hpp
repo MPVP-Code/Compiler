@@ -6,7 +6,6 @@
 #define AST_SCOPE_HPP
 
 #include "ast_node.hpp"
-#include "ast_type.hpp"
 
 #include <map>
 #include <unordered_map>
@@ -14,41 +13,68 @@
 #include <vector>
 #include <iomanip>
 
-class Scope : public Node
-{
+class Variable: public Node{
 public:
-    //Inherits branches & type
-    std::vector<std::shared_ptr<Scope>> parent_scope;
-    //std::map<std::string,Variable> var_map;
+    std::string variable_type;
+    std::string name;
+    bool declaration;
+    Variable(const std::string &_type, const std::string &_name, const bool _declaration);
+};
 
-    Scope(){
+
+class Scope : public Node {
+public:
+
+    Scope* parent_scope;
+    std::map<std::string, Variable *> var_map;
+
+    Scope() {
         this->type = "Scope";
-        this->branches={};
+        this->branches = {};
     }
 
-    //Has gettype
-
-    virtual double compile() const override{
+    double compile() const override {
         throw std::runtime_error("Scope compile not implemented.");
     }
 
-    virtual double print() const override{
+    double print() const override {
         throw std::runtime_error("Scope compile print not implemented.");
+    }
+
+    void generate_var_maps(Scope* parent) override{
+        for (auto node: branches) {
+            if (node->type == "Scope") {
+                Scope *scope = (Scope *) node;
+                scope->parent_scope = this;
+                scope->generate_var_maps(this);
+
+            } else if (node->type == "Variable" ){
+                auto temp = (Variable*) node;
+                if(temp->declaration) {
+                    parent->var_map[temp->name] = temp;
+                }
+
+            }
+
+            {
+                node->generate_var_maps(this);
+            }
+        }
     }
 
 
 };
 
-class Global : public Scope
-{
+class Global : public Scope {
 //private:
 //    static std::unordered_map<std::string, int> registersMapping;
 //    static int currentRegister;
 public:
     //Inherits branches & type
 
-    Global(){
+    Global() {
         this->type = "Global";
+        this->parent_scope = NULL;
     }
 
 //    //Has gettype

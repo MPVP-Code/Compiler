@@ -5,7 +5,7 @@
 #ifndef AST_ARITHMETIC_HPP
 #define AST_ARITHMETIC_HPP
 
-#include "ast_node.hpp"
+#include "../ast.hpp"
 
 class Addition : public Node {
 public:

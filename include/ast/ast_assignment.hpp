@@ -1,9 +1,12 @@
 #ifndef AST_ASSIGNMENT_H
 #define AST_ASSIGNMENT_H
 
-#include "ast_node.hpp"
-#include "ast_type.hpp"
+//#include "../ast.hpp"
+#include "ast_variable.hpp"
+#include "ast_scope.hpp"
 #include <string>
+
+
 
 class Constant : public Node {
 private:
@@ -25,8 +28,20 @@ private:
     Node *source;
 
 public:
-    Assign(Variable *_destination, Node *_source): destination(_destination), source(_source) {
+    Assign(Variable *_destination, Node *_source) : destination(_destination), source(_source) {
         this->type = "Assign";
+    }
+
+    void generate_var_maps(Scope* parent) override {
+        if (this->destination->declaration) {
+            parent->var_map[destination->name] = destination;
+
+        } else {
+            Variable* old_destination = this->destination;
+            this->destination = parent->var_map[old_destination->name];
+            delete old_destination;
+        }
+        source->generate_var_maps(parent);
     }
 
 //    std::string compileToMIPS() const override {

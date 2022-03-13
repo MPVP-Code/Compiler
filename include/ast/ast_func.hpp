@@ -5,8 +5,8 @@
 #ifndef AST_FUNC_H
 #define AST_FUNC_H
 
-#include "ast_node.hpp"
-#include "ast_scope.hpp"
+//Scope forward declarations
+
 
 class FunctionDeclaration : public Scope
 {
@@ -18,9 +18,13 @@ public:
 
     FunctionDeclaration(std::string _return_type, std::string _name, std::vector<Node*> _statements){
         this->statements = _statements;
-        this->type = "Function";
+
         this->name = _name;
         this->return_type = _return_type;
+
+        //Type specification
+        this->type = "Scope";
+        this->subtype = "Function";
     }
 
     virtual ~FunctionDeclaration() {}

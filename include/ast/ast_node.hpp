@@ -9,13 +9,20 @@
 #include <string>
 #include <iostream>
 
+#include "../ast.hpp"
+
+//Forward declaration
+class Scope;
 
 class Node {
 public:
     std::vector<Node*> branches;
-    std::vector<int> allocated_branch_reg;
-    std::string type;
     std::string data_type;
+
+    //Node disambiguation for pointer casting
+    std::string type;
+    std::string subtype;
+    std::string subsubtype;
 
     Node() {
         this->type = "Node";
@@ -41,9 +48,12 @@ public:
         throw std::runtime_error(  this->type + " compileToMIPS not implemented.");
     }
 
-    void virtual generate_var_maps(){
+    virtual void generate_var_maps(Scope* parent){
         std::cout<<"gen varmaps not overridden\n";
     }
 };
+
+
+
 
 #endif
