@@ -1,7 +1,3 @@
-//
-// Created by michal on 4. 3. 2022.
-//
-
 #ifndef AST_FUNC_H
 #define AST_FUNC_H
 

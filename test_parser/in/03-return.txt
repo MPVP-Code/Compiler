@@ -1,0 +1,4 @@
+int test() {
+a = 49;
+return a;
+}

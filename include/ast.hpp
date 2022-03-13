@@ -12,7 +12,7 @@
 #include "ast/ast_flow_control.hpp"
 #include "ast/ast_func.hpp"
 #include "ast/ast_syntax.hpp"
-
+#include "ast/ast_jump_statement.hpp"
 #include "ast/ast_variable.hpp"
 
 extern const Node *parseAST();

@@ -375,7 +375,7 @@ statement
 //	| labeled_statement {}
 //	| selection_statement {}
 //	| iteration_statement {}
-//	| jump_statement {}
+	| jump_statement {$$ = $1;}
 	;
 
 //labeled_statement
@@ -430,11 +430,15 @@ iteration_statement
 	;
 
 jump_statement
-	: CONTINUE ';' {}
-	| BREAK ';' {}
-	| RETURN ';' {}
-	| RETURN expression ';' {}
+	: RETURN expression ';' {
+				$$ = $1;
+				//$$ = new ReturnExpression($1);
+				std::cout << "Found return expression;\n";
+				}
 	;
+//	: CONTINUE ';' {}
+//	| BREAK ';' {}
+//	| RETURN ';' {}
 
 translation_unit
 	: external_declaration { global_root = new Global();
