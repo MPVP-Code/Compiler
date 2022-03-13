@@ -74,3 +74,5 @@ compiler_tests/*/*
 !compiler_tests/*/*.c
 
 test_codegen/bin/*
+test_lexer/bin/*
+test_parser/bin/*

@@ -1,6 +1,5 @@
 #include <iostream>
 #include "../../include/ast.hpp"
-#include "../../include/register_allocator.hpp"
 
 FunctionDeclaration* buildTest2Function() {
     std::vector<Node *> statements;

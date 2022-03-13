@@ -6,11 +6,12 @@
 #define AST_ARITHMETIC_HPP
 
 #include "../ast.hpp"
+#include "../register_allocator.h"
 
 class Addition : public Node {
 public:
-    Node *R;
     Node *L;
+    Node *R;
 
     Addition(Node *L, Node *R) {
         this->type = "Addition";
@@ -18,6 +19,21 @@ public:
         this->R = R;
     }
 
+    Node* getL() {
+        return L;
+    }
+
+    Node* getR() {
+        return R;
+    }
+
+    bool isLInt() {
+        return L->get_type().compare("Variable") == 0 && ((Variable *) L)->getVariableType()->compare("int") == 0;
+    }
+
+    bool isRInt() {
+        return R->get_type().compare("Variable") == 0 && ((Variable *) R)->getVariableType()->compare("int") == 0;
+    }
 };
 
 class Subtraction : public Node {

@@ -21,7 +21,9 @@ public:
         return &(this->name);
     }
 
-
+    std::string* getVariableType() {
+        return &(this->variable_type);
+    }
 
 };
 
