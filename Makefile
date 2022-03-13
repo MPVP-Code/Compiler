@@ -29,7 +29,7 @@ lexertest : parser lexer test_lexer/src/lexer_main.cpp include/register_allocato
 
 parsertest : parser lexer test_parser/src/parser_main.cpp include/register_allocator.cpp
 	mkdir -p test_parser/bin
-	g++ $(CPPFLAGS) -o test_parser/bin/parser_test.o test_parser/src/parser_main.cpp build/lexer.yy.o build/parser.tab.o include/register_allocator.cpp
+	g++ $(CPPFLAGS) -o test_parser/bin/parsertest test_parser/src/parser_main.cpp build/lexer.yy.o build/parser.tab.o include/register_allocator.cpp
 
 codegentest : test_codegen/src/codegen_main.cpp include/register_allocator.cpp
 	g++ $(CPPFLAGS) -o test_codegen/bin/codegen_main test_codegen/src/codegen_main.cpp include/register_allocator.cpp

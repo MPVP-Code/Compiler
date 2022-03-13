@@ -44,3 +44,12 @@ Reference MIPS compiler
 mips-linux-gnu-gcc -O3 -S -mfp32 -march=mips32 main.c -o main.s
 mips-linux-gnu-gcc -mfp32 -static -o "${OUT}" "${OUT}.o" "${TEST_DRIVER}"
 ```
+
+# Testing
+To run parser tests, run the following shell command:
+
+```shell
+./test_parser/test_parser.sh
+```
+
+This command has to be run from the root directory of the project.

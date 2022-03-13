@@ -1,1 +1,48 @@
-Declaration => ( Variable => ( "a" ) Number => ( 1.000000 ) )
+found type specifier
+found directcdeclarator
+found identifier
+a
+unary postfix expression
+Found =
+lexmatch 3
+Found const
+49
+unary postfix expression
+found conditional expression
+found statement
+found identifier
+b
+unary postfix expression
+Found =
+lexmatch 3
+Found const
+44
+unary postfix expression
+found conditional expression
+found statement list
+found functionfound funcdef
+Found function
+found type specifier
+found directcdeclarator
+found identifier
+c
+unary postfix expression
+Found =
+lexmatch 3
+Found const
+41
+unary postfix expression
+found conditional expression
+found statement
+found identifier
+d
+unary postfix expression
+Found =
+lexmatch 3
+Found const
+40
+unary postfix expression
+found conditional expression
+found statement list
+found functionfound funcdef
+Found anotherParsed

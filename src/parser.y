@@ -45,7 +45,7 @@ void yyerror(const char *);
 
 primary_expression
 	: IDENTIFIER { $$ = new Identifier(*$1); std::cout << "found identifier\n" << *$1 << std::endl;}
-	| CONSTANT { $$ = new Constant(std::stoi(*$1)); std::cout<<"Found const \n" << *$1 << std::endl;}
+	| CONSTANT { $$ = new Constant(std::stoi(*$1)); std::cout<<"Found const\n" << *$1 << std::endl;}
 //	| STRING_LITERAL {}
 //	| '(' expression ')' {}
 	;
@@ -160,7 +160,7 @@ assignment_expression
 	;
 
 assignment_operator
-	: '=' { std::cout<<"Found = \n";}
+	: '=' { std::cout<<"Found =\n";}
 //	| MUL_ASSIGN {}
 //	| DIV_ASSIGN {}
 //	| MOD_ASSIGN {}

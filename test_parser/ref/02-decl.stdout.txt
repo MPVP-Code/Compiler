@@ -1,0 +1,15 @@
+found type specifier
+found directcdeclarator
+found directcdeclarator
+found directcdeclarator
+lexmatch 3
+Found const
+10
+unary postfix expression
+found conditional expression
+Found function
+gen varmaps not overridden
+gen varmaps not overridden
+gen varmaps not overridden
+gen varmaps not overridden
+Parsed
