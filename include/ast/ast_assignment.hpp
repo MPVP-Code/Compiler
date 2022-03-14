@@ -38,7 +38,6 @@ public:
         } else {
             Variable *old_destination = this->destination;
             this->destination = parent->var_map[old_destination->name];
-            delete old_destination;
         }
         source->generate_var_maps(parent);
     }

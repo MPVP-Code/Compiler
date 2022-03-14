@@ -3,11 +3,11 @@
 
 #include "./ast_node.hpp"
 
-class ReturnExpression: public Node {
+class Return: public Node {
 private:
     Node* expression;
 public:
-    ReturnExpression(Node* _expression): expression(_expression) {
+    Return(Node* _expression): expression(_expression) {
         this->type = "ReturnExpression";
     }
 };

@@ -1,4 +1,6 @@
+int a = 1;
 int test() {
-a = 49;
-return a;
+    int b, c = 10;
+    b = a + 20;
+    return c;
 }

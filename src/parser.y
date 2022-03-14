@@ -29,16 +29,15 @@ void yyerror(const char *);
 %token STRUCT UNION ENUM
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR CONTINUE BREAK RETURN
-
 %type <node>  multiplicative_expression additive_expression shift_expression relational_expression equality_expression and_expression exclusive_or_expression inclusive_or_expression logical_and_expression conditional_expression assignment_expression logical_or_expression initializer translation_unit
 %type <node>  expression function_definition
 %type <node> statement expression_statement
-%type <node> primary_expression postfix_expression unary_expression
+%type <node> primary_expression postfix_expression unary_expression jump_statement
 %type <string> CONSTANT
 %type <string> IDENTIFIER
 %type <string> type_specifier declaration_specifiers  direct_declarator declarator
 %type <statements> compound_statement statement_list external_declaration declaration init_declarator_list init_declarator
-
+%type <statements> declaration_list
 
 %start translation_unit
 %%
@@ -208,6 +207,7 @@ declaration_specifiers
 init_declarator_list
 	: init_declarator {$$ = $1;}
 	| init_declarator_list ',' init_declarator {$1->insert($1->end(), $3->begin(), $3->end());
+						$$ = $1;
 						delete $3;
 						}
 	;
@@ -385,15 +385,19 @@ statement
 //	;
 
 compound_statement
-	: '{' '}' { $$ = new std::vector<Node*>(); std::cout << "found empty statement\n";	}
+	: '{' '}' { $$ = new std::vector<Node*>(); std::cout << "found empty statement\n";}
 	| '{' statement_list '}' {$$ = $2; std::cout << "found statement list\n"; }
-	//| '{' declaration_list '}' {}
-	//| '{' declaration_list statement_list '}' {}
+	| '{' declaration_list '}' {$$ = $2; std::cout << "found declaration list\n";}
+	| '{' declaration_list statement_list '}' { $2->insert($2->end(), $3->begin(), $3->end());
+							$$ = $2;
+	}
 	;
 
 declaration_list
-	: declaration {}
-	| declaration_list declaration {}
+	: declaration {$$ = $1; std::cout << "found declaration\n";}
+	| declaration_list declaration {$1->insert($1->end(), $2->begin(), $2->end());
+					//delete $2;
+					$$ = $1;}
 	;
 
 statement_list
@@ -412,7 +416,7 @@ statement_list
 	;
 
 expression_statement
-	: ';' {$$ = 0;}
+	: ';' {$$ = NULL;}
 	| expression ';' {$$ = $1;}
 	;
 
@@ -431,14 +435,14 @@ iteration_statement
 
 jump_statement
 	: RETURN expression ';' {
-				$$ = $1;
-				//$$ = new ReturnExpression($1);
+				$$ = new Return($2);
 				std::cout << "Found return expression;\n";
 				}
+	| RETURN ';' { $$ = new Return(NULL);}
 	;
 //	: CONTINUE ';' {}
 //	| BREAK ';' {}
-//	| RETURN ';' {}
+
 
 translation_unit
 	: external_declaration { global_root = new Global();

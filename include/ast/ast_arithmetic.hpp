@@ -54,8 +54,10 @@ public:
     Node *R;
     Node *L;
 
-    Multiplication(Node *_L, Node *_R) : L(_L), R(_R) {
+    Multiplication(Node *L, Node *R) {
         this->type = "Multiplication";
+        this->L = L;
+        this->R = R;
     }
 
 };
