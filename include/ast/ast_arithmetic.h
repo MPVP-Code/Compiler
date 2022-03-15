@@ -1,12 +1,7 @@
-//
-// Created by michal on 9. 3. 2022.
-//
-
 #ifndef AST_ARITHMETIC_HPP
 #define AST_ARITHMETIC_HPP
 
 #include "ast_node.h"
-#include "../register_allocator.h"
 
 class Addition : public Node {
 public:
@@ -22,6 +17,8 @@ public:
     bool isLInt();
 
     bool isRInt();
+
+    virtual void generate_var_maps(Node *parent) override;
 };
 
 class Subtraction : public Node {
@@ -30,6 +27,8 @@ public:
     Node *L;
 
     Subtraction(Node *L, Node *R);
+
+    virtual void generate_var_maps(Node *parent) override;
 };
 
 class Multiplication : public Node {
@@ -39,6 +38,7 @@ public:
 
     Multiplication(Node *L, Node *R);
 
+    virtual void generate_var_maps(Node *parent) override;
 };
 
 class Division : public Node {
@@ -48,6 +48,7 @@ public:
 
     Division(Node *_L, Node *_R);
 
+    virtual void generate_var_maps(Node *parent) override;
 };
 
 #endif

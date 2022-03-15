@@ -2,7 +2,9 @@
 #define AST_FUNC_H
 
 #include "ast_scope.h"
-#include "ast_node.cpp"
+#include "ast_node.h"
+
+#include <vector>
 
 class FunctionDeclaration : public Scope
 {
@@ -17,6 +19,10 @@ public:
     virtual ~FunctionDeclaration();
 
     std::string* getName();
+
+    virtual std::string compileToMIPS() const override;
+
+    virtual void generate_var_maps(Node *parent) override;
 };
 
 class FunctionCall : public Node {

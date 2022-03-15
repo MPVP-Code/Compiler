@@ -1,77 +1,43 @@
-//
-// Created by michal on 9. 3. 2022.
-//
-
-#ifndef AST_ARITHMETIC_HPP
-#define AST_ARITHMETIC_HPP
-
 #include "ast_arithmetic.h"
 #include "ast_node.h"
-#include "../register_allocator.h"
+#include "ast_variable.h"
 
-class Addition : public Node {
-public:
-    Node *L;
-    Node *R;
-
-    Addition(Node *L, Node *R) {
-        this->type = "Addition";
-        this->L = L;
-        this->R = R;
-    }
-
-    Node* getL() {
-        return L;
-    }
-
-    Node* getR() {
-        return R;
-    }
-
-    bool isLInt() {
-        return L->get_type().compare("Variable") == 0 && ((Variable *) L)->getVariableType()->compare("int") == 0;
-    }
-
-    bool isRInt() {
-        return R->get_type().compare("Variable") == 0 && ((Variable *) R)->getVariableType()->compare("int") == 0;
-    }
+Addition::Addition(Node *_L, Node *_R): L(_L), R(_R) {
+    this->type = "Addition";
 };
 
-class Subtraction : public Node {
-public:
-    Node *R;
-    Node *L;
-
-    Subtraction(Node *L, Node *R) {
-        this->type = "Subtraction";
-        this->L = L;
-        this->R = R;
-    }
-
+Node* Addition::getL() {
+    return L;
 };
 
-class Multiplication : public Node {
-public:
-    Node *R;
-    Node *L;
-
-    Multiplication(Node *L, Node *R) {
-        this->type = "Multiplication";
-        this->L = L;
-        this->R = R;
-    }
-
+Node* Addition::getR() {
+    return R;
 };
 
-class Division : public Node {
-public:
-    Node *R;
-    Node *L;
-
-    Division(Node *_L, Node *_R) : L(_L), R(_R) {
-        this->type = "Division";
-    }
-
+bool Addition::isLInt() {
+    return L->get_type().compare("Variable") == 0 && ((Variable *) L)->getVariableType()->compare("int") == 0;
 };
 
-#endif
+bool Addition::isRInt() {
+    return R->get_type().compare("Variable") == 0 && ((Variable *) R)->getVariableType()->compare("int") == 0;
+}
+
+void Addition::generate_var_maps(Node *parent) {}
+
+Subtraction::Subtraction(Node *_L, Node *_R): L(_L), R(_R) {
+    this->type = "Subtraction";
+};
+
+void Subtraction::generate_var_maps(Node *parent) {}
+
+Multiplication::Multiplication(Node *_L, Node *_R) : L(_L), R(_R) {
+    this->type = "Multiplication";
+};
+
+void Multiplication::generate_var_maps(Node *parent) {}
+
+Division::Division(Node *_L, Node *_R) : L(_L), R(_R) {
+    this->type = "Division";
+}
+
+void Division::generate_var_maps(Node *parent) {}

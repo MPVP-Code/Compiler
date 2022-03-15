@@ -7,3 +7,5 @@ Identifier::Identifier(std::string id) {
     this->identifier = id;
 }
 
+void Identifier::generate_var_maps(Node *parent) {}
+

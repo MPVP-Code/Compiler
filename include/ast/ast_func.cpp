@@ -1,67 +1,34 @@
-#ifndef AST_FUNC_H
-#define AST_FUNC_H
-
 #include "ast_func.h"
-#include "ast_scope.h"
-#include "ast_node.cpp"
+#include "ast_node.h"
 
-//Scope forward declarations
+#include <vector>
 
+FunctionDeclaration::FunctionDeclaration(std::string _return_type, std::string _name, std::vector<Node*> _statements):
+    return_type(_return_type), name(_name), statements(_statements) {
+    //Type specification
+    this->type = "Scope";
+    this->subtype = "FunctionDeclaration";
+}
 
-class FunctionDeclaration : public Scope
-{
-public:
-    std::vector<Node*> statements;
-    std::string return_type;
-    std::string name;
+std::string FunctionDeclaration::compileToMIPS() const {
+    std::string result = this->name + ":\n.set noreorder\n";
 
-
-    FunctionDeclaration(std::string _return_type, std::string _name, std::vector<Node*> _statements){
-        this->statements = _statements;
-
-        this->name = _name;
-        this->return_type = _return_type;
-
-        //Type specification
-        this->type = "Scope";
-        this->subtype = "Function";
+    for (Node *statement : statements) {
+        result += statement->compileToMIPS() + "\n";
     }
 
-    virtual ~FunctionDeclaration() {}
-
-    virtual std::string get_type(){
-        return this->type;
-    }
-
-    virtual double compile() const {
-        throw std::runtime_error("Compile not implemented.");
-    }
-
-    virtual double print() const {
-        throw std::runtime_error("Print not implemented.");
-    }
-
-    virtual std::string compileToMIPS() const {
-        std::string result = this->name + ":\n.set noreorder\n";
-
-        for (Node *statement : statements) {
-            result += statement->compileToMIPS() + "\n";
-        }
-
-        result += "jr $31\nnop";
-        return result;
-    }
+    result += "jr $31\nnop";
+    return result;
 };
 
-class FunctionCall : public Node {
-public:
-    std::string function_name;
+std::string* FunctionDeclaration::getName() {
+    return &(this->name);
+}
 
-    FunctionCall(std::string _function_name, std::vector<Node*> arguments){
-        this->function_name =  function_name;
-        this->branches  =  arguments;
+FunctionDeclaration::~FunctionDeclaration() {}
 
-    }
+void FunctionDeclaration::generate_var_maps(Node *parent) {}
+
+FunctionCall::FunctionCall(std::string _function_name, std::vector<Node*> _arguments): function_name(_function_name) {
+    this->branches = _arguments;
 };
-
-#endif

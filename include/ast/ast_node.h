@@ -1,8 +1,6 @@
 #ifndef AST_NODE_H
 #define AST_NODE_H
 
-//#include "ast_scope.h"
-
 #include <memory>
 #include <vector>
 #include <string>
@@ -20,7 +18,9 @@ public:
 
     Node();
 
-    /*virtual std::string get_type();
+    virtual std::string get_type();
+
+    virtual std::string getSubtype();
 
     virtual double compile() const;
 
@@ -30,7 +30,7 @@ public:
 
     virtual std::string compileToMIPS() const;
 
-    void generate_var_maps(Scope *parent); */
+    virtual void generate_var_maps(Node *parent);
 };
 
 

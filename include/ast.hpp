@@ -6,14 +6,14 @@
 #define AST_HPP
 
 #include "ast/ast_scope.h"
-#include "ast/ast_node.cpp"
-#include "ast/ast_arithmetic.cpp"
-#include "ast/ast_assignment.cpp"
+#include "ast/ast_node.h"
+#include "ast/ast_arithmetic.h"
+#include "ast/ast_assignment.h"
 //#include "ast/ast_flow_control.hpp"
 #include "ast/ast_func.h"
-#include "ast/ast_syntax.cpp"
-#include "ast/ast_jump_statement.hpp"
-#include "ast/ast_variable.hpp"
+#include "ast/ast_syntax.h"
+#include "ast/ast_jump_statement.h"
+#include "ast/ast_variable.h"
 
 extern const Node *parseAST();
 

@@ -8,13 +8,13 @@ bin/c_compiler : bin/compiler src/wrapper.sh
 	cp src/wrapper.sh bin/c_compiler
 	chmod u+x bin/c_compiler
 
-bin/compiler : src/compiler.cpp lexer parser include/register_allocator.cpp include/ast/ast_func.cpp include/ast/ast_scope.cpp include/ast/ast_node.cpp
+bin/compiler : src/compiler.cpp lexer parser include/register_allocator.cpp include/ast/ast_arithmetic.cpp include/ast/ast_assignment.cpp include/ast/ast_func.cpp include/ast/ast_node.cpp include/ast/ast_scope.cpp include/ast/ast_syntax.cpp include/ast/ast_variable.cpp include/ast/ast_jump_statement.cpp
 	mkdir -p bin
 	g++ $(CPPFLAGS) -c src/compiler.cpp -o build/compiler.o
-	g++ $(CPPFLAGS) -o bin/compiler build/lexer.yy.o build/parser.tab.o build/compiler.o include/register_allocator.cpp include/ast/ast_func.cpp include/ast/ast_scope.cpp include/ast/ast_node.cpp
+	g++ $(CPPFLAGS) -o bin/compiler build/lexer.yy.o build/parser.tab.o build/compiler.o include/register_allocator.cpp include/ast/ast_arithmetic.cpp include/ast/ast_assignment.cpp include/ast/ast_func.cpp include/ast/ast_node.cpp include/ast/ast_scope.cpp include/ast/ast_syntax.cpp include/ast/ast_variable.cpp include/ast/ast_jump_statement.cpp
 
-syntax_test: src/syntax_test.cpp include/ast/ast_node.cpp include/ast/ast_syntax.cpp
-	g++ $(CPPFLAGS) -o bin/syntax_test src/syntax_test.cpp include/ast/ast_node.cpp include/ast/ast_syntax.cpp
+syntax_test: src/syntax_test.cpp include/register_allocator.cpp include/ast/ast_arithmetic.cpp include/ast/ast_assignment.cpp include/ast/ast_func.cpp include/ast/ast_node.cpp include/ast/ast_scope.cpp include/ast/ast_syntax.cpp include/ast/ast_variable.cpp include/ast/ast_jump_statement.cpp
+	g++ $(CPPFLAGS) -o bin/syntax_test include/register_allocator.cpp src/syntax_test.cpp include/ast/ast_arithmetic.cpp include/ast/ast_assignment.cpp include/ast/ast_func.cpp include/ast/ast_node.cpp include/ast/ast_scope.cpp include/ast/ast_syntax.cpp include/ast/ast_variable.cpp include/ast/ast_jump_statement.cpp
 
 lexer : src/lexer.flex parser
 	mkdir -p build
