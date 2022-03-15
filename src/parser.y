@@ -16,6 +16,7 @@ void yyerror(const char *);
   int number;
   std::string *string;
   std::vector<Node*>* statements;
+  char character;
 }
 
 %token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF
@@ -40,6 +41,7 @@ void yyerror(const char *);
 %type <string> type_specifier declaration_specifiers  direct_declarator declarator
 %type <statements> compound_statement statement_list external_declaration declaration init_declarator_list init_declarator
 %type <statements> declaration_list statement
+%type <character> unary_operator
 
 %start translation_unit
 %%
@@ -48,7 +50,7 @@ primary_expression
 	: IDENTIFIER { $$ = new Identifier(*$1); std::cerr << "found identifier\n" << *$1 << std::endl;}
 	| CONSTANT { $$ = new Constant(std::stoi(*$1)); std::cerr<<"Found const\n" << *$1 << std::endl;}
 //	| STRING_LITERAL {}
-//	| '(' expression ')' {}
+	| '(' expression ')' {$$ = $2;}
 	;
 
 postfix_expression
@@ -71,7 +73,12 @@ unary_expression
 	: postfix_expression {$$ = $1; std::cerr<< "unary postfix expression\n";}
 //	| INC_OP unary_expression {}
 //	| DEC_OP unary_expression {}
-//	| unary_operator cast_expression {}
+	| unary_operator unary_expression {
+	if ($1 == '~'){
+		$$ = new BitNot ($2);
+	}
+
+	}
 //	| SIZEOF unary_expression {}
 //	| SIZEOF '(' type_name ')' {}
 	;
@@ -124,17 +131,17 @@ equality_expression
 
 and_expression
 	: equality_expression {$$ = $1;}
-	//| and_expression '&' equality_expression {}
+	| and_expression '&' equality_expression {$$ = new BitAnd($1, $3);}
 	;
 
 exclusive_or_expression
 	: and_expression {$$ = $1;}
-	//| exclusive_or_expression '^' and_expression {}
+	//| exclusive_or_expression '^' and_expression {$$ = new BitXor($1, $3);}
 	;
 
 inclusive_or_expression
 	: exclusive_or_expression {$$ = $1;}
-	//| inclusive_or_expression '|' exclusive_or_expression {}
+	//| inclusive_or_expression '|' exclusive_or_expression {$$ = new BitOr($1, $3);}
 	;
 
 logical_and_expression
@@ -235,25 +242,19 @@ storage_class_specifier
 
 type_specifier
 	: INT { $$ = new std::string("int");}
-//	| CHAR {}
-//	| VOID {}
-//	| FLOAT {}
-//	| DOUBLE {}
-//	| UNSIGNED {}
-//	| struct_or_union_specifier {}
+//	| CHAR {$$ = new std::string("char");}
+//	| VOID {$$ = new std::string("void");}
+//	| FLOAT {$$ = new std::string("float");}
+//	| DOUBLE {$$ = new std::string("int");}
+//	| struct_specifier {}
 //	| enum_specifier {}
 //	| TYPE_NAME {}
 	;
 
-struct_or_union_specifier
-	: struct_or_union IDENTIFIER '{' struct_declaration_list '}' {}
-	| struct_or_union '{' struct_declaration_list '}' {}
-	| struct_or_union IDENTIFIER {}
-	;
-
-struct_or_union
-	: STRUCT {}
-	| UNION {}
+struct_specifier
+	: STRUCT IDENTIFIER '{' struct_declaration_list '}' {}
+	| STRUCT '{' struct_declaration_list '}' {}
+	| STRUCT IDENTIFIER {}
 	;
 
 struct_declaration_list

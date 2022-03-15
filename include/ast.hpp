@@ -15,6 +15,9 @@
 #include "ast/ast_jump_statement.hpp"
 #include "ast/ast_variable.hpp"
 
+#include "ast/ast_bitwise.hpp"
+#include "ast/ast_logic.hpp"
+
 extern const Node *parseAST();
 
 #endif
