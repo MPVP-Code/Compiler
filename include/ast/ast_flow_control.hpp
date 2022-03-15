@@ -12,10 +12,11 @@
 class While: public Scope {
 private:
     Node* condition;
+    std::vector<Node*>* statements;
 public:
     While(Node* _condition, std::vector<Node*>* _statements): condition(_condition) {
         this->type = "While";
-        this->branches = *_statements;
+        this->statements = _statements;
     }
 };
 
@@ -25,9 +26,10 @@ private:
     std::vector<Node*>* truestatements;
     std::vector<Node*>* falsestatements;
 public:
-    If(Node* _condition, std::vector<Node*>* _statements): condition(_condition) {
+    If(Node* _condition, std::vector<Node*>* _truestatements, std::vector<Node*>* _falsestatements): condition(_condition) {
         this->type = "If";
-        this->branches = *_statements;
+        this->truestatements = _truestatements;
+        this->falsestatements = _falsestatements;
     }
 };
 

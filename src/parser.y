@@ -29,15 +29,17 @@ void yyerror(const char *);
 %token STRUCT UNION ENUM
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR CONTINUE BREAK RETURN
-%type <node>  multiplicative_expression additive_expression shift_expression relational_expression equality_expression and_expression exclusive_or_expression inclusive_or_expression logical_and_expression conditional_expression assignment_expression logical_or_expression initializer translation_unit
+%type <node>  multiplicative_expression additive_expression shift_expression relational_expression equality_expression
+%type <node> and_expression exclusive_or_expression inclusive_or_expression logical_and_expression conditional_expression
+%type <node> assignment_expression logical_or_expression initializer translation_unit
 %type <node>  expression function_definition
-%type <node> statement expression_statement
-%type <node> primary_expression postfix_expression unary_expression jump_statement
+%type <node> expression_statement
+%type <node> primary_expression postfix_expression unary_expression jump_statement iteration_statement
 %type <string> CONSTANT
 %type <string> IDENTIFIER
 %type <string> type_specifier declaration_specifiers  direct_declarator declarator
 %type <statements> compound_statement statement_list external_declaration declaration init_declarator_list init_declarator
-%type <statements> declaration_list
+%type <statements> declaration_list statement
 
 %start translation_unit
 %%
@@ -370,12 +372,18 @@ initializer_list
 	;
 
 statement
-	: expression_statement {$$ = $1; }
-	//| compound_statement {}
+	: expression_statement { $$ = new std::vector<Node*>();
+				$$->push_back($1); }
+	| compound_statement {	$$ = $1;}
+
 //	| labeled_statement {}
 //	| selection_statement {}
-//	| iteration_statement {}
-	| jump_statement {$$ = $1;}
+	| iteration_statement {	$$ = new std::vector<Node*>();
+				$$->push_back($1);
+                               }
+
+	| jump_statement {	$$ = new std::vector<Node*>();
+				$$->push_back($1);}
 	;
 
 //labeled_statement
@@ -385,7 +393,7 @@ statement
 //	;
 
 compound_statement
-	: '{' '}' { $$ = new std::vector<Node*>(); std::cout << "found empty statement\n";}
+	: '{' '}' { std::cout << "found empty statement\n";}
 	| '{' statement_list '}' {$$ = $2; std::cout << "found statement list\n"; }
 	| '{' declaration_list '}' {$$ = $2; std::cout << "found declaration list\n";}
 	| '{' declaration_list statement_list '}' { $2->insert($2->end(), $3->begin(), $3->end());
@@ -401,15 +409,9 @@ declaration_list
 	;
 
 statement_list
-	: statement {
-	std::cout << "found statement\n";
-		$$ = new std::vector<Node*>();
-				if ($1 != 0){
-					$$->push_back($1);
-				}
-			}
+	: statement {$$ = $1;}
 	| statement_list statement {
-		$1->push_back($2);
+		$1->insert($1->end(),$2->begin(), $2->end());
 		$$ = $1;
 	}
 
@@ -427,10 +429,10 @@ selection_statement
 	;
 
 iteration_statement
-	: WHILE '(' expression ')' statement {}
-	| DO statement WHILE '(' expression ')' ';' {}
-	| FOR '(' expression_statement expression_statement ')' statement {}
-	| FOR '(' expression_statement expression_statement expression ')' statement {}
+	: WHILE '(' expression ')' statement { $$ = new While($3, $5);	}
+//	| DO statement WHILE '(' expression ')' ';' {}
+//	| FOR '(' expression_statement expression_statement ')' statement {}
+//	| FOR '(' expression_statement expression_statement expression ')' statement {}
 	;
 
 jump_statement
