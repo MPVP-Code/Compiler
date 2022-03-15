@@ -46,6 +46,12 @@ mips-linux-gnu-gcc -mfp32 -static -o "${OUT}" "${OUT}.o" "${TEST_DRIVER}"
 ```
 
 # Testing
+To run the general compiler tests, run the following shell command from the root directory of the project:
+
+```shell
+./test_compiler/test.sh
+```
+
 To run parser tests, run the following shell command:
 
 ```shell
@@ -53,3 +59,4 @@ To run parser tests, run the following shell command:
 ```
 
 This command has to be run from the root directory of the project.
+

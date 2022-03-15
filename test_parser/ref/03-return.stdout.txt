@@ -1,3 +1,41 @@
-int test() {
-int a = 49;
-}
+found type specifier
+found directcdeclarator
+lexmatch 3
+Found const
+1
+unary postfix expression
+found conditional expression
+Found function
+found type specifier
+found directcdeclarator
+found type specifier
+found directcdeclarator
+found directcdeclarator
+lexmatch 3
+Found const
+10
+unary postfix expression
+found conditional expression
+found declaration
+found identifier
+b
+unary postfix expression
+Found =
+found identifier
+a
+unary postfix expression
+lexmatch 3
+Found const
+20
+unary postfix expression
+found conditional expression
+found statement
+found identifier
+c
+unary postfix expression
+found conditional expression
+Found return expression;
+found functionfound funcdef
+Found anothergen varmaps not overridden
+gen varmaps not overridden
+Parsed
