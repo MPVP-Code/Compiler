@@ -77,7 +77,22 @@ public:
         throw std::runtime_error("Global print not implemented.");
     }
 
+    virtual std::string compileToMIPS() const {
+        std::string result = ".globl f\n";
 
+        for (Node *statement: this->branches) {
+            if (statement->get_type().compare("Function") == 0) {
+                //FunctionDeclaration *function = (FunctionDeclaration*) statement;
+                //result += ".globl " + *(function->getName());
+            }
+        }
+
+        for (Node *statement : this->branches) {
+            result += statement->compileToMIPS() + "\n";
+        }
+
+        return result;
+    }
 
 };
 

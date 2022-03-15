@@ -1,0 +1,13 @@
+found type specifier
+found directcdeclarator
+lexmatch 3
+Found const
+10
+unary postfix expression
+found conditional expression
+Found return expression;
+found statement
+found statement list
+found functionfound funcdef
+Found function
+Parsed

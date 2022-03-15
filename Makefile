@@ -8,17 +8,17 @@ bin/c_compiler : bin/compiler src/wrapper.sh
 	cp src/wrapper.sh bin/c_compiler
 	chmod u+x bin/c_compiler
 
-bin/compiler : src/compiler.cpp lexer parser
+bin/compiler : src/compiler.cpp lexer parser include/register_allocator.cpp
 	mkdir -p bin
 	g++ $(CPPFLAGS) -c src/compiler.cpp -o build/compiler.o
-	g++ $(CPPFLAGS) -o bin/compiler build/lexer.yy.o build/parser.tab.o build/compiler.o
+	g++ $(CPPFLAGS) -o bin/compiler build/lexer.yy.o build/parser.tab.o build/compiler.o include/register_allocator.cpp
 
 lexer : src/lexer.flex parser
 	mkdir -p build
 	flex -o build/lexer.yy.cpp src/lexer.flex
 	g++ $(CPPFLAGS) -c build/lexer.yy.cpp -o build/lexer.yy.o
 
-parser : src/parser.y  include/ast.hpp
+parser : src/parser.y  include/ast.hpp include/register_allocator.cpp
 	mkdir -p build
 	bison -v -d src/parser.y -o build/parser.tab.cpp
 	g++ $(CPPFLAGS) -c build/parser.tab.cpp -o build/parser.tab.o

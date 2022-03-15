@@ -43,8 +43,8 @@ void yyerror(const char *);
 %%
 
 primary_expression
-	: IDENTIFIER { $$ = new Identifier(*$1); std::cout << "found identifier\n" << *$1 << std::endl;}
-	| CONSTANT { $$ = new Constant(std::stoi(*$1)); std::cout<<"Found const\n" << *$1 << std::endl;}
+	: IDENTIFIER { $$ = new Identifier(*$1); std::cerr << "found identifier\n" << *$1 << std::endl;}
+	| CONSTANT { $$ = new Constant(std::stoi(*$1)); std::cerr<<"Found const\n" << *$1 << std::endl;}
 //	| STRING_LITERAL {}
 //	| '(' expression ')' {}
 	;
@@ -66,7 +66,7 @@ argument_expression_list
 	;
 
 unary_expression
-	: postfix_expression {$$ = $1; std::cout<< "unary postfix expression\n";}
+	: postfix_expression {$$ = $1; std::cerr<< "unary postfix expression\n";}
 //	| INC_OP unary_expression {}
 //	| DEC_OP unary_expression {}
 //	| unary_operator cast_expression {}
@@ -146,7 +146,7 @@ logical_or_expression
 	;
 
 conditional_expression
-	: logical_or_expression {$$ = $1; std::cout<< "found conditional expression\n"; }
+	: logical_or_expression {$$ = $1; std::cerr<< "found conditional expression\n"; }
 	//| logical_or_expression '?' expression ':' conditional_expression {}
 	;
 
@@ -159,7 +159,7 @@ assignment_expression
 	;
 
 assignment_operator
-	: '=' { std::cout<<"Found =\n";}
+	: '=' { std::cerr<<"Found =\n";}
 //	| MUL_ASSIGN {}
 //	| DIV_ASSIGN {}
 //	| MOD_ASSIGN {}
@@ -198,7 +198,7 @@ declaration
 	;
 
 declaration_specifiers
-	: type_specifier {$$ = $1; std::cout<< "found type specifier\n"; }
+	: type_specifier {$$ = $1; std::cerr<< "found type specifier\n"; }
 	| type_specifier declaration_specifiers {}
 //	| storage_class_specifier declaration_specifiers  {}
 //	| storage_class_specifier {}
@@ -296,7 +296,7 @@ enumerator
 	;
 
 declarator
-	: direct_declarator { $$ = $1; std::cout << "found directcdeclarator\n"; }
+	: direct_declarator { $$ = $1; std::cerr << "found directcdeclarator\n"; }
 	//|  pointer direct_declarator {}
 	;
 
@@ -385,16 +385,16 @@ statement
 //	;
 
 compound_statement
-	: '{' '}' { $$ = new std::vector<Node*>(); std::cout << "found empty statement\n";}
-	| '{' statement_list '}' {$$ = $2; std::cout << "found statement list\n"; }
-	| '{' declaration_list '}' {$$ = $2; std::cout << "found declaration list\n";}
+	: '{' '}' { $$ = new std::vector<Node*>(); std::cerr << "found empty statement\n";}
+	| '{' statement_list '}' {$$ = $2; std::cerr << "found statement list\n"; }
+	| '{' declaration_list '}' {$$ = $2; std::cerr << "found declaration list\n";}
 	| '{' declaration_list statement_list '}' { $2->insert($2->end(), $3->begin(), $3->end());
 							$$ = $2;
 	}
 	;
 
 declaration_list
-	: declaration {$$ = $1; std::cout << "found declaration\n";}
+	: declaration {$$ = $1; std::cerr << "found declaration\n";}
 	| declaration_list declaration {$1->insert($1->end(), $2->begin(), $2->end());
 					//delete $2;
 					$$ = $1;}
@@ -402,7 +402,7 @@ declaration_list
 
 statement_list
 	: statement {
-	std::cout << "found statement\n";
+	std::cerr << "found statement\n";
 		$$ = new std::vector<Node*>();
 				if ($1 != 0){
 					$$->push_back($1);
@@ -436,7 +436,7 @@ iteration_statement
 jump_statement
 	: RETURN expression ';' {
 				$$ = new Return($2);
-				std::cout << "Found return expression;\n";
+				std::cerr << "Found return expression;\n";
 				}
 	| RETURN ';' { $$ = new Return(NULL);}
 	;
@@ -447,25 +447,25 @@ jump_statement
 translation_unit
 	: external_declaration { global_root = new Global();
 				global_root->branches.insert(global_root->branches.end(), $1->begin(), $1->end());
-				std::cout << "Found function\n";
+				std::cerr << "Found function\n";
 	 			}
 	| translation_unit external_declaration {
 				global_root->branches.insert(global_root->branches.end(), $2->begin(), $2->end());
-				std::cout << "Found another";
+				std::cerr << "Found another";
 				}
 	;
 
 external_declaration
 	: function_definition { $$ = new std::vector<Node*>();
 	$$->push_back($1);
-	std::cout << "found funcdef\n";}
+	std::cerr << "found funcdef\n";}
 	| declaration {
 	$$ = $1;}
 	;
 
 function_definition
 	: declaration_specifiers declarator compound_statement {
-	std::cout<<"found function";
+	std::cerr<<"found function";
 	$$ = new FunctionDeclaration(*$1,*$2,*$3);
 	}
 	//| declaration_specifiers declarator declaration_list compound_statement {}

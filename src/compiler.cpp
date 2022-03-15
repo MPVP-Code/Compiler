@@ -3,8 +3,11 @@
 #include "../include/ast.hpp"
 #include "../build/parser.tab.hpp"
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
+    const Node *ast = parseAST();
+    std::cout << ast->compileToMIPS();
+
+    return 0;
 //    if(argc < 2){
 //        fprintf(stderr, "usage : compiler sourceCode\n");
 //        exit(1);
@@ -22,9 +25,4 @@ int main(int argc, char *argv[])
 //
 //    return 0;
 
-while (1){
-    int s = yylex();
-    if
-    std::cout << s << std::endl;
-}
 }
