@@ -54,10 +54,8 @@ public:
     Node *R;
     Node *L;
 
-    Multiplication(Node *L, Node *R) {
+    Multiplication(Node *_L, Node *_R) : L(_L), R(_R) {
         this->type = "Multiplication";
-        this->L = L;
-        this->R = R;
     }
 
 };
@@ -69,6 +67,17 @@ public:
 
     Division(Node *_L, Node *_R) : L(_L), R(_R) {
         this->type = "Division";
+    }
+
+};
+
+class Modulo : public Node {
+public:
+    Node *R;
+    Node *L;
+
+    Modulo(Node *_L, Node *_R) : L(_L), R(_R) {
+        this->type = "Modulo";
     }
 
 };

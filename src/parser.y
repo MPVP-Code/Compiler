@@ -89,9 +89,9 @@ multiplicative_expression
 		if($1->type == "Identifier"){
 		$$ = new Variable ("None", ((Identifier*)$1)->identifier, false); }
 		}
-//	| multiplicative_expression '*' unary_expression {}
-//	| multiplicative_expression '/' unary_expression {}
-//	| multiplicative_expression '%' unary_expression {}
+	| multiplicative_expression '*' unary_expression {$$ = new Multiplication ($1, $3);}
+	| multiplicative_expression '/' unary_expression {$$ = new Division ($1, $3);}
+	| multiplicative_expression '%' unary_expression {$$ = new Modulo ($1, $3);}
 	;
 
 additive_expression
@@ -484,7 +484,7 @@ const Node *parseAST()
 {
 	global_root=0;
   	yyparse();
-  	(*global_root).generate_var_maps(global_root);
+  	//(*global_root).generate_var_maps(global_root);
   	return global_root;
 }
 

@@ -1,0 +1,7 @@
+int func(){
+    int a,b,c;
+    a = 2 * 2;
+    b = 9 / 3;
+    c = 11 % 5;
+    return a + b + c;
+}
