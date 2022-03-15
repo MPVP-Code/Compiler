@@ -1,0 +1,25 @@
+#ifndef AST_SCOPE_HPP
+#define AST_SCOPE_HPP
+
+#include "ast_node.h"
+//#include "ast_variable.hpp"
+
+#include <map>
+
+class Scope : public Node {
+public:
+    Scope *parent_scope;
+    //std::map<std::string, Variable *> var_map;
+
+    Scope();
+
+    virtual void generate_var_maps(Scope *parent);
+};
+
+/*class Global : public Scope {
+public:
+    Global();
+};*/
+
+#endif
+*/

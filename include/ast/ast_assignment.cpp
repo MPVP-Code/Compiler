@@ -2,7 +2,8 @@
 #define AST_ASSIGNMENT_H
 
 #include "ast_variable.hpp"
-#include "ast_scope.hpp"
+#include "ast_scope.h"
+#include "ast_node.h"
 #include "../register_allocator.h"
 #include <string>
 

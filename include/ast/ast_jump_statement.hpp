@@ -1,7 +1,7 @@
 #ifndef AST_RETURN_EXPRESSION_H
 #define AST_RETURN_EXPRESSION_H
 
-#include "./ast_node.hpp"
+#include "ast_node.cpp"
 
 class Return: public Node {
 private:

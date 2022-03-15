@@ -1,6 +1,10 @@
 #ifndef AST_FUNC_H
 #define AST_FUNC_H
 
+#include "ast_func.h"
+#include "ast_scope.h"
+#include "ast_node.cpp"
+
 //Scope forward declarations
 
 

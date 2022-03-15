@@ -5,13 +5,13 @@
 #ifndef AST_HPP
 #define AST_HPP
 
-#include "ast/ast_scope.hpp"
-#include "ast/ast_node.hpp"
-#include "ast/ast_arithmetic.hpp"
-#include "ast/ast_assignment.hpp"
-#include "ast/ast_flow_control.hpp"
-#include "ast/ast_func.hpp"
-#include "ast/ast_syntax.hpp"
+#include "ast/ast_scope.h"
+#include "ast/ast_node.cpp"
+#include "ast/ast_arithmetic.cpp"
+#include "ast/ast_assignment.cpp"
+//#include "ast/ast_flow_control.hpp"
+#include "ast/ast_func.h"
+#include "ast/ast_syntax.cpp"
 #include "ast/ast_jump_statement.hpp"
 #include "ast/ast_variable.hpp"
 

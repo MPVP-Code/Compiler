@@ -5,7 +5,8 @@
 #ifndef AST_ARITHMETIC_HPP
 #define AST_ARITHMETIC_HPP
 
-#include "../ast.hpp"
+#include "ast_arithmetic.h"
+#include "ast_node.h"
 #include "../register_allocator.h"
 
 class Addition : public Node {
