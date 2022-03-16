@@ -1,6 +1,5 @@
 %code requires{
 #include "../include/ast.hpp"
-
 #include <cassert>
 
 extern Global* global_root; // A way of getting the AST out

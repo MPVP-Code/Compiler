@@ -1,8 +1,8 @@
-#include "ast_variable.h"
-#include "ast_scope.h"
-#include "ast_node.h"
-#include "ast_arithmetic.h"
-#include "ast_assignment.h"
+#include "ast_variable.hpp"
+#include "ast_scope.hpp"
+#include "ast_node.hpp"
+#include "ast_arithmetic.hpp"
+#include "ast_assignment.hpp"
 #include <string>
 
 

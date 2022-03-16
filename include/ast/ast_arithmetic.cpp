@@ -1,6 +1,6 @@
-#include "ast_arithmetic.h"
-#include "ast_node.h"
-#include "ast_variable.h"
+#include "ast_arithmetic.hpp"
+#include "ast_node.hpp"
+#include "ast_variable.hpp"
 
 Addition::Addition(Node *_L, Node *_R): L(_L), R(_R) {
     this->type = "Addition";
@@ -41,3 +41,9 @@ Division::Division(Node *_L, Node *_R) : L(_L), R(_R) {
 }
 
 void Division::generate_var_maps(Node *parent) {}
+
+Modulo::Modulo(Node *_L, Node *_R) : L(_L), R(_R) {
+    this->type = "Division";
+}
+
+void Modulo::generate_var_maps(Node *parent) {}

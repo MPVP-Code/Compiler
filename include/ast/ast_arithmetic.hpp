@@ -1,39 +1,24 @@
-//
-// Created by michal on 9. 3. 2022.
-//
-
 #ifndef AST_ARITHMETIC_HPP
 #define AST_ARITHMETIC_HPP
 
-#include "../ast.hpp"
-#include "../register_allocator.h"
+#include "ast_node.hpp"
 
 class Addition : public Node {
 public:
     Node *L;
     Node *R;
 
-    Addition(Node *L, Node *R) {
-        this->type = "Addition";
-        this->L = L;
-        this->R = R;
-    }
+    Addition(Node *L, Node *R);
 
-    Node* getL() {
-        return L;
-    }
+    Node* getL();
 
-    Node* getR() {
-        return R;
-    }
+    Node* getR();
 
-    bool isLInt() {
-        return L->get_type().compare("Variable") == 0 && ((Variable *) L)->getVariableType()->compare("int") == 0;
-    }
+    bool isLInt();
 
-    bool isRInt() {
-        return R->get_type().compare("Variable") == 0 && ((Variable *) R)->getVariableType()->compare("int") == 0;
-    }
+    bool isRInt();
+
+    virtual void generate_var_maps(Node *parent) override;
 };
 
 class Subtraction : public Node {
@@ -41,12 +26,9 @@ public:
     Node *R;
     Node *L;
 
-    Subtraction(Node *L, Node *R) {
-        this->type = "Subtraction";
-        this->L = L;
-        this->R = R;
-    }
+    Subtraction(Node *L, Node *R);
 
+    virtual void generate_var_maps(Node *parent) override;
 };
 
 class Multiplication : public Node {
@@ -54,10 +36,9 @@ public:
     Node *R;
     Node *L;
 
-    Multiplication(Node *_L, Node *_R) : L(_L), R(_R) {
-        this->type = "Multiplication";
-    }
+    Multiplication(Node *L, Node *R);
 
+    virtual void generate_var_maps(Node *parent) override;
 };
 
 class Division : public Node {
@@ -65,21 +46,18 @@ public:
     Node *R;
     Node *L;
 
-    Division(Node *_L, Node *_R) : L(_L), R(_R) {
-        this->type = "Division";
-    }
+    Division(Node *_L, Node *_R);
 
+    virtual void generate_var_maps(Node *parent) override;
 };
-
 class Modulo : public Node {
 public:
     Node *R;
     Node *L;
 
-    Modulo(Node *_L, Node *_R) : L(_L), R(_R) {
-        this->type = "Modulo";
-    }
+    Modulo(Node *_L, Node *_R);
 
+    virtual void generate_var_maps(Node *parent) override;
 };
 
 #endif

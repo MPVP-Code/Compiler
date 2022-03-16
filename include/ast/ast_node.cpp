@@ -3,7 +3,7 @@
 #include <string>
 #include <iostream>
 
-#include "ast_node.h"
+#include "ast_node.hpp"
 
 Node::Node() {
     this->type = "Node";

@@ -14,10 +14,7 @@ private:
     Node* condition;
     std::vector<Node*>* statements;
 public:
-    While(Node* _condition, std::vector<Node*>* _statements): condition(_condition) {
-        this->type = "While";
-        this->statements = _statements;
-    }
+    While(Node* _condition, std::vector<Node*>* _statements);
 };
 
 class If: public Scope {
@@ -26,11 +23,7 @@ private:
     std::vector<Node*>* truestatements;
     std::vector<Node*>* falsestatements;
 public:
-    If(Node* _condition, std::vector<Node*>* _truestatements, std::vector<Node*>* _falsestatements): condition(_condition) {
-        this->type = "If";
-        this->truestatements = _truestatements;
-        this->falsestatements = _falsestatements;
-    }
+    If(Node* _condition, std::vector<Node*>* _truestatements, std::vector<Node*>* _falsestatements);
 };
 
 #endif

@@ -1,4 +1,4 @@
-#include "ast_syntax.h"
+#include "ast_syntax.hpp"
 
 #include <string>
 

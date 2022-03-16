@@ -1,5 +1,5 @@
-#include "ast_func.h"
-#include "ast_node.h"
+#include "ast_func.hpp"
+#include "ast_node.hpp"
 
 #include <vector>
 

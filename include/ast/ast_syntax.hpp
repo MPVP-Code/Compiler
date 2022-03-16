@@ -1,7 +1,7 @@
 #ifndef AST_SYNTAX_HPP
 #define AST_SYNTAX_HPP
 
-#include "ast_node.h"
+#include "ast_node.hpp"
 #include <string>
 
 class Identifier : public Node {

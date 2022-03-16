@@ -1,4 +1,4 @@
-#include "register_allocator.h"
+#include "register_allocator.hpp"
 
 int RegisterAllocator::currentRegister = 0;
 std::unordered_map<std::string, int> map;

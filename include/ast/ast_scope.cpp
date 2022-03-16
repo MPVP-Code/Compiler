@@ -1,5 +1,5 @@
-#include "ast_scope.h"
-#include "ast_func.h"
+#include "ast_scope.hpp"
+#include "ast_func.hpp"
 
 #include <string>
 

@@ -1,8 +1,8 @@
 #ifndef AST_SCOPE_HPP
 #define AST_SCOPE_HPP
 
-#include "ast_node.h"
-#include "ast_variable.h"
+#include "ast_node.hpp"
+#include "ast_variable.hpp"
 #include <string>
 
 #include <map>

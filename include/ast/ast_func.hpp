@@ -1,8 +1,8 @@
-#ifndef AST_FUNC_H
-#define AST_FUNC_H
+#ifndef AST_FUNC_HPP
+#define AST_FUNC_HPP
 
-#include "ast_scope.h"
-#include "ast_node.h"
+#include "ast_scope.hpp"
+#include "ast_node.hpp"
 
 #include <vector>
 

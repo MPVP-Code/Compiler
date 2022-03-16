@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "ast_node.h"
+#include "ast_node.hpp"
 
 class Variable : public Node {
 public:

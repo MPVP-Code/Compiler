@@ -1,11 +1,11 @@
-#include "../include/ast/ast_arithmetic.h"
-#include "../include/ast/ast_assignment.h"
-#include "../include/ast/ast_func.h"
-#include "../include/ast/ast_jump_statement.h"
-#include "../include/ast/ast_node.h"
-#include "../include/ast/ast_scope.h"
-#include "../include/ast/ast_syntax.h"
-#include "../include/ast/ast_variable.h"
+#include "../include/ast/ast_arithmetic.hpp"
+#include "../include/ast/ast_assignment.hpp"
+#include "../include/ast/ast_func.hpp"
+#include "../include/ast/ast_jump_statement.hpp"
+#include "../include/ast/ast_node.hpp"
+#include "../include/ast/ast_scope.hpp"
+#include "../include/ast/ast_syntax.hpp"
+#include "../include/ast/ast_variable.hpp"
 
 int main() {
     Identifier* identifier = new Identifier("hello");

@@ -1,6 +1,6 @@
-//
-// Created by michal on 15. 3. 2022.
-//
+////
+//// Created by michal on 15. 3. 2022.
+////
 
 #ifndef AST_BITWISE_HPP
 #define AST_BITWISE_HPP
@@ -11,11 +11,7 @@ public:
     Node *R;
     Node *L;
 
-    BitAnd(Node *L, Node *R) {
-        this->type = "Subtraction";
-        this->L = L;
-        this->R = R;
-    }
+    BitAnd(Node *L, Node *R);
 
 };
 
@@ -24,11 +20,7 @@ public:
     Node *R;
     Node *L;
 
-    BitOr(Node *L, Node *R) {
-        this->type = "Subtraction";
-        this->L = L;
-        this->R = R;
-    }
+    BitOr(Node *L, Node *R);
 
 };
 
@@ -37,11 +29,7 @@ public:
     Node *R;
     Node *L;
 
-    BitXor(Node *L, Node *R) {
-        this->type = "Subtraction";
-        this->L = L;
-        this->R = R;
-    }
+    BitXor(Node *L, Node *R);
 
 };
 
@@ -49,10 +37,7 @@ class BitNot : public Node {
 public:
     Node *in;
 
-    BitNot(Node *_in) {
-        this->type = "Subtraction";
-        this->in = _in;
-    }
+    BitNot(Node *_in);
 };
 
 #endif

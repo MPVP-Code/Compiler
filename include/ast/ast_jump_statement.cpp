@@ -1,8 +1,8 @@
-#include "ast_assignment.h"
-#include "ast_jump_statement.h"
-#include "ast_node.h"
-#include "ast_variable.h"
-#include "../register_allocator.h"
+#include "ast_assignment.hpp"
+#include "ast_jump_statement.hpp"
+#include "ast_node.hpp"
+#include "ast_variable.hpp"
+#include "../register_allocator.hpp"
 
 Return::Return(Node* _expression): expression(_expression) {
     this->type = "ReturnExpression";
