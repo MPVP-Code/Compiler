@@ -143,6 +143,22 @@ FunctionDeclaration* buildTest8Function() {
     return function;
 }
 
+FunctionDeclaration* buildTest9Function() {
+    std::vector<Node*> statements;
+    std::vector<Node*>* whileStatements = new std::vector<Node*>;
+
+    Constant *constant0 = new Constant(0);
+    While *whileStatement = new While(constant0, whileStatements);
+    statements.push_back(whileStatement);
+
+    Constant *returnConstant = new Constant(19937);
+    Return *returnStatement = new Return(returnConstant);
+    statements.push_back(returnStatement);
+
+    FunctionDeclaration *function = new FunctionDeclaration("int", "f", statements);
+    return function;
+}
+
 int main() {
     int testsPassed = 0;
     int testsChecked = 0;
@@ -333,6 +349,28 @@ int main() {
         std::cout << "Test 8 passed." << std::endl;
     } else {
         std::cout << "Test 8 failed. Expected output: " << test8Expected << " but received: " << test8Out << std::endl;
+    }
+    testsChecked++;
+
+    // Test 9
+    /*
+    int f()
+    {
+        while(0){
+
+        }
+        return 19937;
+    }
+     */
+    FunctionDeclaration* test9Function = buildTest9Function();
+    std::string test9Out = test9Function->compileToMIPS();
+    std::string test9Expected = "f:\n.set noreorder\nli $2, 0x4e1\njr $31\nnop";
+
+    if (test8Out.compare(test8Expected) == 0) {
+        testsPassed++;
+        std::cout << "Test 9 passed." << std::endl;
+    } else {
+        std::cout << "Test 9 failed. Expected output: " << test8Expected << " but received: " << test8Out << std::endl;
     }
     testsChecked++;
 

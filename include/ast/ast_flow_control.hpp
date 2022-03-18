@@ -15,6 +15,8 @@ private:
     std::vector<Node*>* statements;
 public:
     While(Node* _condition, std::vector<Node*>* _statements);
+
+    virtual std::string compileToMIPS() const override;
 };
 
 class If: public Scope {

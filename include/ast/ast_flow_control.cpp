@@ -9,6 +9,17 @@ While::While(Node* _condition, std::vector<Node*>* _statements): condition(_cond
         this->statements = _statements;
 }
 
+std::string While::compileToMIPS() const {
+    std::string result = "";
+    if (condition->get_type().compare("Constant") == 0) {
+        Constant *constant = (Constant*) condition;
+        if (constant->getValue() == 0) {
+            return "";
+        }
+    }
+    return result;
+}
+
 If::If(Node* _condition, std::vector<Node*>* _truestatements, std::vector<Node*>* _falsestatements): condition(_condition) {
         this->type = "If";
         this->truestatements = _truestatements;
