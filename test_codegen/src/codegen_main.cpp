@@ -159,6 +159,32 @@ FunctionDeclaration* buildTest9Function() {
     return function;
 }
 
+FunctionDeclaration* buildTest10Function() {
+    std::vector<Node*> statements;
+    std::vector<Node*>* whileStatements = new std::vector<Node*>;
+
+    Variable *variableX = new Variable("int", "x", false);
+    statements.push_back(variableX);
+
+    Constant *constant1 = new Constant(1);
+    Assign *assign1 = new Assign(variableX, constant1);
+    statements.push_back(assign1);
+
+    Constant *constant0 = new Constant(0);
+    Assign *assign0 = new Assign(variableX, constant0);
+    whileStatements->push_back(assign0);
+
+    While *whileStatement = new While(variableX, whileStatements);
+    statements.push_back(whileStatement);
+
+    Constant *returnConstant = new Constant(19937);
+    Return *returnStatement = new Return(returnConstant);
+    statements.push_back(returnStatement);
+
+    FunctionDeclaration *function = new FunctionDeclaration("int", "f", statements);
+    return function;
+}
+
 int main() {
     int testsPassed = 0;
     int testsChecked = 0;
@@ -371,6 +397,32 @@ int main() {
         std::cout << "Test 9 passed." << std::endl;
     } else {
         std::cout << "Test 9 failed. Expected output: " << test8Expected << " but received: " << test8Out << std::endl;
+    }
+    testsChecked++;
+
+    // Test 10
+    /*
+     int f()
+    {
+        int x;
+        x=1;
+        while(x){
+            x=0;
+        }
+        return 19937;
+    }
+
+     */
+
+    FunctionDeclaration* test10Function = buildTest10Function();
+    std::string test10Out = test10Function->compileToMIPS();
+    std::string test10Expected = "f:\n.set noreorder\nli $2, 0x0000\nli $2, 0x0001\n$WHILE0START:\nbeq $2, $0, $WHILE0END\nnop\nli $2, 0x0000\nb $WHILE0START\nnop\n$WHILE0END:\nli $2, 0x4de1\njr $31\nnop";
+
+    if (test10Out.compare(test10Expected) == 0) {
+        testsPassed++;
+        std::cout << "Test 10 passed." << std::endl;
+    } else {
+        std::cout << "Test 10 failed. Expected output: " << test10Expected << " but received: " << test10Out << std::endl;
     }
     testsChecked++;
 
