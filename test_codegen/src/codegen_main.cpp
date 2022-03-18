@@ -76,10 +76,29 @@ FunctionDeclaration* buildTest5Function() {
     statements.push_back(returnStatement);
 
     FunctionDeclaration *function = new FunctionDeclaration("int", "f", statements);
-    RegisterAllocator::initCurrentRegister();
     return function;
 }
 
+FunctionDeclaration* buildTest6Function() {
+    std::vector<Node *> statements;
+    std::vector<Node *> trueStatements;
+
+    Constant *constant11 = new Constant(11);
+    Return *returnTrue = new Return(constant11);
+    trueStatements.push_back(returnTrue);
+
+    Constant *condition = new Constant(0);
+
+    If *ifStatement = new If(condition, &trueStatements, nullptr);
+    statements.push_back(ifStatement);
+
+    Constant *constant10 = new Constant(10);
+    Return *returnFalse = new Return(constant10);
+    statements.push_back(returnFalse);
+
+    FunctionDeclaration *function = new FunctionDeclaration("int", "f", statements);
+    return function;
+}
 
 int main() {
     int testsPassed = 0;
@@ -199,6 +218,31 @@ int main() {
     } else {
         std::cout << "Test 5 failed. Expected output: " << test5Expected << " but received: " << test5Out << std::endl;
     }
+    testsChecked++;
+
+    //Test 6
+    /*
+    int f()
+    {
+        if(0){
+            return 11;
+        }
+        return 10;
+    } */
+    RegisterAllocator::initCurrentRegister();
+    RegisterAllocator::reinitRegistersMappingMap();
+
+    FunctionDeclaration* test6Function = buildTest6Function();
+    std::string test6Out = test6Function->compileToMIPS();
+    std::string test6Expected = "f:\n.set noreorder\nli $2, 0x000a\njr $31\nnop";
+
+    if (test6Out.compare(test6Expected) == 0) {
+        testsPassed++;
+        std::cout << "Test 6 passed." << std::endl;
+    } else {
+        std::cout << "Test 6 failed. Expected output: " << test6Expected << " but received: " << test6Out << std::endl;
+    }
+
     testsChecked++;
 
     std::cout << "Tests passed " << testsPassed << " out of " << testsChecked << std::endl;

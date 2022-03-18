@@ -24,6 +24,8 @@ private:
     std::vector<Node*>* falsestatements;
 public:
     If(Node* _condition, std::vector<Node*>* _truestatements, std::vector<Node*>* _falsestatements);
+
+    virtual std::string compileToMIPS() const override;
 };
 
 #endif
