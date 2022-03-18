@@ -69,7 +69,7 @@ argument_expression_list
 	;
 
 unary_expression
-	: postfix_expression {$$ = $1; std::cerr<< "unary postfix expression\n";}
+	: postfix_expression {$$ = $1;}
 //	| INC_OP unary_expression {}
 //	| DEC_OP unary_expression {}
 	| unary_operator unary_expression {
@@ -156,7 +156,7 @@ logical_or_expression
 	;
 
 conditional_expression
-	: logical_or_expression {$$ = $1; std::cerr<< "found conditional expression\n"; }
+	: logical_or_expression {$$ = $1; }
 	//| logical_or_expression '?' expression ':' conditional_expression {}
 	;
 
@@ -214,7 +214,7 @@ assignment_expression
 	;
 
 assignment_operator
-	: '=' { $$ = '='; std::cerr<<"Found =\n";}
+	: '=' { $$ = '='; }
 	| MUL_ASSIGN {$$ = '*';}
 	| DIV_ASSIGN {$$ = '/';}
 	| MOD_ASSIGN {$$ = '%';}
@@ -253,7 +253,7 @@ declaration
 	;
 
 declaration_specifiers
-	: type_specifier {$$ = $1; std::cerr<< "found type specifier\n"; }
+	: type_specifier {$$ = $1; }
 	| type_specifier declaration_specifiers {}
 //	| storage_class_specifier declaration_specifiers  {}
 //	| storage_class_specifier {}
@@ -345,7 +345,7 @@ enumerator
 	;
 
 declarator
-	: direct_declarator { $$ = $1; std::cerr << "found directcdeclarator\n"; }
+	: direct_declarator { $$ = $1; }
 	//|  pointer direct_declarator {}
 	;
 
@@ -441,18 +441,17 @@ statement
 //	;
 
 compound_statement
-	: '{' '}' { std::cerr << "found empty statement\n";}
-	| '{' statement_list '}' {$$ = $2; std::cerr << "found statement list\n"; }
-	| '{' declaration_list '}' {$$ = $2; std::cerr << "found declaration list\n";}
+	: '{' '}' { $$ = new std::vector<Node*>();}
+	| '{' statement_list '}' {$$ = $2; }
+	| '{' declaration_list '}' {$$ = $2; }
 	| '{' declaration_list statement_list '}' { $2->insert($2->end(), $3->begin(), $3->end());
 							$$ = $2;
 	}
 	;
 
 declaration_list
-	: declaration {$$ = $1; std::cerr << "found declaration\n";}
+	: declaration {$$ = $1;}
 	| declaration_list declaration {$1->insert($1->end(), $2->begin(), $2->end());
-					//delete $2;
 					$$ = $1;}
 	;
 
@@ -534,7 +533,6 @@ const Node *parseAST()
 {
 	global_root=0;
   	yyparse();
-  	//(*global_root).generate_var_maps(global_root);
   	return global_root;
 }
 
