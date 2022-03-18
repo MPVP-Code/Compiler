@@ -40,7 +40,7 @@ void yyerror(const char *);
 %type <string> type_specifier declaration_specifiers  direct_declarator declarator
 %type <statements> compound_statement statement_list external_declaration declaration init_declarator_list init_declarator
 %type <statements> declaration_list statement
-%type <character> unary_operator
+%type <character> unary_operator assignment_operator
 
 %start translation_unit
 %%
@@ -75,6 +75,8 @@ unary_expression
 	| unary_operator unary_expression {
 	if ($1 == '~'){
 		$$ = new BitNot ($2);
+	} else if ($1 == '!'){
+		$$ = new LogicNot($2);
 	}
 
 	}
@@ -83,12 +85,12 @@ unary_expression
 	;
 
 unary_operator
-	: '&' {}
-	| '*' {}
-	| '+' {}
-	| '-' {}
-	| '~' {}
-	| '!' {}
+	: '&' {$$ = '&';}
+	| '*' {$$ = '*';}
+	| '+' {$$ = '+';}
+	| '-' {$$ = '-';}
+	| '~' {$$ = '~';}
+	| '!' {$$ = '!';}
 	;
 
 
@@ -110,22 +112,22 @@ additive_expression
 
 shift_expression
 	: additive_expression {$$ = $1;}
-//	| shift_expression LEFT_OP additive_expression {}
-//	| shift_expression RIGHT_OP additive_expression {}
+	| shift_expression LEFT_OP additive_expression {$$ = new BitASL($1, $3);}
+	| shift_expression RIGHT_OP additive_expression {$$ = new BitASR($1, $3);}
 	;
 
 relational_expression
 	: shift_expression {$$ =$1;}
-//	| relational_expression '<' shift_expression {}
-//	| relational_expression '>' shift_expression {}
-//	| relational_expression LE_OP shift_expression {}
-//	| relational_expression GE_OP shift_expression {}
+	| relational_expression '<' shift_expression {$$ = new LogicLT($1,$3);}
+	| relational_expression '>' shift_expression {$$ = new LogicGT($1,$3);}
+	| relational_expression LE_OP shift_expression {$$ = new LogicLE($1,$3);}
+	| relational_expression GE_OP shift_expression {$$ = new LogicGE($1,$3);}
 	;
 
 equality_expression
 	: relational_expression {$$ = $1;}
-//	| equality_expression EQ_OP relational_expression {}
-//	| equality_expression NE_OP relational_expression {}
+	| equality_expression EQ_OP relational_expression {$$ = new LogicEQ($1,$3);}
+	| equality_expression NE_OP relational_expression {$$ = new LogicNE($1,$3);}
 	;
 
 and_expression
@@ -135,22 +137,22 @@ and_expression
 
 exclusive_or_expression
 	: and_expression {$$ = $1;}
-	//| exclusive_or_expression '^' and_expression {$$ = new BitXor($1, $3);}
+	| exclusive_or_expression '^' and_expression {$$ = new BitXor($1, $3);}
 	;
 
 inclusive_or_expression
 	: exclusive_or_expression {$$ = $1;}
-	//| inclusive_or_expression '|' exclusive_or_expression {$$ = new BitOr($1, $3);}
+	| inclusive_or_expression '|' exclusive_or_expression {$$ = new BitOr($1, $3);}
 	;
 
 logical_and_expression
 	: inclusive_or_expression {$$ = $1;}
-	//| logical_and_expression AND_OP inclusive_or_expression {}
+	| logical_and_expression AND_OP inclusive_or_expression {$$ = new LogicAnd($1, $3); }
 	;
 
 logical_or_expression
 	: logical_and_expression {$$ = $1;}
-	//| logical_or_expression OR_OP logical_and_expression {}
+	| logical_or_expression OR_OP logical_and_expression {$$ = new LogicOr($1,$3);}
 	;
 
 conditional_expression
@@ -160,24 +162,69 @@ conditional_expression
 
 assignment_expression
 	: unary_expression assignment_operator assignment_expression {
-		auto temp = new Variable("int", ((Identifier*)$1)->identifier, false);
-		$$ = new Assign(temp, $3);
+		if ($2 == '='){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			$$ = new Assign(temp, $3);
+		}else if($2 == '*'){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new Multiplication(temp, $3);
+			$$ = new Assign(temp, $3);
+		}
+		else if($2 == '/'){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new Division(temp, $3);
+			$$ = new Assign(temp, $3);
+		}
+		else if($2 == '%'){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new Modulo(temp, $3);
+			$$ = new Assign(temp, $3);
+		}else if($2 == '+'){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new Addition(temp, $3);
+			$$ = new Assign(temp, $3);
+		}else if($2 == '-'){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new Subtraction(temp, $3);
+			$$ = new Assign(temp, $3);
+		}else if($2 == '<'){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new BitASL(temp, $3);
+			$$ = new Assign(temp, $3);
+		}else if($2 == '>'){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new BitASR(temp, $3);
+			$$ = new Assign(temp, $3);
+		}else if($2 == '&'){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new BitAnd(temp, $3);
+			$$ = new Assign(temp, $3);
+		}else if($2 == '^'){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new BitXor(temp, $3);
+			$$ = new Assign(temp, $3);
+		}
+		else if($2 == '|'){
+			auto temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new BitOr(temp, $3);
+			$$ = new Assign(temp, $3);
+		}
 	 }
 	| conditional_expression {$$ = $1; }
 	;
 
 assignment_operator
-	: '=' { std::cerr<<"Found =\n";}
-//	| MUL_ASSIGN {}
-//	| DIV_ASSIGN {}
-//	| MOD_ASSIGN {}
-//	| ADD_ASSIGN {}
-//	| SUB_ASSIGN {}
-//	| LEFT_ASSIGN {}
-//	| RIGHT_ASSIGN {}
-//	| AND_ASSIGN {}
-//	| XOR_ASSIGN {}
-//	| OR_ASSIGN {}
+	: '=' { $$ = '='; std::cerr<<"Found =\n";}
+	| MUL_ASSIGN {$$ = '*';}
+	| DIV_ASSIGN {$$ = '/';}
+	| MOD_ASSIGN {$$ = '%';}
+	| ADD_ASSIGN {$$ = '+';}
+	| SUB_ASSIGN {$$ = '-';}
+	| LEFT_ASSIGN {$$ = '<';}
+	| RIGHT_ASSIGN {$$ = '<';}
+	| AND_ASSIGN {$$ = '&';}
+	| XOR_ASSIGN {$$ = '^';}
+	| OR_ASSIGN {$$ = '|';}
 	;
 
 expression
@@ -241,10 +288,10 @@ storage_class_specifier
 
 type_specifier
 	: INT { $$ = new std::string("int");}
-//	| CHAR {$$ = new std::string("char");}
-//	| VOID {$$ = new std::string("void");}
-//	| FLOAT {$$ = new std::string("float");}
-//	| DOUBLE {$$ = new std::string("int");}
+	| CHAR {$$ = new std::string("char");}
+	| VOID {$$ = new std::string("void");}
+	| FLOAT {$$ = new std::string("float");}
+	| DOUBLE {$$ = new std::string("double");}
 //	| struct_specifier {}
 //	| enum_specifier {}
 //	| TYPE_NAME {}

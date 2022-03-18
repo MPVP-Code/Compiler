@@ -5,6 +5,8 @@
 
 int main(int argc, char *argv[]) {
     const Node *ast = parseAST();
+
+
     std::cout << ast->compileToMIPS();
 
     return 0;

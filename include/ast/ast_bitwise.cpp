@@ -26,3 +26,15 @@ BitNot::BitNot(Node *_in) {
     this->type = "Subtraction";
     this->in = _in;
 }
+
+BitASL::BitASL(Node *_in, Node* _shift) {
+    this->type = "ASL";
+    this->in = _in;
+    this->shift = _shift;
+}
+
+BitASR::BitASR(Node *_in, Node* _shift) {
+    this->type = "ASR";
+    this->in = _in;
+    this->shift = _shift;
+}

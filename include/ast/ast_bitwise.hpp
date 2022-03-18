@@ -40,5 +40,21 @@ public:
     BitNot(Node *_in);
 };
 
+class BitASL : public Node {
+public:
+    Node *in;
+    Node* shift;
+
+    BitASL(Node* _in, Node* _shift);
+};
+
+class BitASR : public Node {
+public:
+    Node *in;
+    Node* shift;
+
+    BitASR(Node *_in, Node* _shift);
+};
+
 #endif
 
