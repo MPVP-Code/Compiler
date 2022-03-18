@@ -62,6 +62,25 @@ FunctionDeclaration* buildTest4Function() {
     return function;
 }
 
+FunctionDeclaration* buildTest5Function() {
+    std::vector<Node *> statements;
+
+    Variable *variable = new Variable("int", "x", false);
+    statements.push_back(variable);
+
+    Constant *constant10 = new Constant(10);
+    Assign *assignVar = new Assign(variable, constant10);
+    statements.push_back(assignVar);
+
+    Return *returnStatement = new Return(variable);
+    statements.push_back(returnStatement);
+
+    FunctionDeclaration *function = new FunctionDeclaration("int", "f", statements);
+    RegisterAllocator::initCurrentRegister();
+    return function;
+}
+
+
 int main() {
     int testsPassed = 0;
     int testsChecked = 0;
@@ -82,7 +101,7 @@ int main() {
     RegisterAllocator::initCurrentRegister();
 
     std::string test1Out = function->compileToMIPS();
-    std::string test1Expected = "a():\nli $2, 0x000a\njr $31\nnop";
+    std::string test1Expected = "a:\n.set noreorder\nli $2, 0x000a\njr $31\nnop";
     if (test1Out.compare(test1Expected) == 0) {
         testsPassed++;
         std::cout << "Test 1 passed." << std::endl;
@@ -106,7 +125,7 @@ int main() {
     RegisterAllocator::reinitRegistersMappingMap();
 
     std::string test2Out = test2Function->compileToMIPS();
-    std::string test2Expected = "a():\nli $2, 0x000a\nli $3, 0x0014\naddu $4, $2, $3\njr $31\nnop";
+    std::string test2Expected = "a:\n.set noreorder\nli $2, 0x000a\nli $3, 0x0014\naddu $4, $2, $3\njr $31\nnop";
 
     if (test2Out.compare(test2Expected) == 0) {
         testsPassed++;
@@ -129,7 +148,7 @@ int main() {
     RegisterAllocator::reinitRegistersMappingMap();
 
     std::string test3Out = test3Function->compileToMIPS();
-    std::string test3Expected = "a():\nli $2, 0x000a\nli $3, 0x0014\naddu $4, $2, $3\naddu $2, $4, $0\njr $31\nnop";
+    std::string test3Expected = "a:\n.set noreorder\nli $2, 0x000a\nli $3, 0x0014\naddu $4, $2, $3\naddu $2, $4, $0\njr $31\nnop";
 
     if (test3Out.compare(test3Expected) == 0) {
         testsPassed++;
@@ -150,13 +169,35 @@ int main() {
     RegisterAllocator::reinitRegistersMappingMap();
 
     std::string test4Out = test4Function->compileToMIPS();
-    std::string test4Expected = "f():\nli $2, 0x000a\njr $31\nnop";
+    std::string test4Expected = "f:\n.set noreorder\nli $2, 0x000a\njr $31\nnop";
 
     if (test4Out.compare(test4Expected) == 0) {
         testsPassed++;
         std::cout << "Test 4 passed." << std::endl;
     } else {
         std::cout << "Test 4 failed. Expected output: " << test4Expected << " but received: " << test4Out << std::endl;
+    }
+    testsChecked++;
+
+    // Test 5
+    /*
+     int ffff() {
+        int x;
+        x=10;
+        return x;
+     }
+     */
+    RegisterAllocator::initCurrentRegister();
+    RegisterAllocator::reinitRegistersMappingMap();
+
+    FunctionDeclaration* test5Function = buildTest5Function();
+    std::string test5Out = test5Function->compileToMIPS();
+    std::string test5Expected = "f:\n.set noreorder\nli $2, 0x0000\nli $2, 0x000a\naddu $2, $2, $0\njr $31\nnop";
+    if (test5Out.compare(test5Expected) == 0) {
+        testsPassed++;
+        std::cout << "Test 5 passed." << std::endl;
+    } else {
+        std::cout << "Test 5 failed. Expected output: " << test5Expected << " but received: " << test5Out << std::endl;
     }
     testsChecked++;
 

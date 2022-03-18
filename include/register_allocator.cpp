@@ -13,7 +13,7 @@ void RegisterAllocator::reinitRegistersMappingMap() {
     registersMapping = map;
 }
 
-int RegisterAllocator::getRegisterNumberForVariable(std::string *variable)  {
+int RegisterAllocator::getRegisterNumberForVariable(const std::string *variable)  {
     int result = currentRegister;
     auto iterator = registersMapping.find(*variable);
     if (iterator == registersMapping.end()) {

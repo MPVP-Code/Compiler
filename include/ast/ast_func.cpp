@@ -13,7 +13,10 @@ FunctionDeclaration::FunctionDeclaration(std::string _return_type, std::string _
 std::string FunctionDeclaration::compileToMIPS() const {
     std::string result = this->name + ":\n.set noreorder\n";
 
+    std::cerr << "calling function declaration" << std::endl;
+
     for (Node *statement : statements) {
+        std::cerr << "statement " << statement->get_type() << std::endl;
         result += statement->compileToMIPS() + "\n";
     }
 

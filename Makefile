@@ -37,8 +37,8 @@ parsertest : parser lexer test_parser/src/parser_main.cpp $(ASTOUT)
 	mkdir -p test_parser/bin
 	g++ $(CPPFLAGS) -o test_parser/bin/parsertest test_parser/src/parser_main.cpp build/lexer.yy.o build/parser.tab.o $(ASTOUT)
 
-codegentest : test_codegen/src/codegen_main.cpp include/register_allocator.cpp
-	g++ $(CPPFLAGS) -o test_codegen/bin/codegen_main test_codegen/src/codegen_main.cpp include/register_allocator.cpp
+codegentest : test_codegen/src/codegen_main.cpp include/register_allocator.cpp $(AST)
+	g++ $(CPPFLAGS) -o test_codegen/bin/codegen_main test_codegen/src/codegen_main.cpp $(AST)
 
 clean :
 	rm -f src/*.o

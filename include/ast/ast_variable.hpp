@@ -19,6 +19,8 @@ public:
     std::string* getVariableType();
 
     virtual void generate_var_maps(Node *parent) override;
+
+    virtual std::string compileToMIPS() const override;
 };
 
 #endif
