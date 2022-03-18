@@ -22,7 +22,6 @@ public:
 
     virtual std::string compileToMIPS() const override;
 
-    virtual void generate_var_maps(Node *parent) override;
 };
 
 class FunctionCall : public Node {

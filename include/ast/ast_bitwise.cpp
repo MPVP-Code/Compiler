@@ -4,37 +4,26 @@
 
 #include "ast_bitwise.hpp"
 
-BitAnd::BitAnd(Node *L, Node *R) {
-    this->type = "Subtraction";
-    this->L = L;
-    this->R = R;
+BitAnd::BitAnd(Node *_L, Node *_R) : BinaryOperator(_L, _R){
+    this->type = "BitAnd";
 }
 
-BitOr::BitOr(Node *L, Node *R) {
-    this->type = "Subtraction";
-    this->L = L;
-    this->R = R;
+BitOr::BitOr(Node *_L, Node *_R) : BinaryOperator(_L, _R){
+    this->type = "BitOr";
 }
 
-BitXor::BitXor(Node *L, Node *R) {
-    this->type = "Subtraction";
-    this->L = L;
-    this->R = R;
+BitXor::BitXor(Node *_L, Node *_R) : BinaryOperator(_L, _R){
+    this->type = "BitXor";
 }
 
-BitNot::BitNot(Node *_in) {
-    this->type = "Subtraction";
-    this->in = _in;
+BitNot::BitNot(Node *_in) : UnaryOperator(_in){
+    this->type = "BitNot";
 }
 
-BitASL::BitASL(Node *_in, Node* _shift) {
-    this->type = "ASL";
-    this->in = _in;
-    this->shift = _shift;
+BitASL::BitASL(Node *_L, Node* _R) : BinaryOperator(_L, _R){
+    this->subtype = "ASL";
 }
 
-BitASR::BitASR(Node *_in, Node* _shift) {
-    this->type = "ASR";
-    this->in = _in;
-    this->shift = _shift;
+BitASR::BitASR(Node *_L, Node* _R) : BinaryOperator(_L, _R){
+    this->subtype = "ASR";
 }

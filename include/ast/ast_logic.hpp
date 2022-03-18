@@ -5,84 +5,58 @@
 #ifndef AST_LOGIC_HPP
 #define AST_LOGIC_HPP
 #include "ast_node.hpp"
+#include "ast_operator.hpp"
 
-class LogicAnd : public Node {
+class LogicAnd : public BinaryOperator {
 public:
-    Node *R;
-    Node *L;
-
-    LogicAnd(Node *L, Node *R);
+    LogicAnd(Node *_L, Node *_R);
 
 };
 
-class LogicOr : public Node {
+class LogicOr : public BinaryOperator {
 public:
-    Node *R;
-    Node *L;
-
-    LogicOr(Node *L, Node *R);
+    LogicOr(Node *_L, Node *_R);
 
 };
-class LogicNot : public Node {
+class LogicNot : public UnaryOperator {
 public:
-    Node *R;
-    Node *source;
-
     LogicNot(Node *_source);
 
 };
 
-class LogicEQ : public Node { //Equality operator
+class LogicEQ : public BinaryOperator { //Equality operator
 public:
-    Node *R;
-    Node *L;
-
-    LogicEQ(Node *L, Node *R);
+    LogicEQ(Node *_L, Node *_R);
 
 };
 
-class LogicNE : public Node { // Not equal operator
+class LogicNE : public BinaryOperator { // Not equal operator
 public:
-    Node *R;
-    Node *L;
-
-    LogicNE(Node *L, Node *R);
+    LogicNE(Node *_L, Node *_R);
 
 };
 
-class LogicLT : public Node { //Less than or equal
+class LogicLT : public BinaryOperator { //Less than or equal
 public:
-    Node *R;
-    Node *L;
-
-    LogicLT(Node *L, Node *R);
+    LogicLT(Node *_L, Node *_R);
 
 };
 
-class LogicGT : public Node { // Greater than or equal
+class LogicGT : public BinaryOperator { // Greater than or equal
 public:
-    Node *R;
-    Node *L;
-
-    LogicGT(Node *L, Node *R);
+    LogicGT(Node *_L, Node *_R);
 
 };
 
-class LogicLE : public Node { //Less than or equal
+class LogicLE : public BinaryOperator { //Less than or equal
 public:
-    Node *R;
-    Node *L;
-
-    LogicLE(Node *L, Node *R);
+    LogicLE(Node *_L, Node *_R);
 
 };
 
-class LogicGE : public Node { // Greater than or equal
+class LogicGE : public BinaryOperator { // Greater than or equal
 public:
-    Node *R;
-    Node *L;
-
-    LogicGE(Node *L, Node *R);
+    LogicGE(Node *_L, Node *_R);
 
 };
 

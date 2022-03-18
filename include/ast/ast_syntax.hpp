@@ -10,6 +10,5 @@ public:
 
     Identifier(std::string id);
 
-    virtual void generate_var_maps(Node *parent) override;
 };
 #endif

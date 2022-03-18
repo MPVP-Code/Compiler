@@ -20,13 +20,25 @@ Assign::Assign(Variable *_destination, Node *_source) : destination(_destination
 
 void Assign::generate_var_maps(Node *parent) {
     Scope *parentScope = (Scope*) parent;
+
+    //Destination var mapping
     if (this->destination->declaration) {
         parentScope->var_map[destination->name] = destination;
     } else {
-        Variable *old_destination = this->destination;
-        this->destination = parentScope->var_map[old_destination->name];
+        this->destination = parentScope->var_map[this->destination->name];
     }
-    source->generate_var_maps(parent);
+
+    //Source varmapping
+    if(this->source->type == "Variable"){
+        auto var = (Variable*) this->source;
+        this->source = parentScope->var_map[var->name];
+    }
+    else{
+        source->generate_var_maps(parent);
+    }
+
+    //type propagation
+    this->data_type = source->data_type;
 }
 
 std::string Assign::compileToMIPS() const {

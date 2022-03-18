@@ -27,7 +27,6 @@ std::string* FunctionDeclaration::getName() {
 
 FunctionDeclaration::~FunctionDeclaration() {}
 
-void FunctionDeclaration::generate_var_maps(Node *parent) {}
 
 FunctionCall::FunctionCall(std::string _function_name, std::vector<Node*> _arguments): function_name(_function_name) {
     this->branches = _arguments;

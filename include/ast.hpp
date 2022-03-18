@@ -13,11 +13,12 @@
 #include "ast/ast_jump_statement.hpp"
 #include "ast/ast_logic.hpp"
 #include "ast/ast_node.hpp"
+#include "ast/ast_operator.hpp"
 #include "ast/ast_scope.hpp"
 #include "ast/ast_syntax.hpp"
 #include "ast/ast_variable.hpp"
 
 
-extern const Node *parseAST();
+extern Node *parseAST();
 
 #endif

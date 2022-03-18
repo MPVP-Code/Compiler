@@ -168,46 +168,46 @@ assignment_expression
 		}else if($2 == '*'){
 			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
 			Node* op = new Multiplication(temp, $3);
-			$$ = new Assign(temp, $3);
+			$$ = new Assign(temp, op);
 		}
 		else if($2 == '/'){
 			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
 			Node* op = new Division(temp, $3);
-			$$ = new Assign(temp, $3);
+			$$ = new Assign(temp, op);
 		}
 		else if($2 == '%'){
 			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
 			Node* op = new Modulo(temp, $3);
-			$$ = new Assign(temp, $3);
+			$$ = new Assign(temp, op);
 		}else if($2 == '+'){
 			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
 			Node* op = new Addition(temp, $3);
-			$$ = new Assign(temp, $3);
+			$$ = new Assign(temp, op);
 		}else if($2 == '-'){
 			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
 			Node* op = new Subtraction(temp, $3);
-			$$ = new Assign(temp, $3);
+			$$ = new Assign(temp, op);
 		}else if($2 == '<'){
 			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
 			Node* op = new BitASL(temp, $3);
-			$$ = new Assign(temp, $3);
+			$$ = new Assign(temp, op);
 		}else if($2 == '>'){
 			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
 			Node* op = new BitASR(temp, $3);
-			$$ = new Assign(temp, $3);
+			$$ = new Assign(temp, op);
 		}else if($2 == '&'){
 			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
 			Node* op = new BitAnd(temp, $3);
-			$$ = new Assign(temp, $3);
+			$$ = new Assign(temp, op);
 		}else if($2 == '^'){
 			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
 			Node* op = new BitXor(temp, $3);
-			$$ = new Assign(temp, $3);
+			$$ = new Assign(temp, op);
 		}
 		else if($2 == '|'){
 			auto temp = new Variable("None", ((Identifier*)$1)->identifier, false);
 			Node* op = new BitOr(temp, $3);
-			$$ = new Assign(temp, $3);
+			$$ = new Assign(temp, op);
 		}
 	 }
 	| conditional_expression {$$ = $1; }
@@ -242,7 +242,7 @@ declaration
 			if(statement -> type == "Variable"){
 				auto temp = (Variable*) statement;
 				if (temp->declaration){
-					temp->variable_type = *$1;
+					temp->data_type = *$1;
 				}
 			}
 		}
@@ -529,7 +529,7 @@ extern char yytext[];
 
 Global* global_root;
 
-const Node *parseAST()
+Node *parseAST()
 {
 	global_root=0;
   	yyparse();

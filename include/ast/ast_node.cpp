@@ -32,4 +32,8 @@ std::string Node::compileToMIPS() const {
     throw std::runtime_error(this->type + " compileToMIPS not implemented.");
 }
 
-void Node::generate_var_maps(Node *parent) {}
+void Node::generate_var_maps(Node *parent) {
+    std::cerr << "failed to generate map\n";
+}
+
+

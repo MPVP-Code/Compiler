@@ -1,9 +1,11 @@
 #include "ast_arithmetic.hpp"
 #include "ast_node.hpp"
 #include "ast_variable.hpp"
+#include "ast_operator.hpp"
+#include "../ast.hpp"
 
-Addition::Addition(Node *_L, Node *_R): L(_L), R(_R) {
-    this->type = "Addition";
+Addition::Addition(Node *_L, Node *_R) : BinaryOperator(_L, _R){
+    this->subtype = "Addition";
 };
 
 Node* Addition::getL() {
@@ -22,28 +24,22 @@ bool Addition::isRInt() {
     return R->get_type().compare("Variable") == 0 && ((Variable *) R)->getVariableType()->compare("int") == 0;
 }
 
-void Addition::generate_var_maps(Node *parent) {}
 
-Subtraction::Subtraction(Node *_L, Node *_R): L(_L), R(_R) {
+Subtraction::Subtraction(Node *_L, Node *_R): BinaryOperator(_L, _R) {
     this->type = "Subtraction";
 };
 
-void Subtraction::generate_var_maps(Node *parent) {}
 
-Multiplication::Multiplication(Node *_L, Node *_R) : L(_L), R(_R) {
+Multiplication::Multiplication(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
     this->type = "Multiplication";
 };
 
-void Multiplication::generate_var_maps(Node *parent) {}
 
-Division::Division(Node *_L, Node *_R) : L(_L), R(_R) {
+Division::Division(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
     this->type = "Division";
 }
 
-void Division::generate_var_maps(Node *parent) {}
 
-Modulo::Modulo(Node *_L, Node *_R) : L(_L), R(_R) {
+Modulo::Modulo(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
     this->type = "Division";
 }
-
-void Modulo::generate_var_maps(Node *parent) {}

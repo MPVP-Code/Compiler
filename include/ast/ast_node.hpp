@@ -31,6 +31,7 @@ public:
     virtual std::string compileToMIPS() const;
 
     virtual void generate_var_maps(Node *parent);
+
 };
 
 

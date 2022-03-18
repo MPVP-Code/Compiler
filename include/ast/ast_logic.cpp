@@ -3,51 +3,34 @@
 //
 #include "ast_logic.hpp"
 
-LogicAnd::LogicAnd(Node *L, Node *R) {
-    this->type = "LogicAnd";
-    this->L = L;
-    this->R = R;
+LogicAnd::LogicAnd(Node *_L, Node *_R) : BinaryOperator(_L, _R){
+    this->subtype = "LogicAnd";
 }
 
-LogicOr::LogicOr(Node *L, Node *R) {
-    this->type = "LogicOr";
-    this->L = L;
-    this->R = R;
+LogicOr::LogicOr(Node *_L, Node *_R) : BinaryOperator(_L, _R){
+    this->subtype = "LogicOr";
 }
-LogicNot::LogicNot(Node *_source) {
-    this->type = "LogicNot";
-    this->source = _source;
+LogicNot::LogicNot(Node *_source) : UnaryOperator(_source){
+    this->subtype = "LogicNot";
 }
-LogicEQ::LogicEQ(Node *L, Node *R) {
-    this->type = "Equal";
-    this->L = L;
-    this->R = R;
+LogicEQ::LogicEQ(Node *_L, Node *_R) : BinaryOperator(_L, _R){
+    this->subtype = "Equal";
 }
-LogicNE::LogicNE(Node *L, Node *R) {
-    this->type = "NotEqual";
-    this->L = L;
-    this->R = R;
+LogicNE::LogicNE(Node *_L, Node *_R) : BinaryOperator(_L, _R){
+    this->subtype = "NotEqual";
 }
-LogicLT::LogicLT(Node *L, Node *R) {
-    this->type = "LessThan";
-    this->L = L;
-    this->R = R;
+LogicLT::LogicLT(Node *_L, Node *_R) : BinaryOperator(_L, _R){
+    this->subtype = "LessThan";
 }
-LogicGT::LogicGT(Node *L, Node *R) {
-    this->type = "GreaterThan";
-    this->L = L;
-    this->R = R;
+LogicGT::LogicGT(Node *_L, Node *_R) : BinaryOperator(_L, _R){
+    this->subtype = "GreaterThan";
 }
 
-LogicGE::LogicGE(Node *L, Node *R) {
-    this->type = "GreaterEqual";
-    this->L = L;
-    this->R = R;
+LogicGE::LogicGE(Node *_L, Node *_R) : BinaryOperator(_L, _R){
+    this->subtype = "GreaterEqual";
 }
 
-LogicLE::LogicLE(Node *L, Node *R) {
-    this->type = "LessEqual";
-    this->L = L;
-    this->R = R;
+LogicLE::LogicLE(Node *_L, Node *_R) : BinaryOperator(_L, _R){
+    this->subtype = "LessEqual";
 }
 
