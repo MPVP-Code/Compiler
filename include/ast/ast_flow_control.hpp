@@ -22,6 +22,8 @@ private:
     Node* condition;
     std::vector<Node*>* truestatements;
     std::vector<Node*>* falsestatements;
+
+    std::string compileStatementsToMIPS(std::vector<Node*>* statements) const;
 public:
     If(Node* _condition, std::vector<Node*>* _truestatements, std::vector<Node*>* _falsestatements);
 

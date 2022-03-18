@@ -121,6 +121,28 @@ FunctionDeclaration* buildTest7Function() {
     return function;
 }
 
+FunctionDeclaration* buildTest8Function() {
+    std::vector<Node *> statements;
+    std::vector<Node *>* trueStatements = new std::vector<Node*>;
+    std::vector<Node *>* falseStatements = new std::vector<Node*>;
+
+    Constant *constant11 = new Constant(11);
+    Return *returnTrue = new Return(constant11);
+    trueStatements->push_back(returnTrue);
+
+    Constant *condition = new Constant(0);
+
+    Constant *constant10 = new Constant(10);
+    Return *returnFalse = new Return(constant10);
+    falseStatements->push_back(returnFalse);
+
+    If *ifStatement = new If(condition, trueStatements, falseStatements);
+    statements.push_back(ifStatement);
+
+    FunctionDeclaration *function = new FunctionDeclaration("int", "f", statements);
+    return function;
+}
+
 int main() {
     int testsPassed = 0;
     int testsChecked = 0;
@@ -289,6 +311,28 @@ int main() {
         std::cout << "Test 7 passed." << std::endl;
     } else {
         std::cout << "Test 7 failed. Expected output: " << test7Expected << " but received: " << test7Out << std::endl;
+    }
+    testsChecked++;
+
+    // Test 8
+    /*
+     int f()
+{
+    if(0){
+        return 11;
+    }else{
+        return 10;
+    }
+}*/
+    FunctionDeclaration* test8Function = buildTest8Function();
+    std::string test8Out = test8Function->compileToMIPS();
+    std::string test8Expected = "f:\n.set noreorder\nli $2, 0x000a\njr $31\nnop\njr $31\nnop"; // Because of the fact that the function does not know its context
+
+    if (test8Out.compare(test8Expected) == 0) {
+        testsPassed++;
+        std::cout << "Test 8 passed." << std::endl;
+    } else {
+        std::cout << "Test 8 failed. Expected output: " << test8Expected << " but received: " << test8Out << std::endl;
     }
     testsChecked++;
 
