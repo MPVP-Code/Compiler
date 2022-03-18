@@ -22,6 +22,15 @@ std::string If::compileToMIPS() const {
         Constant *constantCondition = (Constant*) condition;
         if (constantCondition->getValue() == 0 && falsestatements == nullptr) {
             return "";
+        } else if (constantCondition->getValue() != 0 && truestatements != nullptr) {
+            for (Node *statement : *truestatements) {
+                std::string generatedCode = statement->compileToMIPS();
+                if (generatedCode.length() != 0) {
+                    result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
+                }
+            }
+
+            result = result.substr(0, result.length() - 1);
         }
     }
 

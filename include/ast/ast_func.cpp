@@ -19,8 +19,11 @@ std::string FunctionDeclaration::compileToMIPS() const {
             result += compiledCode + "\n";
         }
     }
+    result = result.substr(0, result.length() - 1);
 
-    result += "jr $31\nnop";
+    if (statements[statements.size() - 1]->get_type() != "ReturnExpression") {
+        result += "\njr $31\nnop";
+    }
     return result;
 };
 
