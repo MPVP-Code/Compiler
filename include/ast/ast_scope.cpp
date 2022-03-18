@@ -20,10 +20,7 @@ void Scope::generate_var_maps(Node* parent) {
         } else if (node->type == "Variable" ){
             auto temp = (Variable*) node;
             if(temp->declaration) {
-                parentScope->var_map[temp->name] = temp;
-            }
-            else{
-                this->resolve_variable_scope(temp->name);
+                this->var_map[temp->name] = temp;
             }
         }
         else{

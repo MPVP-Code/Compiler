@@ -25,13 +25,13 @@ void Assign::generate_var_maps(Node *parent) {
     if (this->destination->declaration) {
         parentScope->var_map[destination->name] = destination;
     } else {
-        this->destination = parentScope->var_map[this->destination->name];
+        this->destination = parentScope->resolve_variable_scope(this->destination->name);
     }
 
     //Source varmapping
     if(this->source->type == "Variable"){
         auto var = (Variable*) this->source;
-        this->source = parentScope->var_map[var->name];
+        this->source = parentScope->resolve_variable_scope(var->name);
     }
     else{
         source->generate_var_maps(parent);

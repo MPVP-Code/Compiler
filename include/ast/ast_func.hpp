@@ -9,7 +9,6 @@
 class FunctionDeclaration : public Scope
 {
 public:
-    std::vector<Node*> statements;
     std::string return_type;
     std::string name;
 
