@@ -9,6 +9,8 @@
 
 class Scope : public Node {
 public:
+    std::vector<Node *> statements;  //New instead of branches
+
     Scope *parent_scope;
     std::map<std::string, Variable *> var_map;
     int stack_frame_length;

@@ -42,10 +42,6 @@ void Assign::generate_var_maps(Node *parent) {
     this->data_type = destination->data_type;
 }
 
-void Constant::generate_var_maps(Node *parent) {
-    return;
-}
-
 std::string Assign::compileToMIPS() const {
     std::string result = "";
     if (source->type == "Constant") {

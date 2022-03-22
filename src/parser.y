@@ -476,7 +476,7 @@ selection_statement
 	;
 
 iteration_statement
-	: WHILE '(' expression ')' statement { $$ = new While($3, $5);	}
+	: WHILE '(' expression ')' statement { $$ = new While($3, *$5);	}
 //	| DO statement WHILE '(' expression ')' ';' {}
 //	| FOR '(' expression_statement expression_statement ')' statement {}
 //	| FOR '(' expression_statement expression_statement expression ')' statement {}
@@ -495,11 +495,11 @@ jump_statement
 
 translation_unit
 	: external_declaration { global_root = new Global();
-				global_root->branches.insert(global_root->branches.end(), $1->begin(), $1->end());
+				global_root->statements.insert(global_root->statements.end(), $1->begin(), $1->end());
 				std::cerr << "Found function\n";
 	 			}
 	| translation_unit external_declaration {
-				global_root->branches.insert(global_root->branches.end(), $2->begin(), $2->end());
+				global_root->statements.insert(global_root->statements.end(), $2->begin(), $2->end());
 				std::cerr << "Found another";
 				}
 	;

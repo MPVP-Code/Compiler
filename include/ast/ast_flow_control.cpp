@@ -4,7 +4,7 @@
 #include "ast_flow_control.hpp"
 #include "ast_assignment.hpp"
 
-While::While(Node* _condition, std::vector<Node*>* _statements): Scope(), condition(_condition){
+While::While(Node* _condition, std::vector<Node*> _statements): Scope(), condition(_condition){
         this->subtype = "While";
         this->statements = _statements;
 }
@@ -25,7 +25,7 @@ std::string While::compileToMIPS() const {
         int conditionRegister = RegisterAllocator::getRegisterNumberForVariable(conditionVariable->getName());
         result += "beq $" + std::to_string(conditionRegister) + ", $0, " + whileEnd + "\nnop\n";
 
-        for (Node *statement : *statements) {
+        for (Node *statement : statements) {
             std::string generatedCode = statement->compileToMIPS();
             if (generatedCode.length() != 0) {
                 result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");

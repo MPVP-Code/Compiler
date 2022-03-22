@@ -5,12 +5,11 @@
 
 Scope::Scope() {
     this->type = "Scope";
-    this->branches = {};
 }
 
 void Scope::generate_var_maps(Node* parent) {
     Scope *parentScope = (Scope*) parent;
-    for (auto &node: this->branches) {
+    for (auto &node: this->statements) {
         if (node->type == "Scope") {
             Scope *scope = (Scope *) node;
             scope->parent_scope = this;
@@ -34,7 +33,7 @@ void Scope::generate_var_maps(Node* parent) {
 };
 
 std::vector<Node*>* Scope::getBranches() {
-    return &(this->branches);
+    return &(this->statements);
 };
 
 std::string Scope::compileToMIPS() const {
@@ -50,7 +49,7 @@ Global::Global() {
 std::string Global::compileToMIPS() const {
     std::string result = "";
 
-    for (Node *statement: this->branches) {
+    for (Node *statement: this->statements) {
         std::cerr << "statement->get_type(): " << statement->get_type()  << "subtype: " << statement->getSubtype() << std::endl;
         if (statement->get_type().compare("FunctionDeclaration") == 0 || statement->getSubtype().compare("FunctionDeclaration") == 0) {
             FunctionDeclaration *function = (FunctionDeclaration*) statement;
@@ -58,7 +57,7 @@ std::string Global::compileToMIPS() const {
         }
     }
 
-    for (Node *statement : this->branches) {
+    for (Node *statement : this->statements) {
         result += statement->compileToMIPS() + "\n";
     }
 

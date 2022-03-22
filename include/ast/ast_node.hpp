@@ -8,7 +8,6 @@
 
 class Node {
 public:
-    std::vector<Node *> branches;
     std::string data_type;
 
     //Node disambiguation for pointer casting
