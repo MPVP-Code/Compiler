@@ -16,6 +16,7 @@
 #include "ast/ast_operator.hpp"
 #include "ast/ast_scope.hpp"
 #include "ast/ast_syntax.hpp"
+#include "ast/ast_stack.hpp"
 #include "ast/ast_variable.hpp"
 
 

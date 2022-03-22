@@ -7,9 +7,6 @@
 
 class Addition : public BinaryOperator {
 public:
-    Node *L;
-    Node *R;
-
     Addition(Node *_L, Node *_R);
 
     ~Addition(){}

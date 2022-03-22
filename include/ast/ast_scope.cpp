@@ -10,7 +10,7 @@ Scope::Scope() {
 
 void Scope::generate_var_maps(Node* parent) {
     Scope *parentScope = (Scope*) parent;
-    for (auto node: this->branches) {
+    for (auto &node: this->branches) {
         if (node->type == "Scope") {
             Scope *scope = (Scope *) node;
             scope->parent_scope = this;
@@ -21,9 +21,12 @@ void Scope::generate_var_maps(Node* parent) {
             if(temp->declaration) {
                 this->var_map[temp->name] = temp;
             }
+            else{
+                node = this->var_map[temp->name] = temp;
+            }
         }
         else{
-            node->generate_var_maps(parent);
+            node->generate_var_maps(this);
         }
 
     }
@@ -38,18 +41,6 @@ std::string Scope::compileToMIPS() const {
     throw std::runtime_error(this->type + " compileToMIPS not implemented.");
 }
 
-Variable* Scope::resolve_variable_scope(std::string name){
-    Scope* current = this;
-    while(current != NULL){
-        if(this->var_map.contains(name)){
-            return var_map.at(name);
-        }
-        else{
-            current = current->parent_scope;
-        }
-    }
-    return NULL;
-};
 
 Global::Global() {
     this->type = "Global";

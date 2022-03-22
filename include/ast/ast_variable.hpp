@@ -22,4 +22,14 @@ public:
     virtual std::string compileToMIPS() const override;
 };
 
+class Variable_type{
+public:
+    std::string name;
+    std::string aliasfor;
+    int size;
+    Variable_type(){
+        
+    }
+};
+
 #endif
