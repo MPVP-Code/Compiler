@@ -16,6 +16,8 @@ public:
     Constant(int _value);
 
     int getValue();
+
+    virtual void generate_var_maps(Node *parent) override;
 };
 
 class Assign : public Node {

@@ -20,4 +20,14 @@ public:
     virtual void generate_var_maps(Node *parent) override;
 };
 
+class Variable_type{
+public:
+    std::string name;
+    std::string aliasfor;
+    int size;
+    Variable_type(){
+        
+    }
+};
+
 #endif

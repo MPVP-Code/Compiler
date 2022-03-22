@@ -13,6 +13,7 @@ Constant::Constant(int _value) : value(_value) {
 int Constant::getValue() {
     return this->value;
 }
+void Constant::generate_var_maps(Node *parent) {}
 
 Assign::Assign(Variable *_destination, Node *_source) : destination(_destination), source(_source) {
     this->type = "Assign";
@@ -25,20 +26,20 @@ void Assign::generate_var_maps(Node *parent) {
     if (this->destination->declaration) {
         parentScope->var_map[destination->name] = destination;
     } else {
-        this->destination = parentScope->resolve_variable_scope(this->destination->name);
+        this->destination = resolve_variable_scope(this->destination->name, parentScope);
     }
 
     //Source varmapping
     if(this->source->type == "Variable"){
         auto var = (Variable*) this->source;
-        this->source = parentScope->resolve_variable_scope(var->name);
+        this->source = resolve_variable_scope(var->name, parentScope);
     }
     else{
         source->generate_var_maps(parent);
     }
 
     //type propagation
-    this->data_type = source->data_type;
+    this->data_type = destination->data_type;
 }
 
 std::string Assign::compileToMIPS() const {

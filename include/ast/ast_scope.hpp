@@ -11,6 +11,7 @@ class Scope : public Node {
 public:
     Scope *parent_scope;
     std::map<std::string, Variable *> var_map;
+    int stack_frame_length;
 
     Scope();
 
