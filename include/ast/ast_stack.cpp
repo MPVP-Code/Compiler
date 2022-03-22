@@ -17,3 +17,22 @@ Variable* resolve_variable_scope(std::string name, Scope* current){
     }
     return NULL;
 };
+
+
+//Tries to replace variable pointer with mapped variables
+
+void try_replace_variable(Node* &varptr, Node* inscope){
+    Scope* scope = (Scope*) inscope;
+    if (varptr->type == "Variable" ){
+        auto temp = (Variable*) varptr;
+        if(temp->declaration) {
+            scope->var_map[temp->name] = temp;
+        }
+        else {
+            varptr = resolve_variable_scope(temp->name, scope);
+        }
+    }
+    else{
+        varptr->generate_var_maps(scope);
+    }
+}

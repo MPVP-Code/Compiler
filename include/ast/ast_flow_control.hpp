@@ -18,16 +18,16 @@ public:
 };
 
 class If: public Scope {
-private:
+public:
     Node* condition;
     std::vector<Node*>* truestatements;
     std::vector<Node*>* falsestatements;
 
-    std::string compileStatementsToMIPS(std::vector<Node*>* statements) const;
-public:
+
     If(Node* _condition, std::vector<Node*>* _truestatements, std::vector<Node*>* _falsestatements);
 
     virtual std::string compileToMIPS() const override;
+    std::string compileStatementsToMIPS(std::vector<Node*>* statements) const;
 };
 
 #endif

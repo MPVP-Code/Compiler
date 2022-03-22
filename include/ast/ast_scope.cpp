@@ -1,6 +1,7 @@
 #include "ast_scope.hpp"
 #include "ast_func.hpp"
-
+#include "ast_flow_control.hpp"
+#include "ast_stack.hpp"
 #include <string>
 
 Scope::Scope() {
@@ -10,27 +11,29 @@ Scope::Scope() {
 void Scope::generate_var_maps(Node* parent) {
     Scope *parentScope = (Scope*) parent;
     for (auto &node: this->statements) {
+
         if (node->type == "Scope") {
             Scope *scope = (Scope *) node;
             scope->parent_scope = this;
-            scope->generate_var_maps(this);
 
-        } else if (node->type == "Variable" ){
-            auto temp = (Variable*) node;
-            if(temp->declaration) {
-                this->var_map[temp->name] = temp;
+            //Applies varmaps to conditions
+            if (scope->subtype == "While") {
+                While* flow = (While *) scope;
+                try_replace_variable(flow->condition, scope);
+
+            } else if (scope->subtype == "If") {
+                If* flow = (If *) scope;
+                try_replace_variable(flow->condition, scope);
             }
-            else{
-                node = this->var_map[temp->name] = temp;
-            }
-        }
-        else{
-            node->generate_var_maps(this);
+            scope->generate_var_maps(scope);
+
+        }else {
+            try_replace_variable(node, this);
         }
 
     }
-
 };
+
 
 std::vector<Node*>* Scope::getBranches() {
     return &(this->statements);
