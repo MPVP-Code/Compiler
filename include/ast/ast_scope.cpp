@@ -32,6 +32,21 @@ void Scope::generate_var_maps(Node* parent) {
         }
 
     }
+    //Generate scope offsets & allocate stack memory.
+    int offset = 0;
+
+
+
+    for(auto &var : this->var_map){
+        var.second->offset = offset;
+        offset += resolve_variable_size(var.second->data_type, this);
+    }
+
+    //Allocates two extra words for future system use $ra backup, $spfp backup
+    int extra_words = 2;
+    offset += 4*extra_words;
+    this->stack_frame_size = offset;
+
 };
 
 
@@ -47,6 +62,12 @@ std::string Scope::compileToMIPS() const {
 Global::Global() {
     this->type = "Global";
     this->parent_scope = NULL;
+
+    this->type_map["int"] = new Variable_type("int", "none", 4);
+    this->type_map["int"] = new Variable_type("double", "none", 4);
+    this->type_map["int"] = new Variable_type("float", "none", 2);
+    this->type_map["int"] = new Variable_type("char", "none", 1);
+    this->type_map["int"] = new Variable_type("unsigned", "int", 4);
 }
 
 std::string Global::compileToMIPS() const {
