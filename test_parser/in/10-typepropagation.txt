@@ -1,0 +1,7 @@
+int glob = 10;
+int f(){
+    int a, b;
+    a = 10;
+    b  = 10;
+    glob = a + b;
+}
