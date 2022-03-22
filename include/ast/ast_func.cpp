@@ -4,8 +4,9 @@
 #include <vector>
 
 FunctionDeclaration::FunctionDeclaration(std::string _return_type, std::string _name, std::vector<Node*> _statements):
-    return_type(_return_type), name(_name), statements(_statements) {
+    return_type(_return_type), name(_name){
     //Type specification
+    this->branches = _statements;
     this->type = "Scope";
     this->subtype = "FunctionDeclaration";
 }
@@ -13,7 +14,7 @@ FunctionDeclaration::FunctionDeclaration(std::string _return_type, std::string _
 std::string FunctionDeclaration::compileToMIPS() const {
     std::string result = this->name + ":\n.set noreorder\n";
 
-    for (Node *statement : statements) {
+    for (Node *statement : branches) {
         std::string compiledCode = statement->compileToMIPS();
         if (compiledCode.length() != 0) {
             result += compiledCode + "\n";
@@ -21,7 +22,7 @@ std::string FunctionDeclaration::compileToMIPS() const {
     }
     result = result.substr(0, result.length() - 1);
 
-    if (statements[statements.size() - 1]->get_type() != "ReturnExpression") {
+    if (branches[branches.size() - 1]->get_type() != "ReturnExpression") {
         result += "\njr $31\nnop";
     }
     return result;

@@ -4,8 +4,8 @@
 #include "ast_flow_control.hpp"
 #include "ast_assignment.hpp"
 
-While::While(Node* _condition, std::vector<Node*>* _statements): condition(_condition) {
-        this->type = "While";
+While::While(Node* _condition, std::vector<Node*>* _statements): Scope(), condition(_condition){
+        this->subtype = "While";
         this->statements = _statements;
 }
 
@@ -39,8 +39,8 @@ std::string While::compileToMIPS() const {
     return result.substr(0, result.length() - 1);
 }
 
-If::If(Node* _condition, std::vector<Node*>* _truestatements, std::vector<Node*>* _falsestatements): condition(_condition) {
-        this->type = "If";
+If::If(Node* _condition, std::vector<Node*>* _truestatements, std::vector<Node*>* _falsestatements): Scope(), condition(_condition) {
+        this->subtype = "If";
         this->truestatements = _truestatements;
         this->falsestatements = _falsestatements;
 }

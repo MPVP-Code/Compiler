@@ -1,0 +1,10 @@
+int glob = 10;
+int f(){
+        int a, b, c, d, e, f, x, y;
+    a = x & y;
+    b = x | y;
+    c = x ^ y;
+    d = ~x;
+    e = x << y;
+    f = x >> y;
+}

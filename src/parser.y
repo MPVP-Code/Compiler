@@ -40,7 +40,7 @@ void yyerror(const char *);
 %type <string> type_specifier declaration_specifiers  direct_declarator declarator
 %type <statements> compound_statement statement_list external_declaration declaration init_declarator_list init_declarator
 %type <statements> declaration_list statement
-%type <character> unary_operator
+%type <character> unary_operator assignment_operator
 
 %start translation_unit
 %%
@@ -69,12 +69,14 @@ argument_expression_list
 	;
 
 unary_expression
-	: postfix_expression {$$ = $1; std::cerr<< "unary postfix expression\n";}
+	: postfix_expression {$$ = $1;}
 //	| INC_OP unary_expression {}
 //	| DEC_OP unary_expression {}
 	| unary_operator unary_expression {
 	if ($1 == '~'){
 		$$ = new BitNot ($2);
+	} else if ($1 == '!'){
+		$$ = new LogicNot($2);
 	}
 
 	}
@@ -83,12 +85,12 @@ unary_expression
 	;
 
 unary_operator
-	: '&' {}
-	| '*' {}
-	| '+' {}
-	| '-' {}
-	| '~' {}
-	| '!' {}
+	: '&' {$$ = '&';}
+	| '*' {$$ = '*';}
+	| '+' {$$ = '+';}
+	| '-' {$$ = '-';}
+	| '~' {$$ = '~';}
+	| '!' {$$ = '!';}
 	;
 
 
@@ -110,22 +112,22 @@ additive_expression
 
 shift_expression
 	: additive_expression {$$ = $1;}
-//	| shift_expression LEFT_OP additive_expression {}
-//	| shift_expression RIGHT_OP additive_expression {}
+	| shift_expression LEFT_OP additive_expression {$$ = new BitASL($1, $3);}
+	| shift_expression RIGHT_OP additive_expression {$$ = new BitASR($1, $3);}
 	;
 
 relational_expression
 	: shift_expression {$$ =$1;}
-//	| relational_expression '<' shift_expression {}
-//	| relational_expression '>' shift_expression {}
-//	| relational_expression LE_OP shift_expression {}
-//	| relational_expression GE_OP shift_expression {}
+	| relational_expression '<' shift_expression {$$ = new LogicLT($1,$3);}
+	| relational_expression '>' shift_expression {$$ = new LogicGT($1,$3);}
+	| relational_expression LE_OP shift_expression {$$ = new LogicLE($1,$3);}
+	| relational_expression GE_OP shift_expression {$$ = new LogicGE($1,$3);}
 	;
 
 equality_expression
 	: relational_expression {$$ = $1;}
-//	| equality_expression EQ_OP relational_expression {}
-//	| equality_expression NE_OP relational_expression {}
+	| equality_expression EQ_OP relational_expression {$$ = new LogicEQ($1,$3);}
+	| equality_expression NE_OP relational_expression {$$ = new LogicNE($1,$3);}
 	;
 
 and_expression
@@ -135,49 +137,94 @@ and_expression
 
 exclusive_or_expression
 	: and_expression {$$ = $1;}
-	//| exclusive_or_expression '^' and_expression {$$ = new BitXor($1, $3);}
+	| exclusive_or_expression '^' and_expression {$$ = new BitXor($1, $3);}
 	;
 
 inclusive_or_expression
 	: exclusive_or_expression {$$ = $1;}
-	//| inclusive_or_expression '|' exclusive_or_expression {$$ = new BitOr($1, $3);}
+	| inclusive_or_expression '|' exclusive_or_expression {$$ = new BitOr($1, $3);}
 	;
 
 logical_and_expression
 	: inclusive_or_expression {$$ = $1;}
-	//| logical_and_expression AND_OP inclusive_or_expression {}
+	| logical_and_expression AND_OP inclusive_or_expression {$$ = new LogicAnd($1, $3); }
 	;
 
 logical_or_expression
 	: logical_and_expression {$$ = $1;}
-	//| logical_or_expression OR_OP logical_and_expression {}
+	| logical_or_expression OR_OP logical_and_expression {$$ = new LogicOr($1,$3);}
 	;
 
 conditional_expression
-	: logical_or_expression {$$ = $1; std::cerr<< "found conditional expression\n"; }
+	: logical_or_expression {$$ = $1; }
 	//| logical_or_expression '?' expression ':' conditional_expression {}
 	;
 
 assignment_expression
 	: unary_expression assignment_operator assignment_expression {
-		auto temp = new Variable("int", ((Identifier*)$1)->identifier, false);
-		$$ = new Assign(temp, $3);
+		if ($2 == '='){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			$$ = new Assign(temp, $3);
+		}else if($2 == '*'){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new Multiplication(temp, $3);
+			$$ = new Assign(temp, op);
+		}
+		else if($2 == '/'){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new Division(temp, $3);
+			$$ = new Assign(temp, op);
+		}
+		else if($2 == '%'){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new Modulo(temp, $3);
+			$$ = new Assign(temp, op);
+		}else if($2 == '+'){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new Addition(temp, $3);
+			$$ = new Assign(temp, op);
+		}else if($2 == '-'){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new Subtraction(temp, $3);
+			$$ = new Assign(temp, op);
+		}else if($2 == '<'){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new BitASL(temp, $3);
+			$$ = new Assign(temp, op);
+		}else if($2 == '>'){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new BitASR(temp, $3);
+			$$ = new Assign(temp, op);
+		}else if($2 == '&'){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new BitAnd(temp, $3);
+			$$ = new Assign(temp, op);
+		}else if($2 == '^'){
+			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new BitXor(temp, $3);
+			$$ = new Assign(temp, op);
+		}
+		else if($2 == '|'){
+			auto temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Node* op = new BitOr(temp, $3);
+			$$ = new Assign(temp, op);
+		}
 	 }
 	| conditional_expression {$$ = $1; }
 	;
 
 assignment_operator
-	: '=' { std::cerr<<"Found =\n";}
-//	| MUL_ASSIGN {}
-//	| DIV_ASSIGN {}
-//	| MOD_ASSIGN {}
-//	| ADD_ASSIGN {}
-//	| SUB_ASSIGN {}
-//	| LEFT_ASSIGN {}
-//	| RIGHT_ASSIGN {}
-//	| AND_ASSIGN {}
-//	| XOR_ASSIGN {}
-//	| OR_ASSIGN {}
+	: '=' { $$ = '='; }
+	| MUL_ASSIGN {$$ = '*';}
+	| DIV_ASSIGN {$$ = '/';}
+	| MOD_ASSIGN {$$ = '%';}
+	| ADD_ASSIGN {$$ = '+';}
+	| SUB_ASSIGN {$$ = '-';}
+	| LEFT_ASSIGN {$$ = '<';}
+	| RIGHT_ASSIGN {$$ = '<';}
+	| AND_ASSIGN {$$ = '&';}
+	| XOR_ASSIGN {$$ = '^';}
+	| OR_ASSIGN {$$ = '|';}
 	;
 
 expression
@@ -195,7 +242,7 @@ declaration
 			if(statement -> type == "Variable"){
 				auto temp = (Variable*) statement;
 				if (temp->declaration){
-					temp->variable_type = *$1;
+					temp->data_type = *$1;
 				}
 			}
 		}
@@ -206,7 +253,7 @@ declaration
 	;
 
 declaration_specifiers
-	: type_specifier {$$ = $1; std::cerr<< "found type specifier\n"; }
+	: type_specifier {$$ = $1; }
 	| type_specifier declaration_specifiers {}
 //	| storage_class_specifier declaration_specifiers  {}
 //	| storage_class_specifier {}
@@ -241,10 +288,10 @@ storage_class_specifier
 
 type_specifier
 	: INT { $$ = new std::string("int");}
-//	| CHAR {$$ = new std::string("char");}
-//	| VOID {$$ = new std::string("void");}
-//	| FLOAT {$$ = new std::string("float");}
-//	| DOUBLE {$$ = new std::string("int");}
+	| CHAR {$$ = new std::string("char");}
+	| VOID {$$ = new std::string("void");}
+	| FLOAT {$$ = new std::string("float");}
+	| DOUBLE {$$ = new std::string("double");}
 //	| struct_specifier {}
 //	| enum_specifier {}
 //	| TYPE_NAME {}
@@ -298,7 +345,7 @@ enumerator
 	;
 
 declarator
-	: direct_declarator { $$ = $1; std::cerr << "found directcdeclarator\n"; }
+	: direct_declarator { $$ = $1; }
 	//|  pointer direct_declarator {}
 	;
 
@@ -394,18 +441,17 @@ statement
 //	;
 
 compound_statement
-	: '{' '}' { std::cerr << "found empty statement\n";}
-	| '{' statement_list '}' {$$ = $2; std::cerr << "found statement list\n"; }
-	| '{' declaration_list '}' {$$ = $2; std::cerr << "found declaration list\n";}
+	: '{' '}' { $$ = new std::vector<Node*>();}
+	| '{' statement_list '}' {$$ = $2; }
+	| '{' declaration_list '}' {$$ = $2; }
 	| '{' declaration_list statement_list '}' { $2->insert($2->end(), $3->begin(), $3->end());
 							$$ = $2;
 	}
 	;
 
 declaration_list
-	: declaration {$$ = $1; std::cerr << "found declaration\n";}
+	: declaration {$$ = $1;}
 	| declaration_list declaration {$1->insert($1->end(), $2->begin(), $2->end());
-					//delete $2;
 					$$ = $1;}
 	;
 
@@ -483,11 +529,10 @@ extern char yytext[];
 
 Global* global_root;
 
-const Node *parseAST()
+Node *parseAST()
 {
 	global_root=0;
   	yyparse();
-  	//(*global_root).generate_var_maps(global_root);
   	return global_root;
 }
 

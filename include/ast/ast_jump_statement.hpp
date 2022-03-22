@@ -10,6 +10,9 @@ public:
     Return(Node* _expression);
 
     virtual std::string compileToMIPS() const override;
+
+    virtual void generate_var_maps(Node *parent) override;
+
 };
 
 #endif

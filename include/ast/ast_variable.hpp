@@ -8,7 +8,6 @@
 
 class Variable : public Node {
 public:
-    std::string variable_type;
     std::string name;
     bool declaration;
 

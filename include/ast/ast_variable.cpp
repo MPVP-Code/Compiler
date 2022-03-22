@@ -1,8 +1,9 @@
 #include "ast_variable.hpp"
 #include "../register_allocator.hpp"
 
-Variable::Variable(const std::string &_type, const std::string &_name, const bool _declaration) : variable_type(_type), name(_name), declaration(_declaration) {
+Variable::Variable(const std::string &_type, const std::string &_name, const bool _declaration) : name(_name), declaration(_declaration) {
     this->type = "Variable";
+    this->data_type = _type;
 };
 
 std::string *Variable::getName() {
@@ -10,7 +11,7 @@ std::string *Variable::getName() {
 }
 
 std::string *Variable::getVariableType() {
-    return &(this->variable_type);
+    return &(this->data_type);
 }
 
 std::string Variable::compileToMIPS() const {
@@ -18,4 +19,6 @@ std::string Variable::compileToMIPS() const {
     return "li $" + std::to_string(registerIndex) + ", 0x0000";
 }
 
-void Variable::generate_var_maps(Node *parent) {}
+void Variable::generate_var_maps(Node *parent) {
+    return;
+}

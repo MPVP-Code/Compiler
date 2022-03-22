@@ -2,13 +2,17 @@
 #define AST_ARITHMETIC_HPP
 
 #include "ast_node.hpp"
+#include "ast_operator.hpp"
+#include "../ast.hpp"
 
-class Addition : public Node {
+class Addition : public BinaryOperator {
 public:
     Node *L;
     Node *R;
 
-    Addition(Node *L, Node *R);
+    Addition(Node *_L, Node *_R);
+
+    ~Addition(){}
 
     Node* getL();
 
@@ -18,46 +22,34 @@ public:
 
     bool isRInt();
 
-    virtual void generate_var_maps(Node *parent) override;
+
 };
 
-class Subtraction : public Node {
+class Subtraction : public BinaryOperator {
 public:
-    Node *R;
-    Node *L;
 
     Subtraction(Node *L, Node *R);
 
-    virtual void generate_var_maps(Node *parent) override;
 };
 
-class Multiplication : public Node {
+class Multiplication : public BinaryOperator {
 public:
-    Node *R;
-    Node *L;
 
     Multiplication(Node *L, Node *R);
 
-    virtual void generate_var_maps(Node *parent) override;
 };
 
-class Division : public Node {
+class Division : public BinaryOperator {
 public:
-    Node *R;
-    Node *L;
 
     Division(Node *_L, Node *_R);
 
-    virtual void generate_var_maps(Node *parent) override;
 };
-class Modulo : public Node {
+class Modulo : public BinaryOperator {
 public:
-    Node *R;
-    Node *L;
 
     Modulo(Node *_L, Node *_R);
 
-    virtual void generate_var_maps(Node *parent) override;
 };
 
 #endif

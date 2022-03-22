@@ -6,38 +6,39 @@
 #define AST_BITWISE_HPP
 
 #include "ast_node.hpp"
-class BitAnd : public Node {
-public:
-    Node *R;
-    Node *L;
+#include "ast_operator.hpp"
 
-    BitAnd(Node *L, Node *R);
+class BitAnd : public BinaryOperator {
+public:
+    BitAnd(Node *_L, Node *_R);
 
 };
 
-class BitOr : public Node {
+class BitOr : public BinaryOperator {
 public:
-    Node *R;
-    Node *L;
-
-    BitOr(Node *L, Node *R);
+    BitOr(Node *_L, Node *_R);
 
 };
 
-class BitXor : public Node {
+class BitXor : public BinaryOperator {
 public:
-    Node *R;
-    Node *L;
-
-    BitXor(Node *L, Node *R);
+    BitXor(Node *_L, Node *_R);
 
 };
 
-class BitNot : public Node {
+class BitNot : public UnaryOperator {
 public:
-    Node *in;
-
     BitNot(Node *_in);
+};
+
+class BitASL : public BinaryOperator {
+public:
+    BitASL(Node *_L, Node *_R); //Value, shift
+};
+
+class BitASR : public BinaryOperator {
+public:
+    BitASR(Node *_L, Node *_R); //Value, shift
 };
 
 #endif

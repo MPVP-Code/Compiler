@@ -22,3 +22,11 @@ std::string Return::compileToMIPS() const {
 
     return result;
 }
+
+void Return::generate_var_maps(Node *parent) {
+    //Generate map
+    expression->generate_var_maps(parent);
+
+    //Propagate type
+    this->data_type = expression->data_type;
+}
