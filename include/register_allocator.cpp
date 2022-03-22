@@ -1,4 +1,5 @@
 #include "register_allocator.hpp"
+#include <iostream>
 
 int RegisterAllocator::currentRegister = 0;
 std::unordered_map<std::string, int> map;
@@ -13,9 +14,10 @@ void RegisterAllocator::reinitRegistersMappingMap() {
     registersMapping = map;
 }
 
-int RegisterAllocator::getRegisterNumberForVariable(std::string *variable)  {
+int RegisterAllocator::getRegisterNumberForVariable(const std::string *variable)  {
     int result = currentRegister;
     auto iterator = registersMapping.find(*variable);
+    std::cerr << "looking for " << *variable << std::endl;
     if (iterator == registersMapping.end()) {
         registersMapping.insert(std::pair<std::string, int>(*variable, currentRegister));
         currentRegister++;

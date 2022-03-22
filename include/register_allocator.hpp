@@ -16,7 +16,7 @@ public:
 
     static void reinitRegistersMappingMap();
 
-    static int getRegisterNumberForVariable(std::string *variable);
+    static int getRegisterNumberForVariable(const std::string *variable);
 
     static std::string intToHex(int i);
 };

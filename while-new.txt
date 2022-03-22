@@ -1,0 +1,12 @@
+f:
+.set noreorder
+li $2, 0x0000
+li $2, 0x0001
+$WHILE0START:
+beq $2, $0, $WHILE0END
+li $2, 0x0000
+b $WHILE0START
+$WHILE0END:
+li $2, 0x4de1
+jr $31
+nop

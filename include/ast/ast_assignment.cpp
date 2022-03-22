@@ -42,15 +42,31 @@ void Assign::generate_var_maps(Node *parent) {
     this->data_type = destination->data_type;
 }
 
+void Constant::generate_var_maps(Node *parent) {
+    return;
+}
+
 std::string Assign::compileToMIPS() const {
     std::string result = "";
     if (source->type == "Constant") {
+        std::cerr << "Compiling the constant 1" << std::endl;
         Constant *constant = (Constant *) source;
+        std::cerr << "Compiling the constant 2" << std::endl;
         std::string hexValue = RegisterAllocator::intToHex(constant->getValue());
+        std::cerr << "Compiling the constant 3" << std::endl;
+        //std::cerr << "Destination getName " << *(destination->getName()) << std::endl;
+        std::cerr << "Destination data_type " << destination->data_type << std::endl;
+        std::cerr << "Destination type " << destination->type << std::endl;
+        std::cerr << "Destination getType " << destination->get_type() << std::endl;
+        std::cerr << "Destination variable type " << destination->getVariableType() << std::endl;
         int registerNumber = RegisterAllocator::getRegisterNumberForVariable(destination->getName());
+        std::cerr << "Compiling the constant 4" << std::endl;
         result = "li $" + std::to_string(registerNumber) + ", " + hexValue;
     } else if (source->type == "Addition") {
         Addition *addition = (Addition *) source;
+        std::cerr << "Compiling the addition" << std::endl;
+        std::cerr << "Compiling the addition is left int" << addition->isLInt() << std::endl;
+        std::cerr << "Compiling the addition is right int" << addition->isRInt() << std::endl;
         if (addition->isLInt() && addition->isRInt()) {
             Variable *LVar = (Variable *) addition->getL();
             Variable *RVar = (Variable *) addition->getR();

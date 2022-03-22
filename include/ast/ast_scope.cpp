@@ -9,7 +9,6 @@ Scope::Scope() {
 }
 
 void Scope::generate_var_maps(Node* parent) {
-
     Scope *parentScope = (Scope*) parent;
     for (auto &node: this->branches) {
         if (node->type == "Scope") {
@@ -64,4 +63,10 @@ std::string Global::compileToMIPS() const {
     }
 
     return result;
+}
+
+int Global::whileCount = 0;
+
+int Global::getIdForWhile() {
+    return whileCount++;
 }

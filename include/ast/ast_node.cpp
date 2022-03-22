@@ -33,7 +33,7 @@ std::string Node::compileToMIPS() const {
 }
 
 void Node::generate_var_maps(Node *parent) {
-    std::cerr << "failed to generate map\n";
+    std::cerr << this->type << " failed to generate map\n";
 }
 
 
