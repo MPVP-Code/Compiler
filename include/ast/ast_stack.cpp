@@ -6,7 +6,7 @@
 void load_mapped_variable(Scope* scope, Variable* var, std::string reg_name) {}
 void store_mapped_variable(Scope* scope, Variable* var, std::string reg_name){}
 
-Variable* resolve_variable_scope(std::string name, Scope* current){
+Variable* resolve_variable_name(std::string name, Scope* current){
     while(current != NULL){
         if(current->var_map.contains(name)){
             return current->var_map.at(name);
@@ -29,7 +29,7 @@ void try_replace_variable(Node* &varptr, Node* inscope){
             scope->var_map[temp->name] = temp;
         }
         else {
-            varptr = resolve_variable_scope(temp->name, scope);
+            varptr = resolve_variable_name(temp->name, scope);
         }
     }
     else{

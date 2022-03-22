@@ -47,7 +47,7 @@ void yyerror(const char *);
 
 primary_expression
 	: IDENTIFIER { $$ = new Identifier(*$1); std::cerr << "found identifier\n" << *$1 << std::endl;}
-	| CONSTANT { $$ = new Constant(std::stoi(*$1)); std::cerr<<"Found const\n" << *$1 << std::endl;}
+	| CONSTANT { $$ = new Constant(std::stoi(*$1)); $$->data_type = "int"; std::cerr<<"Found const\n" << *$1 << std::endl;}
 //	| STRING_LITERAL {}
 	| '(' expression ')' {$$ = $2;}
 	;
