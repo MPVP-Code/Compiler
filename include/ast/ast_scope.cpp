@@ -9,7 +9,6 @@ Scope::Scope() {
 }
 
 void Scope::generate_var_maps(Node* parent) {
-
     Scope *parentScope = (Scope*) parent;
     for (auto node: this->branches) {
         if (node->type == "Scope") {

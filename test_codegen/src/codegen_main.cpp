@@ -4,7 +4,7 @@
 FunctionDeclaration* buildTest2Function() {
     std::vector<Node *> statements;
     Variable *variableB = new Variable("int", "b", true);
-    Constant *constant10 = new Constant(10);
+    Constant *constant10 = new Constant(10);\
     Assign *assignB = new Assign(variableB, constant10);
     statements.push_back(assignB);
 

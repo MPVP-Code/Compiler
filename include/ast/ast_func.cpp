@@ -12,9 +12,11 @@ FunctionDeclaration::FunctionDeclaration(std::string _return_type, std::string _
 }
 
 std::string FunctionDeclaration::compileToMIPS() const {
+    std::cerr << "Compiling function " << this->name << std::endl;
     std::string result = this->name + ":\n.set noreorder\n";
 
     for (Node *statement : branches) {
+        std::cerr << "Compiling statement " << statement->get_type() << std::endl;
         std::string compiledCode = statement->compileToMIPS();
         if (compiledCode.length() != 0) {
             result += compiledCode + "\n";
@@ -33,8 +35,6 @@ std::string* FunctionDeclaration::getName() {
 }
 
 FunctionDeclaration::~FunctionDeclaration() {}
-
-void FunctionDeclaration::generate_var_maps(Node *parent) {}
 
 FunctionCall::FunctionCall(std::string _function_name, std::vector<Node*> _arguments): function_name(_function_name) {
     this->branches = _arguments;
