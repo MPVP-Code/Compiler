@@ -14,7 +14,7 @@ std::string Return::compileToMIPS() const {
     if (expression->type.compare("Variable") == 0) {
         Variable *variable = (Variable*) expression;
         int registerNumber = RegisterAllocator::getRegisterNumberForVariable(variable->getName());
-        result = "addu $2, $" + std::to_string(registerNumber) + ", $0" + "\njr $31\nnop";
+        result = "add $2, $" + std::to_string(registerNumber) + ", $0" + "\njr $31\nnop";
     } else if (expression->type.compare("Constant") == 0) {
         Constant *constant = (Constant*) expression;
         result = "li $2, " + RegisterAllocator::intToHex(constant->getValue()) + "\njr $31\nnop";

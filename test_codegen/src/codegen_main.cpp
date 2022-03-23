@@ -145,7 +145,7 @@ FunctionDeclaration* buildTest8Function() {
 
 FunctionDeclaration* buildTest9Function() {
     std::vector<Node*> statements;
-    std::vector<Node*>* whileStatements = new std::vector<Node*>;
+    std::vector<Node*> whileStatements;
 
     Constant *constant0 = new Constant(0);
     While *whileStatement = new While(constant0, whileStatements);
@@ -161,7 +161,7 @@ FunctionDeclaration* buildTest9Function() {
 
 FunctionDeclaration* buildTest10Function() {
     std::vector<Node*> statements;
-    std::vector<Node*>* whileStatements = new std::vector<Node*>;
+    std::vector<Node*> whileStatements;
 
     Variable *variableX = new Variable("int", "x", false);
     statements.push_back(variableX);
@@ -172,7 +172,7 @@ FunctionDeclaration* buildTest10Function() {
 
     Constant *constant0 = new Constant(0);
     Assign *assign0 = new Assign(variableX, constant0);
-    whileStatements->push_back(assign0);
+    whileStatements.push_back(assign0);
 
     While *whileStatement = new While(variableX, whileStatements);
     statements.push_back(whileStatement);
@@ -209,6 +209,31 @@ FunctionDeclaration* buildTest11Function() {
     FunctionDeclaration *function = new FunctionDeclaration("int", "f", statements);
     return function;
 }
+
+FunctionDeclaration* buildTest12Function() {
+    std::vector<Node *> statements;
+    Variable *variableB = new Variable("int", "b", true);
+    Constant *constant10 = new Constant(10);
+    Assign *assignB = new Assign(variableB, constant10);
+    statements.push_back(assignB);
+
+    Variable *variableC = new Variable("int", "c", true);
+    Constant *constant20 = new Constant(20);
+    Assign *assignC = new Assign(variableC, constant20);
+    statements.push_back(assignC);
+
+    Subtraction *subtractionBAndC = new Subtraction(variableB, variableC);
+    Variable *variableD = new Variable("int", "d", true);
+    Assign *assignD = new Assign(variableD, subtractionBAndC);
+    statements.push_back(assignD);
+
+    Return *returnStatement = new Return(variableD);
+    statements.push_back(returnStatement);
+
+    FunctionDeclaration *function = new FunctionDeclaration("int", "f", statements);
+    return function;
+}
+
 
 int main() {
     int testsPassed = 0;
@@ -254,7 +279,7 @@ int main() {
     RegisterAllocator::reinitRegistersMappingMap();
 
     std::string test2Out = test2Function->compileToMIPS();
-    std::string test2Expected = "a:\n.set noreorder\nli $2, 0x000a\nli $3, 0x0014\naddu $4, $2, $3\njr $31\nnop";
+    std::string test2Expected = "a:\n.set noreorder\nli $2, 0x000a\nli $3, 0x0014\nadd $4, $2, $3\njr $31\nnop";
 
     if (test2Out.compare(test2Expected) == 0) {
         testsPassed++;
@@ -277,7 +302,7 @@ int main() {
     RegisterAllocator::reinitRegistersMappingMap();
 
     std::string test3Out = test3Function->compileToMIPS();
-    std::string test3Expected = "a:\n.set noreorder\nli $2, 0x000a\nli $3, 0x0014\naddu $4, $2, $3\naddu $2, $4, $0\njr $31\nnop";
+    std::string test3Expected = "a:\n.set noreorder\nli $2, 0x000a\nli $3, 0x0014\nadd $4, $2, $3\nadd $2, $4, $0\njr $31\nnop";
 
     if (test3Out.compare(test3Expected) == 0) {
         testsPassed++;
@@ -321,7 +346,7 @@ int main() {
 
     FunctionDeclaration* test5Function = buildTest5Function();
     std::string test5Out = test5Function->compileToMIPS();
-    std::string test5Expected = "f:\n.set noreorder\nli $2, 0x0000\nli $2, 0x000a\naddu $2, $2, $0\njr $31\nnop";
+    std::string test5Expected = "f:\n.set noreorder\nli $2, 0x0000\nli $2, 0x000a\nadd $2, $2, $0\njr $31\nnop";
     if (test5Out.compare(test5Expected) == 0) {
         testsPassed++;
         std::cout << "Test 5 passed." << std::endl;
@@ -473,6 +498,30 @@ int main() {
         std::cout << "Test 11 passed." << std::endl;
     } else {
         std::cout << "Test 11 failed. Expected output:\n" << test11Expected << "\nbut received:\n" << test11Out << std::endl;
+    }
+    testsChecked++;
+
+    // Test 12
+    /*
+     int a() {
+        int b = 10;
+        int c = 20;
+        int d = b - c;
+        return d;
+     } */
+
+    FunctionDeclaration* test12Function = buildTest12Function();
+    RegisterAllocator::initCurrentRegister();
+    RegisterAllocator::reinitRegistersMappingMap();
+    std::string test12Out = test12Function->compileToMIPS();
+    std::string test12Expected = "f:\n.set noreorder\nli $2, 0x000a\nli $3, 0x0014\nsub $4, $2, $3\nadd $2, $4, $0\njr $31\nnop";
+
+
+    if (test12Out.compare(test12Expected) == 0) {
+        testsPassed++;
+        std::cout << "Test 12 passed." << std::endl;
+    } else {
+        std::cout << "Test 12 failed. Expected output:\n" << test12Expected << "\nbut received:\n" << test12Out << std::endl;
     }
     testsChecked++;
 

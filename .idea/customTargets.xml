@@ -21,5 +21,15 @@
         </clean>
       </configuration>
     </target>
+    <target id="7fe70b11-3c22-4c23-9261-36d4c65a170b" name="bin/c_compiler" defaultType="MAKE">
+      <configuration id="8435d29f-65ee-4ba9-907f-2be19c4434fb" name="bin/c_compiler" toolchainName="Default">
+        <build type="MAKE">
+          <make targetName="bin/c_compiler" />
+        </build>
+        <clean type="MAKE">
+          <make targetName="clean" />
+        </clean>
+      </configuration>
+    </target>
   </component>
 </project>
