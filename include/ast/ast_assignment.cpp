@@ -8,6 +8,7 @@
 
 Constant::Constant(int _value) : value(_value) {
     this->type = "Constant";
+    this->data_type = "int";
 }
 
 int Constant::getValue() {

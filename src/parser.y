@@ -37,7 +37,7 @@ void yyerror(const char *);
 %type <node> primary_expression postfix_expression unary_expression jump_statement iteration_statement declarator direct_declarator
 %type <string> CONSTANT
 %type <string> IDENTIFIER
-%type <string> type_specifier declaration_specifiers
+%type <string> type_specifier declaration_specifiers specifier_qualifier_list type_name
 %type <statements> compound_statement statement_list external_declaration declaration init_declarator_list init_declarator
 %type <statements> declaration_list statement parameter_list parameter_type_list argument_expression_list
 %type <character> unary_operator assignment_operator
@@ -93,8 +93,11 @@ unary_expression
 	}
 
 	}
-//	| SIZEOF unary_expression {}
-//	| SIZEOF '(' type_name ')' {}
+	| SIZEOF unary_expression {$$ = new SizeOf($2);}
+	| SIZEOF '(' type_name ')' {
+		auto con = new Constant(0);
+		con->data_type = *$3;
+		$$ = new SizeOf(con);}
 	;
 
 unary_operator
@@ -328,8 +331,8 @@ struct_declaration
 	;
 
 specifier_qualifier_list
-	: type_specifier specifier_qualifier_list {}
-	| type_specifier {}
+	: type_specifier {$$ = $1;}
+	//| type_specifier specifier_qualifier_list {}
 	;
 
 struct_declarator_list
@@ -425,7 +428,7 @@ identifier_list
 	;
 
 type_name
-	: specifier_qualifier_list {}
+	: specifier_qualifier_list {$$ = $1;}
 //	| specifier_qualifier_list abstract_declarator {}
 	;
 

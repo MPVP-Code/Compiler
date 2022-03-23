@@ -2,6 +2,9 @@
 // Created by Michal on 22. 3. 2022.
 //
 #include "ast_stack.hpp"
+#include "ast_syntax.hpp"
+#include "ast_assignment.hpp"
+#include "ast_assignment.hpp"
 
 Variable* resolve_variable_name(std::string name, Scope* current){
     while(current != NULL){
@@ -28,6 +31,11 @@ void try_replace_variable(Node* &varptr, Node* inscope){
         else {
             varptr = resolve_variable_name(temp->name, scope);
         }
+    }else if (varptr->type == "UnaryOperator" && varptr->subtype == "SizeOf"  ){
+        auto temp = (SizeOf*) varptr;
+        try_replace_variable(temp->in, inscope);
+        int varsize = resolve_variable_size(temp->in->data_type, scope);
+        varptr = new Constant(varsize);
     }
     else{
         varptr->generate_var_maps(scope);

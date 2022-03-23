@@ -3,6 +3,7 @@
 #include "ast_node.hpp"
 #include "ast_variable.hpp"
 #include "../register_allocator.hpp"
+#include "ast_stack.hpp"
 
 Return::Return(Node* _expression): expression(_expression) {
     this->type = "ReturnExpression";
@@ -25,7 +26,7 @@ std::string Return::compileToMIPS() const {
 
 void Return::generate_var_maps(Node *parent) {
     //Generate map
-    expression->generate_var_maps(parent);
+    try_replace_variable(this->expression, parent);
 
     //Propagate type
     this->data_type = expression->data_type;
