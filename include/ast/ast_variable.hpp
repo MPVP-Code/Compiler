@@ -10,6 +10,7 @@ class Variable : public Node {
 public:
     std::string name;
     bool declaration;
+    int offset;
 
     Variable(const std::string &_type, const std::string &_name, const bool _declaration);
 
@@ -25,11 +26,9 @@ public:
 class Variable_type{
 public:
     std::string name;
-    std::string aliasfor;
+    std::string aliasof;
     int size;
-    Variable_type(){
-        
-    }
+    Variable_type(std::string _name, std::string alias, int _size);
 };
 
 #endif

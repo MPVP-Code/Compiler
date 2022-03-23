@@ -22,3 +22,5 @@ std::string Variable::compileToMIPS() const {
 void Variable::generate_var_maps(Node *parent) {
     return;
 }
+
+Variable_type::Variable_type(std::string _name, std::string alias, int _size): name(_name), size(_size), aliasof(alias){}

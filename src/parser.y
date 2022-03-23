@@ -47,7 +47,7 @@ void yyerror(const char *);
 
 primary_expression
 	: IDENTIFIER { $$ = new Identifier(*$1); std::cerr << "found identifier\n" << *$1 << std::endl;}
-	| CONSTANT { $$ = new Constant(std::stoi(*$1)); std::cerr<<"Found const\n" << *$1 << std::endl;}
+	| CONSTANT { $$ = new Constant(std::stoi(*$1)); $$->data_type = "int"; std::cerr<<"Found const\n" << *$1 << std::endl;}
 //	| STRING_LITERAL {}
 	| '(' expression ')' {$$ = $2;}
 	;
@@ -355,7 +355,7 @@ direct_declarator
 	//| '(' declarator ')' {}
 	//| direct_declarator '[' constant_expression ']' {}
 	//| direct_declarator '[' ']' {}
-	//| direct_declarator '(' parameter_type_list ')' {}
+	| direct_declarator '(' parameter_type_list ')' {}
 	//| direct_declarator '(' identifier_list ')' {}
 	;
 
@@ -476,7 +476,7 @@ selection_statement
 	;
 
 iteration_statement
-	: WHILE '(' expression ')' statement { $$ = new While($3, $5);	}
+	: WHILE '(' expression ')' statement { $$ = new While($3, *$5);	}
 //	| DO statement WHILE '(' expression ')' ';' {}
 //	| FOR '(' expression_statement expression_statement ')' statement {}
 //	| FOR '(' expression_statement expression_statement expression ')' statement {}
@@ -495,11 +495,11 @@ jump_statement
 
 translation_unit
 	: external_declaration { global_root = new Global();
-				global_root->branches.insert(global_root->branches.end(), $1->begin(), $1->end());
+				global_root->statements.insert(global_root->statements.end(), $1->begin(), $1->end());
 				std::cerr << "Found function\n";
 	 			}
 	| translation_unit external_declaration {
-				global_root->branches.insert(global_root->branches.end(), $2->begin(), $2->end());
+				global_root->statements.insert(global_root->statements.end(), $2->begin(), $2->end());
 				std::cerr << "Found another";
 				}
 	;

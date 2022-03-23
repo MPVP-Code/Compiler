@@ -10,26 +10,24 @@
 #include <vector>
 
 class While: public Scope {
-private:
-    Node* condition;
-    std::vector<Node*>* statements;
 public:
-    While(Node* _condition, std::vector<Node*>* _statements);
+    Node* condition;
+    While(Node* _condition, std::vector<Node*> _statements);
 
     virtual std::string compileToMIPS() const override;
 };
 
 class If: public Scope {
-private:
+public:
     Node* condition;
     std::vector<Node*>* truestatements;
     std::vector<Node*>* falsestatements;
 
-    std::string compileStatementsToMIPS(std::vector<Node*>* statements) const;
-public:
+
     If(Node* _condition, std::vector<Node*>* _truestatements, std::vector<Node*>* _falsestatements);
 
     virtual std::string compileToMIPS() const override;
+    std::string compileStatementsToMIPS(std::vector<Node*>* statements) const;
 };
 
 #endif

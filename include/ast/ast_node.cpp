@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "ast_node.hpp"
+#include "ast_variable.hpp"
 
 Node::Node() {
     this->type = "Node";
