@@ -4,5 +4,5 @@ return a + b;
 
 int great(){
     int c, d;
-    return f(1,2);
+    return f(c,2);
 }

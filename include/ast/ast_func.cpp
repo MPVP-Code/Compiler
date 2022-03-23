@@ -1,5 +1,6 @@
 #include "ast_func.hpp"
 #include "ast_node.hpp"
+#include "ast_stack.hpp"
 
 #include <vector>
 
@@ -37,3 +38,13 @@ FunctionDeclaration::~FunctionDeclaration() {}
 FunctionCall::FunctionCall(std::string _function_name, std::vector<Node*>* _arguments): function_name(_function_name) {
     this->arguments = _arguments;
 };
+
+void FunctionCall::generate_var_maps(Node *parent){
+
+    //Applies varmapping to parameters
+    auto scope = (Scope*) parent;
+    for(auto param : *this->arguments){
+        try_replace_variable(param, scope);
+    }
+}
+

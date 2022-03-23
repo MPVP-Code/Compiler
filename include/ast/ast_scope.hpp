@@ -23,8 +23,6 @@ public:
 
     virtual void generate_var_maps(Node *parent) override;
 
-    Variable* resolve_variable_scope(std::string name);
-
     std::vector<Node *> *getBranches();
 };
 class Global : public Scope {

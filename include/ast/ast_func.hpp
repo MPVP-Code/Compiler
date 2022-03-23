@@ -30,6 +30,8 @@ public:
     std::vector<Node*>* arguments;
 
     FunctionCall(std::string _function_name, std::vector<Node*>* arguments);
+
+    void generate_var_maps(Node *parent) override;
 };
 
 #endif

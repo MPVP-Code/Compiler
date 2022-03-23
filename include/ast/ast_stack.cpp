@@ -43,7 +43,7 @@ int resolve_variable_size(std::string name, Scope* child_scope){
 
     while(current != NULL){
         if(current->var_map.contains(name)){
-            type_name = current->var_map.at(name)->type;
+            type_name = current->var_map.at(name)->data_type;
             break;
         }
         else{
@@ -58,8 +58,8 @@ int resolve_variable_size(std::string name, Scope* child_scope){
     if(type_name == "none") type_name = name;
 
     while(current != NULL){
-        if(current->type_map.contains(name)){
-            return (current->type_map.at(name))->size;
+        if(current->type_map.contains(type_name)){
+            return (current->type_map.at(type_name))->size;
         }
         else{
             current = current->parent_scope;
