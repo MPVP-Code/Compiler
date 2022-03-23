@@ -73,6 +73,36 @@ std::string Assign::compileToMIPS() const {
                 int resultReg = RegisterAllocator::getRegisterNumberForVariable(destination->getName());
                 result = "sub $" + std::to_string(resultReg) + ", $" + std::to_string(lOpReg) + ", $" + std::to_string(rOpReg);
             }
+        } else if (source->type == "Multiplication" || (source->type == "BinaryOperator" && source->subtype == "Multiplication")) {
+            Multiplication *multiplication = (Multiplication *) source;
+            if (multiplication->isLInt() && multiplication->isRInt()) {
+                Variable *LVar = (Variable *) multiplication->getL();
+                Variable *RVar = (Variable *) multiplication->getR();
+                int lOpReg = RegisterAllocator::getRegisterNumberForVariable(LVar->getName());
+                int rOpReg = RegisterAllocator::getRegisterNumberForVariable(RVar->getName());
+                int resultReg = RegisterAllocator::getRegisterNumberForVariable(destination->getName());
+                result = "mult $" + std::to_string(lOpReg) + ", $" + std::to_string(rOpReg) + "\nmflo $" + std::to_string(resultReg);
+            }
+        } else if (source->type == "Division" || (source->type == "BinaryOperator" && source->subtype == "Division")) {
+            Division *division = (Division *) source;
+            if (division->isLInt() && division->isRInt()) {
+                Variable *LVar = (Variable *) division->getL();
+                Variable *RVar = (Variable *) division->getR();
+                int lOpReg = RegisterAllocator::getRegisterNumberForVariable(LVar->getName());
+                int rOpReg = RegisterAllocator::getRegisterNumberForVariable(RVar->getName());
+                int resultReg = RegisterAllocator::getRegisterNumberForVariable(destination->getName());
+                result = "div $" + std::to_string(lOpReg) + ", $" + std::to_string(rOpReg) + "\nmflo $" + std::to_string(resultReg);
+            }
+        } else if (source->type == "Modulo" || (source->type == "BinaryOperator" && source->subtype == "Modulo")) {
+            Modulo *modulo = (Modulo *) source;
+            if (modulo->isLInt() && modulo->isRInt()) {
+                Variable *LVar = (Variable *) modulo->getL();
+                Variable *RVar = (Variable *) modulo->getR();
+                int lOpReg = RegisterAllocator::getRegisterNumberForVariable(LVar->getName());
+                int rOpReg = RegisterAllocator::getRegisterNumberForVariable(RVar->getName());
+                int resultReg = RegisterAllocator::getRegisterNumberForVariable(destination->getName());
+                result = "div $" + std::to_string(lOpReg) + ", $" + std::to_string(rOpReg) + "\nmfhi $" + std::to_string(resultReg);
+            }
         }
     }
     return result;

@@ -234,6 +234,77 @@ FunctionDeclaration* buildTest12Function() {
     return function;
 }
 
+FunctionDeclaration* buildTest13Function() {
+    std::vector<Node *> statements;
+    Variable *variableB = new Variable("int", "b", true);
+    Constant *constant10 = new Constant(10);
+    Assign *assignB = new Assign(variableB, constant10);
+    statements.push_back(assignB);
+
+    Variable *variableC = new Variable("int", "c", true);
+    Constant *constant20 = new Constant(20);
+    Assign *assignC = new Assign(variableC, constant20);
+    statements.push_back(assignC);
+
+    Multiplication *multiplicationBAndC = new Multiplication(variableB, variableC);
+    Variable *variableD = new Variable("int", "d", true);
+    Assign *assignD = new Assign(variableD, multiplicationBAndC);
+    statements.push_back(assignD);
+
+    Return *returnStatement = new Return(variableD);
+    statements.push_back(returnStatement);
+
+    FunctionDeclaration *function = new FunctionDeclaration("int", "f", statements);
+    return function;
+}
+
+FunctionDeclaration* buildTest14Function() {
+    std::vector<Node *> statements;
+    Variable *variableB = new Variable("int", "b", true);
+    Constant *constant10 = new Constant(10);
+    Assign *assignB = new Assign(variableB, constant10);
+    statements.push_back(assignB);
+
+    Variable *variableC = new Variable("int", "c", true);
+    Constant *constant20 = new Constant(20);
+    Assign *assignC = new Assign(variableC, constant20);
+    statements.push_back(assignC);
+
+    Division *divisionBAndC = new Division(variableB, variableC);
+    Variable *variableD = new Variable("int", "d", true);
+    Assign *assignD = new Assign(variableD, divisionBAndC);
+    statements.push_back(assignD);
+
+    Return *returnStatement = new Return(variableD);
+    statements.push_back(returnStatement);
+
+    FunctionDeclaration *function = new FunctionDeclaration("int", "f", statements);
+    return function;
+}
+
+FunctionDeclaration* buildTest15Function() {
+    std::vector<Node *> statements;
+    Variable *variableB = new Variable("int", "b", true);
+    Constant *constant10 = new Constant(10);
+    Assign *assignB = new Assign(variableB, constant10);
+    statements.push_back(assignB);
+
+    Variable *variableC = new Variable("int", "c", true);
+    Constant *constant20 = new Constant(20);
+    Assign *assignC = new Assign(variableC, constant20);
+    statements.push_back(assignC);
+
+    Modulo *moduloBAndC = new Modulo(variableB, variableC);
+    Variable *variableD = new Variable("int", "d", true);
+    Assign *assignD = new Assign(variableD, moduloBAndC);
+    statements.push_back(assignD);
+
+    Return *returnStatement = new Return(variableD);
+    statements.push_back(returnStatement);
+
+    FunctionDeclaration *function = new FunctionDeclaration("int", "f", statements);
+    return function;
+}
 
 int main() {
     int testsPassed = 0;
@@ -522,6 +593,75 @@ int main() {
         std::cout << "Test 12 passed." << std::endl;
     } else {
         std::cout << "Test 12 failed. Expected output:\n" << test12Expected << "\nbut received:\n" << test12Out << std::endl;
+    }
+    testsChecked++;
+
+    // Test 13
+    /*
+     int f() {
+        int b = 10;
+        int c = 20;
+        int d = b * c;
+        return d;
+     } */
+
+    FunctionDeclaration* test13Function = buildTest13Function();
+    RegisterAllocator::initCurrentRegister();
+    RegisterAllocator::reinitRegistersMappingMap();
+    std::string test13Out = test13Function->compileToMIPS();
+    std::string test13Expected = "f:\n.set noreorder\nli $2, 0x000a\nli $3, 0x0014\nmult $2, $3\nmflo $4\nadd $2, $4, $0\njr $31\nnop";
+
+    if (test13Out.compare(test13Expected) == 0) {
+        testsPassed++;
+        std::cout << "Test 13 passed." << std::endl;
+    } else {
+        std::cout << "Test 13 failed. Expected output:\n" << test13Expected << "\nbut received:\n" << test13Out << std::endl;
+    }
+    testsChecked++;
+
+    // Test 14
+    /*
+     int f() {
+        int b = 10;
+        int c = 20;
+        int d = b / c;
+        return d;
+     } */
+
+    FunctionDeclaration* test14Function = buildTest14Function();
+    RegisterAllocator::initCurrentRegister();
+    RegisterAllocator::reinitRegistersMappingMap();
+    std::string test14Out = test14Function->compileToMIPS();
+    std::string test14Expected = "f:\n.set noreorder\nli $2, 0x000a\nli $3, 0x0014\ndiv $2, $3\nmflo $4\nadd $2, $4, $0\njr $31\nnop";
+
+    if (test14Out.compare(test14Expected) == 0) {
+        testsPassed++;
+        std::cout << "Test 14 passed." << std::endl;
+    } else {
+        std::cout << "Test 14 failed. Expected output:\n" << test14Expected << "\nbut received:\n" << test14Out << std::endl;
+    }
+    testsChecked++;
+
+    // Test 15
+    /*
+     int f() {
+        int b = 10;
+        int c = 20;
+        int d = b % c;
+        return d;
+     } */
+
+    FunctionDeclaration* test15Function = buildTest15Function();
+    RegisterAllocator::initCurrentRegister();
+    RegisterAllocator::reinitRegistersMappingMap();
+    std::string test15Out = test15Function->compileToMIPS();
+    std::string test15Expected = "f:\n.set noreorder\nli $2, 0x000a\nli $3, 0x0014\ndiv $2, $3\nmfhi $4\nadd $2, $4, $0\njr $31\nnop";
+
+    if (test15Out.compare(test14Expected) == 0) {
+        testsPassed++;
+        std::cout << "Test 15 passed." << std::endl;
+    } else {
+        std::cout << "Test 15 failed. Expected output:\n" << test14Expected << "\nbut received:\n" << test14Out << std::endl;
     }
     testsChecked++;
 
