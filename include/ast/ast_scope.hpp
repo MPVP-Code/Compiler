@@ -15,6 +15,7 @@ public:
     std::map<std::string, Variable*> var_map;
     std::map<std::string, Variable_type*> type_map;
     int stack_frame_size;
+    int tmp_var_counter;
 
     Scope();
 
@@ -26,7 +27,6 @@ public:
 
     std::vector<Node *> *getBranches();
 };
-
 class Global : public Scope {
 private:
     static int whileCount;

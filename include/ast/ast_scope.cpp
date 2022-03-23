@@ -24,6 +24,11 @@ void Scope::generate_var_maps(Node* parent) {
             } else if (scope->subtype == "If") {
                 If* flow = (If *) scope;
                 try_replace_variable(flow->condition, scope);
+            } else if (scope->subtype == "FunctionDeclaration"){ //Applies varmapping to declared variables
+                auto func = (FunctionDeclaration*) scope;
+                        for(auto arg : func->statements){
+                            try_replace_variable(arg, func);
+                        }
             }
             scope->generate_var_maps(scope);
 
@@ -34,15 +39,14 @@ void Scope::generate_var_maps(Node* parent) {
     }
     //Generate scope offsets & allocate stack memory.
     int offset = 0;
-
-
-
-    for(auto &var : this->var_map){
-        var.second->offset = offset;
-        offset += resolve_variable_size(var.second->data_type, this);
+    if(this->type == "FunctionDeclaration"){
+        auto func = (FunctionDeclaration*) this;
+        for(auto const arg : *(func->arguments)){
+            this->var_map[arg->name] = arg;
+        }
     }
 
-    //Allocates two extra words for future system use $ra backup, $spfp backup
+    //Allocates two extra words for future system use $ra backup, $fp backup
     int extra_words = 2;
     offset += 4*extra_words;
     this->stack_frame_size = offset;

@@ -1,0 +1,8 @@
+int f(int a, int b){
+return a + b;
+}
+
+int great(){
+    int c, d;
+    return f(1,2);
+}

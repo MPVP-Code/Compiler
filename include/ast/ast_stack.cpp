@@ -85,23 +85,41 @@ int resolve_variable_offset(std::string name, Scope* current){
 
 std::string load_mapped_variable(Scope* scope, Variable* var, std::string reg_name) {
     int offset = resolve_variable_offset(var->name, scope );
-    return "lw "+ reg_name +", " + std::to_string(offset) + "($sp)\n";
+    std::string out = "";
+    if(offset%4 == 0) {
+        out =  "lw " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
+    }else{ //Storing in unaligned memory addresses
+        out +=  "lwl " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
+        out +=  "lwr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
+    }
+    out+= "nop\n";
+    return out;
 }
 std::string store_mapped_variable(Scope* scope, Variable* var, std::string reg_name){
     int offset = resolve_variable_offset(var->name, scope );
-    return "sw "+ reg_name +", " + std::to_string(offset) + "($sp)\n";
+    std::string out = "";
+    if(offset%4 == 0) {
+        out += "sw "+ reg_name +", " + std::to_string(offset) + "($sp)\n";
+    }else{ //Storing in unaligned memory addresses
+        out +=  "lwl " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
+        out +=  "lwr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
+    }
+    out+= "nop\n";
+    return out;
+
 }
 
 std::string allocate_stack_frame(Scope* scope){
     std::string out = "";
-    int frame_size =  -1 * scope->stack_frame_size; //Stack counts down in mips
+    int frame_size =  -1 * (scope->stack_frame_size + (scope->stack_frame_size%4 != 0)); //Stack counts down in mips, rounds to full word
     out += "addiu $sp, $sp, "+ std::to_string(frame_size) + "\n";
     out += "addiu $fp, $fp, "+ std::to_string(frame_size) + "\n";
+
     return out;
 }
 std::string deallocate_stack_frame(Scope* scope){
     std::string out = "";
-    int frame_size = scope->stack_frame_size; //Stack counts down in mips, deallocation increases pointer
+    int frame_size = (scope->stack_frame_size + (scope->stack_frame_size%4 != 0)); //Stack counts down in mips, deallocation increases pointer
     out += "addiu $sp, $sp, "+ std::to_string(frame_size) + "\n";
     out += "addiu $fp, $fp, "+ std::to_string(frame_size) + "\n";
     return out;

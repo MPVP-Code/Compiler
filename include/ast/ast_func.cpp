@@ -3,10 +3,8 @@
 
 #include <vector>
 
-FunctionDeclaration::FunctionDeclaration(std::string _return_type, std::string _name, std::vector<Node*> _statements):
-    return_type(_return_type), name(_name){
+FunctionDeclaration::FunctionDeclaration(){  //std::string _return_type, std::string _name, std::vector<Node*> _statements
     //Type specification
-    this->statements = _statements;
     this->type = "Scope";
     this->subtype = "FunctionDeclaration";
 }
@@ -36,6 +34,6 @@ std::string* FunctionDeclaration::getName() {
 
 FunctionDeclaration::~FunctionDeclaration() {}
 
-FunctionCall::FunctionCall(std::string _function_name, std::vector<Node*> _arguments): function_name(_function_name) {
-    //this->statements = _arguments;
+FunctionCall::FunctionCall(std::string _function_name, std::vector<Node*>* _arguments): function_name(_function_name) {
+    this->arguments = _arguments;
 };
