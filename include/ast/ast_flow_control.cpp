@@ -26,6 +26,7 @@ std::string While::compileToMIPS() const {
         result += "beq $" + std::to_string(conditionRegister) + ", $0, " + whileEnd + "\nnop\n";
 
         for (Node *statement : *statements) {
+            std::cerr << "compiling statement from while with type" << statement->type << std::endl;
             std::string generatedCode = statement->compileToMIPS();
             if (generatedCode.length() != 0) {
                 result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
@@ -70,6 +71,22 @@ std::string If::compileToMIPS() const {
         } else if (constantCondition->getValue() != 0 && truestatements != nullptr) {
             result = compileStatementsToMIPS(truestatements);
         }
+    } else if (condition->get_type().compare("Variable") == 0) {
+        Variable *variableCondition = (Variable*) condition;
+        int ifId = Global::getIdForIf();
+        int registerNumber = RegisterAllocator::getRegisterNumberForVariable(variableCondition->getName());
+        std::string elseLabel = "$ELSE" + std::to_string(ifId);
+        std::string ifEndLabel = "$IFEND" + std::to_string(ifId);
+        result = "beq $" + std::to_string(registerNumber) + ", $0, " + elseLabel + "\nnop\n";
+        if (truestatements != nullptr) {
+            result += this->compileStatementsToMIPS(this->truestatements) + "\n";
+            result += "b " + ifEndLabel + "\nnop\n";
+        }
+        result += elseLabel + ":\n";
+        if (falsestatements != nullptr) {
+            result += this->compileStatementsToMIPS(this->falsestatements) + "\n";
+        }
+        result += ifEndLabel + ":";
     }
 
     return result;

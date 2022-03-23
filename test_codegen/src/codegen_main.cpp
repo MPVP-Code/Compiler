@@ -185,6 +185,31 @@ FunctionDeclaration* buildTest10Function() {
     return function;
 }
 
+FunctionDeclaration* buildTest11Function() {
+    std::vector<Node *> statements;
+    std::vector<Node *>* trueStatements = new std::vector<Node*>;
+    std::vector<Node *>* falseStatements =  new std::vector<Node*>;
+
+    Variable* x = new Variable("int", "x", true);
+    Constant* constant1 = new Constant(1);
+    Assign* assignX = new Assign(x, constant1);
+    statements.push_back(assignX);
+
+    Constant *constant11 = new Constant(11);
+    Return *returnTrue = new Return(constant11);
+    trueStatements->push_back(returnTrue);
+
+    Constant *constant10 = new Constant(10);
+    Return *returnFalse = new Return(constant10);
+    falseStatements->push_back(returnFalse);
+
+    If *ifStatement = new If(x, trueStatements, falseStatements);
+    statements.push_back(ifStatement);
+
+    FunctionDeclaration *function = new FunctionDeclaration("int", "f", statements);
+    return function;
+}
+
 int main() {
     int testsPassed = 0;
     int testsChecked = 0;
@@ -423,6 +448,31 @@ int main() {
         std::cout << "Test 10 passed." << std::endl;
     } else {
         std::cout << "Test 10 failed. Expected output: " << test10Expected << " but received: " << test10Out << std::endl;
+    }
+    testsChecked++;
+
+    // Test 11
+    /*
+     int f()
+     {
+         int x = 1;
+         if(x){
+             return 11;
+         }else{
+             return 10;
+         }
+     }
+     */
+
+    FunctionDeclaration* test11Function = buildTest11Function();
+    std::string test11Out = test11Function->compileToMIPS();
+    std::string test11Expected = "f:\n.set noreorder\nli $2, 0x0001\nbeq $2, $0, $ELSE0\nnop\nli $2, 0x000b\njr $31\nnop\nb $IFEND0\nnop\n$ELSE0:\nli $2, 0x000a\njr $31\nnop\n$IFEND0:\njr $31\nnop";
+
+    if (test11Out.compare(test11Expected) == 0) {
+        testsPassed++;
+        std::cout << "Test 11 passed." << std::endl;
+    } else {
+        std::cout << "Test 11 failed. Expected output:\n" << test11Expected << "\nbut received:\n" << test11Out << std::endl;
     }
     testsChecked++;
 

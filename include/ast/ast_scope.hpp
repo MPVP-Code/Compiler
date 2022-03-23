@@ -27,11 +27,14 @@ public:
 class Global : public Scope {
 private:
     static int whileCount;
+    static int ifCount;
 
 public:
     Global();
 
     static int getIdForWhile();
+
+    static int getIdForIf();
 
     virtual std::string compileToMIPS() const override;
 };

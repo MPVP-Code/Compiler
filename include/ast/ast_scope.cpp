@@ -66,7 +66,12 @@ std::string Global::compileToMIPS() const {
 }
 
 int Global::whileCount = 0;
+int Global::ifCount = 0;
 
 int Global::getIdForWhile() {
     return whileCount++;
+}
+
+int Global::getIdForIf() {
+    return ifCount++;
 }
