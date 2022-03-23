@@ -26,20 +26,12 @@ void Assign::generate_var_maps(Node *parent) {
     Scope *parentScope = (Scope*) parent;
 
     //Destination var mapping
-    if (this->destination->declaration) {
-        parentScope->var_map[destination->name] = destination;
-    } else {
-        this->destination = resolve_variable_name(this->destination->name, parentScope);
-    }
+    auto temp = (Node*)this->destination;
+    try_replace_variable(temp, parent);
+    this->destination = (Variable*) temp;
 
     //Source varmapping
-    if(this->source->type == "Variable"){
-        auto var = (Variable*) this->source;
-        this->source = resolve_variable_name(var->name, parentScope);
-    }
-    else{
-        source->generate_var_maps(parent);
-    }
+    try_replace_variable(source, parent);
 
     //type propagation
     this->data_type = destination->data_type;

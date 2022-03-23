@@ -9,8 +9,6 @@ class Addition : public BinaryOperator {
 public:
     Addition(Node *_L, Node *_R);
 
-    virtual void generate_var_maps(Node *parent) override;
-
 };
 
 class Subtraction : public BinaryOperator {
