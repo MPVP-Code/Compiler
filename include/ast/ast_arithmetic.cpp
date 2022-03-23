@@ -8,10 +8,6 @@ Addition::Addition(Node *_L, Node *_R) : BinaryOperator(_L, _R){
     this->subtype = "Addition";
 };
 
-void Addition::generate_var_maps(Node *parent) {
-    return;
-}
-
 Subtraction::Subtraction(Node *_L, Node *_R): BinaryOperator(_L, _R) {
     this->type = "Subtraction";
 };
