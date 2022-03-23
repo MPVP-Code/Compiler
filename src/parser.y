@@ -355,7 +355,7 @@ direct_declarator
 	//| '(' declarator ')' {}
 	//| direct_declarator '[' constant_expression ']' {}
 	//| direct_declarator '[' ']' {}
-	//| direct_declarator '(' parameter_type_list ')' {}
+	| direct_declarator '(' parameter_type_list ')' {}
 	//| direct_declarator '(' identifier_list ')' {}
 	;
 

@@ -11,6 +11,7 @@ class FunctionDeclaration : public Scope
 public:
     std::string return_type;
     std::string name;
+    std::vector<Variable*> Arguments;
 
 
     FunctionDeclaration(std::string _return_type, std::string _name, std::vector<Node*> _statements);

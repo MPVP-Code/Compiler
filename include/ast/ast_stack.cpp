@@ -83,24 +83,26 @@ int resolve_variable_offset(std::string name, Scope* current){
     return -1;
 };
 
-void load_mapped_variable(Scope* scope, Variable* var, std::string reg_name) {
+std::string load_mapped_variable(Scope* scope, Variable* var, std::string reg_name) {
     int offset = resolve_variable_offset(var->name, scope );
-    std::cout<< "lw "<<reg_name<<", "<<offset<<"($sp)" << std::endl;
+    return "lw "+ reg_name +", " + std::to_string(offset) + "($sp)\n";
 }
-void store_mapped_variable(Scope* scope, Variable* var, std::string reg_name){
+std::string store_mapped_variable(Scope* scope, Variable* var, std::string reg_name){
     int offset = resolve_variable_offset(var->name, scope );
-    std::cout<< "sw "<<reg_name<<", "<<offset<<"($sp)" << std::endl ;
+    return "sw "+ reg_name +", " + std::to_string(offset) + "($sp)\n";
 }
 
-void allocate_stack_frame(Scope* scope){
+std::string allocate_stack_frame(Scope* scope){
+    std::string out = "";
     int frame_size =  -1 * scope->stack_frame_size; //Stack counts down in mips
-    std::cout << "addiu $sp, $sp, "<<frame_size << std::endl;
-    std::cout << "addiu $fp, $fp, "<<frame_size << std::endl;
-
+    out += "addiu $sp, $sp, "+ std::to_string(frame_size) + "\n";
+    out += "addiu $fp, $fp, "+ std::to_string(frame_size) + "\n";
+    return out;
 }
-void deallocate_stack_frame(Scope* scope){
+std::string deallocate_stack_frame(Scope* scope){
+    std::string out = "";
     int frame_size = scope->stack_frame_size; //Stack counts down in mips, deallocation increases pointer
-    std::cout << "addiu $sp, $sp, "<<frame_size << std::endl;
-    std::cout << "addiu $fp, $fp, "<<frame_size << std::endl;
-
+    out += "addiu $sp, $sp, "+ std::to_string(frame_size) + "\n";
+    out += "addiu $fp, $fp, "+ std::to_string(frame_size) + "\n";
+    return out;
 }

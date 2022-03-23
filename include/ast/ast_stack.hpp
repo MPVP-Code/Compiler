@@ -8,10 +8,10 @@
 #include "ast_scope.hpp"
 
 
-void load_mapped_variable(Scope* scope, Variable* var, std::string reg_name); //reg_name inserted directly into lw instruction.
-void store_mapped_variable(Scope* scope, Variable* var, std::string reg_name);
-void allocate_stack_frame(Scope* scope);
-void deallocate_stack_frame(Scope* scope);
+std::string load_mapped_variable(Scope* scope, Variable* var, std::string reg_name); //reg_name inserted directly into lw instruction.
+std::string store_mapped_variable(Scope* scope, Variable* var, std::string reg_name);
+std::string allocate_stack_frame(Scope* scope);
+std::string deallocate_stack_frame(Scope* scope);
 
 Variable* resolve_variable_name(std::string name, Scope* current);
 void try_replace_variable(Node* &varptr, Node* scope);

@@ -3,6 +3,7 @@ int f()
 int x;
 x=1;
 while(x){
+int a  = 1;
 x=0;
 }
 return 19937;
