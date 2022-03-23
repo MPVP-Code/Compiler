@@ -14,6 +14,10 @@ int Constant::getValue() {
     return this->value;
 }
 
+void Constant::generate_var_maps(Node *parent) {
+    return;
+}
+
 Assign::Assign(Variable *_destination, Node *_source) : destination(_destination), source(_source) {
     this->type = "Assign";
 }
@@ -43,7 +47,9 @@ void Assign::generate_var_maps(Node *parent) {
 
 std::string Assign::compileToMIPS() const {
     std::string result = "";
+    std::cerr << "destination->data_type: " << destination->data_type << std::endl;
     if (destination->data_type == "int") {
+        std::cerr << "source->type: " << source->type << " source->subtype: " << source->subtype << std::endl;
         if (source->type == "Constant") {
             Constant *constant = (Constant *) source;
             std::string hexValue = RegisterAllocator::intToHex(constant->getValue());
@@ -51,13 +57,28 @@ std::string Assign::compileToMIPS() const {
             result = "li $" + std::to_string(registerNumber) + ", " + hexValue;
         } else if (source->type == "BinaryOperator" && source->subtype == "Addition") {
             Addition *addition = (Addition *) source;
+            std::cerr << "addition->isLInt(): " << addition->isLInt() << " addition->isRInt(): " << addition->isRInt();
+            std::cerr << "addition->L->get_type(): " << addition->L->get_type() << std::endl;
+            std::cerr << "addition->L->data_type: " << addition->L->data_type << std::endl;
+            std::cerr << "addition->R->get_type(): " << addition->R->get_type() << std::endl;
+            std::cerr << "addition->R->data_type: " << addition->R->data_type << std::endl;
             if (addition->isLInt() && addition->isRInt()) {
                 Variable *LVar = (Variable *) addition->getL();
                 Variable *RVar = (Variable *) addition->getR();
                 int lOpReg = RegisterAllocator::getRegisterNumberForVariable(LVar->getName());
                 int rOpReg = RegisterAllocator::getRegisterNumberForVariable(RVar->getName());
                 int resultReg = RegisterAllocator::getRegisterNumberForVariable(destination->getName());
-                result = "addu $" + std::to_string(resultReg) + ", $" + std::to_string(lOpReg) + ", $" + std::to_string(rOpReg);
+                result = "add $" + std::to_string(resultReg) + ", $" + std::to_string(lOpReg) + ", $" + std::to_string(rOpReg);
+            }
+        } else if (source->type == "BinaryOperator" && source->subtype == "Subtraction") {
+            Subtraction *subtraction = (Subtraction *) source;
+            if (subtraction->isLInt() && subtraction->isRInt()) {
+                Variable *LVar = (Variable *) subtraction->getL();
+                Variable *RVar = (Variable *) subtraction->getR();
+                int lOpReg = RegisterAllocator::getRegisterNumberForVariable(LVar->getName());
+                int rOpReg = RegisterAllocator::getRegisterNumberForVariable(RVar->getName());
+                int resultReg = RegisterAllocator::getRegisterNumberForVariable(destination->getName());
+                result = "sub $" + std::to_string(resultReg) + ", $" + std::to_string(lOpReg) + ", $" + std::to_string(rOpReg);
             }
         }
     }

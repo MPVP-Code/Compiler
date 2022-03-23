@@ -26,7 +26,9 @@ std::string While::compileToMIPS() const {
         result += "beq $" + std::to_string(conditionRegister) + ", $0, " + whileEnd + "\nnop\n";
 
         for (Node *statement : statements) {
+            std::cerr << "while statement type: " << statement->get_type() << std::endl;
             std::string generatedCode = statement->compileToMIPS();
+            std::cerr << "while generatedCode: " << generatedCode << std::endl;
             if (generatedCode.length() != 0) {
                 result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
             }

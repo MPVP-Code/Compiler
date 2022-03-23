@@ -20,6 +20,24 @@ void BinaryOperator::generate_var_maps(Node *parent) {
     //Propagate types
     data_type = L->data_type;
 }
+
+Node* BinaryOperator::getL() const {
+    return L;
+};
+
+Node* BinaryOperator::getR() const {
+    return R;
+};
+
+bool BinaryOperator::isLInt() const {
+    return L->get_type().compare("Variable") == 0 && ((Variable *) L)->getVariableType()->compare("int") == 0;
+};
+
+bool BinaryOperator::isRInt() const {
+    return R->get_type().compare("Variable") == 0 && ((Variable *) R)->getVariableType()->compare("int") == 0;
+}
+
+
 UnaryOperator::UnaryOperator(Node* _in) {
     this->type = "UnaryOperator";
     this->in = _in;

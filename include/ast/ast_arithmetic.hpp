@@ -9,16 +9,7 @@ class Addition : public BinaryOperator {
 public:
     Addition(Node *_L, Node *_R);
 
-    ~Addition(){}
-
-    Node* getL();
-
-    Node* getR();
-
-    bool isLInt();
-
-    bool isRInt();
-
+    virtual void generate_var_maps(Node *parent) override;
 
 };
 

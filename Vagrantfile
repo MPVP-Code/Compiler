@@ -42,6 +42,9 @@ Vagrant.configure(2) do |config|
       # Standard build tools
       sudo apt-get -y install g++ gdb make dos2unix git
 
+      # Timeout util
+      sudo apt-get -y install timeout
+
       # Compiler build tools
       sudo apt-get -y install bison flex
 

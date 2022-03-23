@@ -14,6 +14,14 @@ public:
 
     BinaryOperator(Node* _L, Node* _R);
 
+    Node* getL() const;
+
+    Node* getR() const;
+
+    bool isLInt() const;
+
+    bool isRInt() const;
+
     virtual void generate_var_maps(Node *parent) override;
 };
 

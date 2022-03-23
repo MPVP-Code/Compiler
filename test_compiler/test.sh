@@ -41,7 +41,7 @@ for filename in compiler_tests/*/*.c; do
     if [[ $RESULT == 0 ]]; then
       echo "  Simulating"
       set +e
-      qemu-mips "$TEST"
+      timeout 10 qemu-mips "$TEST"
       RESULT=${?}
       set -e
 

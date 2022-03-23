@@ -8,22 +8,9 @@ Addition::Addition(Node *_L, Node *_R) : BinaryOperator(_L, _R){
     this->subtype = "Addition";
 };
 
-Node* Addition::getL() {
-    return L;
-};
-
-Node* Addition::getR() {
-    return R;
-};
-
-bool Addition::isLInt() {
-    return L->get_type().compare("Variable") == 0 && ((Variable *) L)->getVariableType()->compare("int") == 0;
-};
-
-bool Addition::isRInt() {
-    return R->get_type().compare("Variable") == 0 && ((Variable *) R)->getVariableType()->compare("int") == 0;
+void Addition::generate_var_maps(Node *parent) {
+    return;
 }
-
 
 Subtraction::Subtraction(Node *_L, Node *_R): BinaryOperator(_L, _R) {
     this->type = "Subtraction";
