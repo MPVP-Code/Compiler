@@ -15,18 +15,16 @@ public:
     std::map<std::string, Variable*> var_map;
     std::map<std::string, Variable_type*> type_map;
     int stack_frame_size;
+    int tmp_var_counter;
 
     Scope();
 
-    virtual std::string compileToMIPS() const override;
+    virtual std::string compileToMIPS(const Node *parent_scope) const override;
 
     virtual void generate_var_maps(Node *parent) override;
 
-    Variable* resolve_variable_scope(std::string name);
-
     std::vector<Node *> *getBranches();
 };
-
 class Global : public Scope {
 private:
     static int whileCount;
@@ -39,7 +37,7 @@ public:
 
     static int getIdForIf();
 
-    virtual std::string compileToMIPS() const override;
+    virtual std::string compileToMIPS(const Node *parent_scope) const override;
 };
 
 #endif

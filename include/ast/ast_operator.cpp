@@ -19,6 +19,13 @@ void BinaryOperator::generate_var_maps(Node *parent) {
 
     //Propagate types
     data_type = L->data_type;
+
+    //Generate temporary variable
+    std::string tmpname = "!tmp" + std::to_string(((Scope*) parent)->tmp_var_counter++);
+    this->temp_variable = new Variable(this->data_type, tmpname , true);
+
+    auto scope = (Scope*) parent;
+    scope->var_map[tmpname] = this->temp_variable;
 }
 
 Node* BinaryOperator::getL() const {
@@ -49,4 +56,9 @@ void UnaryOperator::generate_var_maps(Node *parent){
 
     //Propagate data types
     data_type = in -> data_type;
+    std::string tmpname = "!tmp" + std::to_string(((Scope*) parent)->tmp_var_counter++);
+    this->temp_variable = new Variable(this->data_type, tmpname , true);
+
+    auto scope = (Scope*) parent;
+    scope->var_map[tmpname] = this->temp_variable;
 }

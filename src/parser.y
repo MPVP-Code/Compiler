@@ -33,13 +33,13 @@ void yyerror(const char *);
 %type <node> and_expression exclusive_or_expression inclusive_or_expression logical_and_expression conditional_expression
 %type <node> assignment_expression logical_or_expression initializer translation_unit
 %type <node>  expression function_definition
-%type <node> expression_statement selection_statement
-%type <node> primary_expression postfix_expression unary_expression jump_statement iteration_statement
+%type <node> expression_statement selection_statement parameter_declaration
+%type <node> primary_expression postfix_expression unary_expression jump_statement iteration_statement declarator direct_declarator
 %type <string> CONSTANT
 %type <string> IDENTIFIER
-%type <string> type_specifier declaration_specifiers  direct_declarator declarator
+%type <string> type_specifier declaration_specifiers specifier_qualifier_list type_name
 %type <statements> compound_statement statement_list external_declaration declaration init_declarator_list init_declarator
-%type <statements> declaration_list statement
+%type <statements> declaration_list statement parameter_list parameter_type_list argument_expression_list
 %type <character> unary_operator assignment_operator
 
 %start translation_unit
@@ -54,9 +54,16 @@ primary_expression
 
 postfix_expression
 	: primary_expression {$$ = $1; }
+
+	| postfix_expression '(' ')' {
+				auto id = (Identifier*) $1;
+				auto empty  = new std::vector<Node*>();
+				$$ = new FunctionCall(id->identifier, empty);}
+	| postfix_expression '(' argument_expression_list ')' {
+				auto id = (Identifier*) $1;
+				$$ = new FunctionCall(id->identifier, $3);
+	}
 //	| postfix_expression '[' expression ']' {}
-//	| postfix_expression '(' ')' {}
-//	| postfix_expression '(' argument_expression_list ')' {}
 //	| postfix_expression '.' IDENTIFIER {}
 //	| postfix_expression PTR_OP IDENTIFIER {}
 //	| postfix_expression INC_OP {}
@@ -64,8 +71,14 @@ postfix_expression
 	;
 
 argument_expression_list
-	: assignment_expression {}
-	| argument_expression_list ',' assignment_expression {}
+	: assignment_expression {
+		$$ = new std::vector<Node*>();
+		$$->push_back($1);
+	}
+	| argument_expression_list ',' assignment_expression {
+		$1->push_back($3);
+		$$ = $1;
+	}
 	;
 
 unary_expression
@@ -80,8 +93,11 @@ unary_expression
 	}
 
 	}
-//	| SIZEOF unary_expression {}
-//	| SIZEOF '(' type_name ')' {}
+	| SIZEOF unary_expression {$$ = new SizeOf($2);}
+	| SIZEOF '(' type_name ')' {
+		auto con = new Constant(0);
+		con->data_type = *$3;
+		$$ = new SizeOf(con);}
 	;
 
 unary_operator
@@ -269,12 +285,14 @@ init_declarator_list
 
 init_declarator
 	: declarator {$$ = new std::vector<Node*>;
-			auto temp = new Variable("None", *$1, true);
+			auto id = (Identifier*)$1;
+			auto temp = new Variable("None", id->identifier, true);
 			$$-> push_back(temp);
 	}
 	| declarator '=' initializer {
 			$$ = new std::vector<Node*>;
-			auto temp = new Variable("None", *$1, true);
+			auto id = (Identifier*)$1;
+			auto temp = new Variable("None", id->identifier, true);
 			$$-> push_back(temp);
 			auto temp2 = new Assign(temp, $3);
 			$$-> push_back(temp2);
@@ -313,8 +331,8 @@ struct_declaration
 	;
 
 specifier_qualifier_list
-	: type_specifier specifier_qualifier_list {}
-	| type_specifier {}
+	: type_specifier {$$ = $1;}
+	//| type_specifier specifier_qualifier_list {}
 	;
 
 struct_declarator_list
@@ -350,12 +368,32 @@ declarator
 	;
 
 direct_declarator
-	: IDENTIFIER { $$ = $1;	}
-	| direct_declarator '(' ')' {$$ = $1;}
-	//| '(' declarator ')' {}
+	: IDENTIFIER { $$ = new Identifier(*$1);	}
+	| direct_declarator '(' ')' {
+		auto id = (Identifier*)$1;
+		auto func =  new FunctionDeclaration();
+		func->arguments = new std::vector<Variable*>();
+		func->name = id->identifier;
+		$$ = func;
+	}
+	| direct_declarator '(' parameter_type_list ')' {
+			auto id = (Identifier*)$1;
+        		auto func =  new FunctionDeclaration();
+        		func->name = id->identifier;
+
+        		//Copy with cast to var
+        		func->arguments = new std::vector<Variable*>();
+        		for(auto arg : *$3){
+        			auto var = (Variable*) arg;
+        			func->arguments->push_back(var);
+        			func->var_map[var->name] = var;
+        		}
+        		$$ = func;
+	}
+	| '(' declarator ')' {$$ = $2;}
 	//| direct_declarator '[' constant_expression ']' {}
 	//| direct_declarator '[' ']' {}
-	| direct_declarator '(' parameter_type_list ')' {}
+
 	//| direct_declarator '(' identifier_list ')' {}
 	;
 
@@ -365,18 +403,23 @@ pointer
 	;
 
 parameter_type_list
-	: parameter_list {}
+	: parameter_list {$$ = $1;}
 	;
 
 parameter_list
-	: parameter_declaration {}
-	| parameter_list ',' parameter_declaration {}
+	: parameter_declaration {$$ = new std::vector<Node*>();
+				$$->push_back($1);}
+	| parameter_list ',' parameter_declaration {$1->push_back($3);\
+	$$ =$1; }
 	;
 
 parameter_declaration
-	: declaration_specifiers declarator {}
-	| declaration_specifiers abstract_declarator {}
-	| declaration_specifiers {}
+	: declaration_specifiers declarator {
+		auto id = (Identifier*) $2;
+		$$ = new Variable(*$1, id->identifier, true);
+	 }
+	//| declaration_specifiers abstract_declarator {}
+	//| declaration_specifiers {}
 	;
 
 identifier_list
@@ -385,27 +428,27 @@ identifier_list
 	;
 
 type_name
-	: specifier_qualifier_list {}
-	| specifier_qualifier_list abstract_declarator {}
+	: specifier_qualifier_list {$$ = $1;}
+//	| specifier_qualifier_list abstract_declarator {}
 	;
 
-abstract_declarator
-	: pointer {}
-	| direct_abstract_declarator {}
-	| pointer direct_abstract_declarator {}
-	;
+//abstract_declarator
+//	: pointer {}
+//	| direct_abstract_declarator {}
+//	| pointer direct_abstract_declarator {}
+//	;
 
-direct_abstract_declarator
-	: '(' abstract_declarator ')' {}
-	| '[' ']' {}
-	| '[' constant_expression ']' {}
-	| direct_abstract_declarator '[' ']' {}
-	| direct_abstract_declarator '[' constant_expression ']' {}
-	| '(' ')' {}
-	| '(' parameter_type_list ')' {}
-	| direct_abstract_declarator '(' ')' {}
-	| direct_abstract_declarator '(' parameter_type_list ')' {}
-	;
+//direct_abstract_declarator
+//	: '(' abstract_declarator ')' {}
+//	| '[' ']' {}
+//	| '[' constant_expression ']' {}
+//	| direct_abstract_declarator '[' ']' {}
+//	| direct_abstract_declarator '[' constant_expression ']' {}
+//	| '(' ')' {}
+//	| '(' parameter_type_list ')' {}
+//	| direct_abstract_declarator '(' ')' {}
+//	| direct_abstract_declarator '(' parameter_type_list ')' {}
+//	;
 
 initializer
 	: assignment_expression {}
@@ -477,7 +520,7 @@ selection_statement
 
 iteration_statement
 	: WHILE '(' expression ')' statement { $$ = new While($3, *$5);	}
-//	| DO statement WHILE '(' expression ')' ';' {}
+	| DO statement WHILE '(' expression ')' ';' {$$ = new DoWhile($5, *$2);	}
 //	| FOR '(' expression_statement expression_statement ')' statement {}
 //	| FOR '(' expression_statement expression_statement expression ')' statement {}
 	;
@@ -515,7 +558,11 @@ external_declaration
 function_definition
 	: declaration_specifiers declarator compound_statement {
 	std::cerr<<"found function";
-	$$ = new FunctionDeclaration(*$1,*$2,*$3);
+	auto func = (FunctionDeclaration*) $2;
+	func->return_type = *$1;
+	func->statements = *$3;
+	$$ = func;
+	//$$ = new FunctionDeclaration(*$1,*$2,*$3);
 	}
 	//| declaration_specifiers declarator declaration_list compound_statement {}
 	//| declarator declaration_list compound_statement {}

@@ -1,0 +1,7 @@
+int f(int a, int b){
+b = sizeof(int);
+b = sizeof(char);
+b = sizeof(a);
+b = sizeof(a + b);
+return b;
+}

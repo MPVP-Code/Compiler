@@ -27,7 +27,7 @@ public:
 
     virtual std::string to_string() const;
 
-    virtual std::string compileToMIPS() const;
+    virtual std::string compileToMIPS(const Node* parent_scope) const;
 
     virtual void generate_var_maps(Node *parent);
 

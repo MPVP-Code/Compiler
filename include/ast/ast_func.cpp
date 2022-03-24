@@ -1,23 +1,22 @@
 #include "ast_func.hpp"
 #include "ast_node.hpp"
+#include "ast_stack.hpp"
 
 #include <vector>
 
-FunctionDeclaration::FunctionDeclaration(std::string _return_type, std::string _name, std::vector<Node*> _statements):
-    return_type(_return_type), name(_name){
+FunctionDeclaration::FunctionDeclaration(){  //std::string _return_type, std::string _name, std::vector<Node*> _statements
     //Type specification
-    this->statements = _statements;
     this->type = "Scope";
     this->subtype = "FunctionDeclaration";
 }
 
-std::string FunctionDeclaration::compileToMIPS() const {
+std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
     std::cerr << "Compiling function " << this->name << std::endl;
     std::string result = this->name + ":\n.set noreorder\n";
 
     for (Node *statement : statements) {
         std::cerr << "Compiling statement " << statement->get_type() << std::endl;
-        std::string compiledCode = statement->compileToMIPS();
+        std::string compiledCode = statement->compileToMIPS(this);
         if (compiledCode.length() != 0) {
             result += compiledCode + "\n";
         }
@@ -36,6 +35,16 @@ std::string* FunctionDeclaration::getName() {
 
 FunctionDeclaration::~FunctionDeclaration() {}
 
-FunctionCall::FunctionCall(std::string _function_name, std::vector<Node*> _arguments): function_name(_function_name) {
-    //this->statements = _arguments;
+FunctionCall::FunctionCall(std::string _function_name, std::vector<Node*>* _arguments): function_name(_function_name) {
+    this->arguments = _arguments;
 };
+
+void FunctionCall::generate_var_maps(Node *parent){
+
+    //Applies varmapping to parameters
+    auto scope = (Scope*) parent;
+    for(auto param : *this->arguments){
+        try_replace_variable(param, scope);
+    }
+}
+

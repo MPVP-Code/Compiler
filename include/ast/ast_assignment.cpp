@@ -8,6 +8,7 @@
 
 Constant::Constant(int _value) : value(_value) {
     this->type = "Constant";
+    this->data_type = "int";
 }
 
 int Constant::getValue() {
@@ -37,7 +38,7 @@ void Assign::generate_var_maps(Node *parent) {
     this->data_type = destination->data_type;
 }
 
-std::string Assign::compileToMIPS() const {
+std::string Assign::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
     if (destination->data_type == "int") {
         if (source->type == "Constant") {

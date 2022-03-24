@@ -7,3 +7,7 @@ Identifier::Identifier(std::string id) {
     this->identifier = id;
 }
 
+SizeOf::SizeOf(Node *in) : UnaryOperator(in) {
+    this->subtype = "SizeOf";
+}
+

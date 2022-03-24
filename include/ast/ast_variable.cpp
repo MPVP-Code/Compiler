@@ -14,7 +14,7 @@ std::string *Variable::getVariableType() {
     return &(this->data_type);
 }
 
-std::string Variable::compileToMIPS() const {
+std::string Variable::compileToMIPS(const Node *parent_scope) const {
     int registerIndex = RegisterAllocator::getRegisterNumberForVariable(&(this->name));
     return "li $" + std::to_string(registerIndex) + ", 0x0000";
 }

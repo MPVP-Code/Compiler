@@ -11,24 +11,27 @@ class FunctionDeclaration : public Scope
 public:
     std::string return_type;
     std::string name;
-    std::vector<Variable*> Arguments;
+    std::vector<Variable*>* arguments;
 
 
-    FunctionDeclaration(std::string _return_type, std::string _name, std::vector<Node*> _statements);
+    FunctionDeclaration();
 
     virtual ~FunctionDeclaration();
 
     std::string* getName();
 
-    virtual std::string compileToMIPS() const override;
+    virtual std::string compileToMIPS(const Node *parent_scope) const override;
 
 };
 
 class FunctionCall : public Node {
 public:
     std::string function_name;
+    std::vector<Node*>* arguments;
 
-    FunctionCall(std::string _function_name, std::vector<Node*> arguments);
+    FunctionCall(std::string _function_name, std::vector<Node*>* arguments);
+
+    void generate_var_maps(Node *parent) override;
 };
 
 #endif
