@@ -1,8 +1,5 @@
 #include<iostream>
-#include <iomanip>
 #include "../include/ast.hpp"
-#include "../include/register_allocator.hpp"
-#include "../build/parser.tab.hpp"
 
 int main(int argc, char *argv[]) {
     Node *ast = parseAST();

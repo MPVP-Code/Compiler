@@ -49,3 +49,4 @@ clean :
 	rm -f src/*.yy.cpp
 	rm -f src/*.output
 	rm -f test/out/*
+	rm -f test_codegen/bin/*
