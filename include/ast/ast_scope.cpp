@@ -10,38 +10,33 @@ Scope::Scope() {
 
 void Scope::generate_var_maps(Node* parent) {
     Scope *parentScope = (Scope*) parent;
-    for (auto &node: this->statements) {
 
-        if (node->type == "Scope") {
-            Scope *scope = (Scope *) node;
-            scope->parent_scope = this;
+    this->parent_scope = parentScope;
 
-            //Applies varmaps to conditions
-            if (scope->subtype == "While") {
-                While* flow = (While *) scope;
-                try_replace_variable(flow->condition, scope);
+    //Applies varmaps to conditions
+    if (this->subtype == "While") {
+        While* flow = (While *) this;
+        try_replace_variable(flow->condition, this);
 
-            } else if (scope->subtype == "If") {
-                If* flow = (If *) scope;
-                try_replace_variable(flow->condition, scope);
+    }if (this->subtype == "DoWhile") {
+        auto flow = (DoWhile *) this;
+        try_replace_variable(flow->condition, this);
 
-            } else if (scope->subtype == "FunctionDeclaration"){
-                //Applies varmapping to declared variables
-                auto func = (FunctionDeclaration*) scope;
-                for(auto const arg : *(func->arguments)){
-                    func->var_map[arg->name] = arg;
-                }
-                //Applies varmapping to statements
-                for(auto arg : func->statements){
-                    try_replace_variable(arg, func);
-                }
-            }
-            scope->generate_var_maps(scope);
+    } else if (this->subtype == "If") {
+        If* flow = (If *) this;
+        try_replace_variable(flow->condition, this);
 
-        }else {
-            try_replace_variable(node, this);
+    } else if (this->subtype == "FunctionDeclaration"){
+        //Applies varmapping to declared variables
+        auto func = (FunctionDeclaration*) this;
+        for(auto const arg : *(func->arguments)){
+            func->var_map[arg->name] = arg;
         }
+    }
 
+
+    for (auto &node: this->statements) {
+            try_replace_variable(node, this);
     }
 
     //Generates variable offsets

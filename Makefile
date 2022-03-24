@@ -3,7 +3,7 @@ CPPFLAGS += -std=c++2a -W -Wall -g -Wno-unused-parameter
 CPPFLAGS += -I inc
 
 AST := include/register_allocator.cpp include/ast/ast_arithmetic.cpp include/ast/ast_assignment.cpp include/ast/ast_bitwise.cpp include/ast/ast_flow_control.cpp include/ast/ast_func.cpp include/ast/ast_jump_statement.cpp include/ast/ast_logic.cpp include/ast/ast_node.cpp include/ast/ast_operator.cpp include/ast/ast_scope.cpp include/ast/ast_stack.cpp include/ast/ast_syntax.cpp include/ast/ast_variable.cpp
-
+fAST := include/register_allocator.o include/ast/ast_arithmetic.o include/ast/ast_assignment.o include/ast/ast_bitwise.o include/ast/ast_flow_control.o include/ast/ast_func.o include/ast/ast_jump_statement.o include/ast/ast_logic.o include/ast/ast_node.o include/ast/ast_operator.o include/ast/ast_scope.o include/ast/ast_stack.o include/ast/ast_syntax.o include/ast/ast_variable.o
 all : bin/c_compiler src/lexer.yy.cpp src/parser.tab.cpp
 
 bin/c_compiler : bin/compiler src/wrapper.sh
@@ -32,9 +32,9 @@ lexertest : parser lexer test_lexer/src/lexer_main.cpp include/register_allocato
 	mkdir -p test_lexer/bin
 	g++ $(CPPFLAGS) -o test_lexer/bin/lexer_test.o test_lexer/src/lexer_main.cpp build/lexer.yy.o include/register_allocator.cpp
 
-parsertest : parser lexer test_parser/src/parser_main.cpp $(AST)
+parsertest : parser lexer test_parser/src/parser_main.cpp $(fAST)
 	mkdir -p test_parser/bin
-	g++ $(CPPFLAGS) -o test_parser/bin/parsertest test_parser/src/parser_main.cpp build/lexer.yy.o build/parser.tab.o $(AST)
+	g++ $(CPPFLAGS) -o test_parser/bin/parsertest test_parser/src/parser_main.cpp build/lexer.yy.o build/parser.tab.o $(fAST)
 
 codegentest : test_codegen/src/codegen_main.cpp include/register_allocator.cpp $(AST)
 	g++ $(CPPFLAGS) -o test_codegen/bin/codegen_main test_codegen/src/codegen_main.cpp $(AST)

@@ -41,6 +41,13 @@ std::string While::compileToMIPS() const {
     return result.substr(0, result.length() - 1);
 }
 
+DoWhile::DoWhile(Node* _condition, std::vector<Node*> _statements): Scope(), condition(_condition){
+    this->subtype = "DoWhile";
+    this->statements = _statements;
+}
+std::string DoWhile::compileToMIPS() const {}
+
+
 If::If(Node* _condition, std::vector<Node*>* _truestatements, std::vector<Node*>* _falsestatements): Scope(), condition(_condition) {
         this->subtype = "If";
         this->truestatements = _truestatements;

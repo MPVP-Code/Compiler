@@ -96,7 +96,7 @@ std::string load_mapped_variable(Scope* scope, Variable* var, std::string reg_na
     std::string out = "";
     if(offset%4 == 0) {
         out =  "lw " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-    }else{ //Storing in unaligned memory addresses
+    }else{ //Load from unaligned memory addresses
         out +=  "lwl " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
         out +=  "lwr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
     }

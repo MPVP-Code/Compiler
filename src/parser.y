@@ -520,7 +520,7 @@ selection_statement
 
 iteration_statement
 	: WHILE '(' expression ')' statement { $$ = new While($3, *$5);	}
-//	| DO statement WHILE '(' expression ')' ';' {}
+	| DO statement WHILE '(' expression ')' ';' {$$ = new DoWhile($5, *$2);	}
 //	| FOR '(' expression_statement expression_statement ')' statement {}
 //	| FOR '(' expression_statement expression_statement expression ')' statement {}
 	;

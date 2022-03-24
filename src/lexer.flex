@@ -31,6 +31,7 @@ extern "C" int fileno(FILE *stream);
 "sizeof"		{return(SIZEOF); }
 "struct"		{return(STRUCT); }
 
+"do"			{return(DO); }
 "if"			{return(IF); }
 "else"			{return(ELSE); }
 "return"		{return(RETURN); }
