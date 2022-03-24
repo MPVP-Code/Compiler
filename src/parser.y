@@ -82,7 +82,13 @@ argument_expression_list
 	;
 
 unary_expression
-	: postfix_expression {$$ = $1;}
+	: postfix_expression {
+				if($1->type == "Identifier"){
+					$$ = new Variable ("None", ((Identifier*)$1)->identifier, false);
+				}else{
+					$$ = $1;
+				}
+				}
 //	| INC_OP unary_expression {}
 //	| DEC_OP unary_expression {}
 	| unary_operator unary_expression {
@@ -111,10 +117,7 @@ unary_operator
 
 
 multiplicative_expression
-	: unary_expression {
-		if($1->type == "Identifier"){
-		$$ = new Variable ("None", ((Identifier*)$1)->identifier, false); }
-		}
+	: unary_expression {$$ = $1;}
 	| multiplicative_expression '*' unary_expression {$$ = new Multiplication ($1, $3);}
 	| multiplicative_expression '/' unary_expression {$$ = new Division ($1, $3);}
 	| multiplicative_expression '%' unary_expression {$$ = new Modulo ($1, $3);}
