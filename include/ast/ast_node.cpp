@@ -29,7 +29,7 @@ std::string Node::to_string() const {
     throw std::runtime_error("Node print not implemented.");
 }
 
-std::string Node::compileToMIPS() const {
+std::string Node::compileToMIPS( const Node *parent_scope) const {
     throw std::runtime_error(this->type + " compileToMIPS not implemented.");
 }
 

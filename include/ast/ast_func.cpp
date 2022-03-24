@@ -10,13 +10,13 @@ FunctionDeclaration::FunctionDeclaration(){  //std::string _return_type, std::st
     this->subtype = "FunctionDeclaration";
 }
 
-std::string FunctionDeclaration::compileToMIPS() const {
+std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
     std::cerr << "Compiling function " << this->name << std::endl;
     std::string result = this->name + ":\n.set noreorder\n";
 
     for (Node *statement : statements) {
         std::cerr << "Compiling statement " << statement->get_type() << std::endl;
-        std::string compiledCode = statement->compileToMIPS();
+        std::string compiledCode = statement->compileToMIPS(this);
         if (compiledCode.length() != 0) {
             result += compiledCode + "\n";
         }

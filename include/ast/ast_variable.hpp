@@ -20,7 +20,7 @@ public:
 
     virtual void generate_var_maps(Node *parent) override;
 
-    virtual std::string compileToMIPS() const override;
+    virtual std::string compileToMIPS(const Node *parent_scope) const override;
 };
 
 class Variable_type{

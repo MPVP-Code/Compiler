@@ -20,7 +20,7 @@ public:
 
     std::string* getName();
 
-    virtual std::string compileToMIPS() const override;
+    virtual std::string compileToMIPS(const Node *parent_scope) const override;
 
 };
 

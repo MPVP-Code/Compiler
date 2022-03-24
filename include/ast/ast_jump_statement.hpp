@@ -9,7 +9,7 @@ private:
 public:
     Return(Node* _expression);
 
-    virtual std::string compileToMIPS() const override;
+    virtual std::string compileToMIPS(const Node *parent_scope) const override;
 
     virtual void generate_var_maps(Node *parent) override;
 

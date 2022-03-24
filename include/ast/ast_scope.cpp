@@ -60,7 +60,7 @@ std::vector<Node*>* Scope::getBranches() {
     return &(this->statements);
 };
 
-std::string Scope::compileToMIPS() const {
+std::string Scope::compileToMIPS(const Node *parent_scope) const {
     throw std::runtime_error(this->type + " compileToMIPS not implemented.");
 }
 
@@ -76,7 +76,7 @@ Global::Global() {
     this->type_map["unsigned"] = new Variable_type("unsigned", "int", 4);
 }
 
-std::string Global::compileToMIPS() const {
+std::string Global::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
 
     for (Node *statement: this->statements) {
@@ -88,7 +88,7 @@ std::string Global::compileToMIPS() const {
     }
 
     for (Node *statement : this->statements) {
-        result += statement->compileToMIPS() + "\n";
+        result += statement->compileToMIPS(this) + "\n";
     }
 
     return result;

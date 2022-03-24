@@ -10,10 +10,10 @@ bin/c_compiler : bin/compiler src/wrapper.sh
 	cp src/wrapper.sh bin/c_compiler
 	chmod u+x bin/c_compiler
 
-bin/compiler : src/compiler.cpp lexer $(AST)
+bin/compiler : src/compiler.cpp lexer $(fAST)
 	mkdir -p bin
 	g++ $(CPPFLAGS) -c src/compiler.cpp -o build/compiler.o
-	g++ $(CPPFLAGS) -o bin/compiler build/lexer.yy.o build/parser.tab.o build/compiler.o $(AST)
+	g++ $(CPPFLAGS) -o bin/compiler build/lexer.yy.o build/parser.tab.o build/compiler.o $(fAST)
 
 syntax_test: src/syntax_test.cpp $(AST)
 	g++ $(CPPFLAGS) -o bin/syntax_test src/syntax_test.cpp $(AST)
@@ -42,6 +42,7 @@ codegentest : test_codegen/src/codegen_main.cpp include/register_allocator.cpp $
 clean :
 	rm -f src/*.o
 	rm -f include/**/*.o
+	rm -f include/*.o
 	rm -f bin/*
 	rm -f build/*
 	rm -f src/*.tab.cpp

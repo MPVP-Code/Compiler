@@ -9,7 +9,7 @@ While::While(Node* _condition, std::vector<Node*> _statements): Scope(), conditi
         this->statements = _statements;
 }
 
-std::string While::compileToMIPS() const {
+std::string While::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
     if (condition->get_type().compare("Constant") == 0) {
         Constant *constant = (Constant*) condition;
@@ -27,7 +27,7 @@ std::string While::compileToMIPS() const {
 
         for (Node *statement : statements) {
             std::cerr << "while statement type: " << statement->get_type() << std::endl;
-            std::string generatedCode = statement->compileToMIPS();
+            std::string generatedCode = statement->compileToMIPS(this);
             std::cerr << "while generatedCode: " << generatedCode << std::endl;
             if (generatedCode.length() != 0) {
                 result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
@@ -45,7 +45,7 @@ DoWhile::DoWhile(Node* _condition, std::vector<Node*> _statements): Scope(), con
     this->subtype = "DoWhile";
     this->statements = _statements;
 }
-std::string DoWhile::compileToMIPS() const {}
+std::string DoWhile::compileToMIPS(const Node *parent_scope) const {}
 
 
 If::If(Node* _condition, std::vector<Node*>* _truestatements, std::vector<Node*>* _falsestatements): Scope(), condition(_condition) {
@@ -58,7 +58,7 @@ std::string If::compileStatementsToMIPS(std::vector<Node*>* statements) const {
     std::string result = "";
 
     for (Node *statement : *statements) {
-        std::string generatedCode = statement->compileToMIPS();
+        std::string generatedCode = statement->compileToMIPS(this);
         if (generatedCode.length() != 0) {
             result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
         }
@@ -67,7 +67,7 @@ std::string If::compileStatementsToMIPS(std::vector<Node*>* statements) const {
     return result.substr(0, result.length() - 1);
 }
 
-std::string If::compileToMIPS() const {
+std::string If::compileToMIPS(const Node* parent_scope) const {
     std::string result = "";
 
     if (condition->get_type().compare("Constant") == 0) {

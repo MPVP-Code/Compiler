@@ -14,7 +14,7 @@ public:
     Node* condition;
     While(Node* _condition, std::vector<Node*> _statements);
 
-    virtual std::string compileToMIPS() const override;
+    virtual std::string compileToMIPS(const Node *parent_scope) const override;
 };
 
 class DoWhile: public Scope {
@@ -22,7 +22,7 @@ public:
     Node* condition;
     DoWhile(Node* _condition, std::vector<Node*> _statements);
 
-    virtual std::string compileToMIPS() const override;
+    virtual std::string compileToMIPS(const Node *parent_scope) const override;
 };
 
 class If: public Scope {
@@ -34,7 +34,7 @@ public:
 
     If(Node* _condition, std::vector<Node*>* _truestatements, std::vector<Node*>* _falsestatements);
 
-    virtual std::string compileToMIPS() const override;
+    virtual std::string compileToMIPS(const Node *parent_scope) const override;
     std::string compileStatementsToMIPS(std::vector<Node*>* statements) const;
 };
 
@@ -47,7 +47,7 @@ public:
 
     //If(Node* _condition, std::vector<Node*>* _truestatements, std::vector<Node*>* _falsestatements);
 
-    virtual std::string compileToMIPS() const override;
+    virtual std::string compileToMIPS(const Node *parent_scope) const override;
     std::string compileStatementsToMIPS(std::vector<Node*>* statements) const;
 };
 

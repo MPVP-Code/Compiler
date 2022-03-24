@@ -9,7 +9,7 @@ Return::Return(Node* _expression): expression(_expression) {
     this->type = "ReturnExpression";
 };
 
-std::string Return::compileToMIPS() const {
+std::string Return::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
 
     if (expression->type.compare("Variable") == 0) {

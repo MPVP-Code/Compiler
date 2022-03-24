@@ -8,7 +8,7 @@ int main(int argc, char *argv[]) {
     RegisterAllocator::initCurrentRegister();
     RegisterAllocator::reinitRegistersMappingMap();
 
-    std::cout << ast->compileToMIPS();
+    std::cout << ast->compileToMIPS(NULL);
 
     return 0;
 }

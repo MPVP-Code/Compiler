@@ -28,9 +28,9 @@ private:
 public:
     Assign(Variable *_destination, Node *_source);
 
-    virtual std::string compileToMIPS() const override;
+    std::string compileToMIPS(const Node *parent_scope) const override;
 
-    virtual void generate_var_maps(Node *parent) override;
+    void generate_var_maps(Node *parent) override;
 };
 
 #endif
