@@ -10,7 +10,7 @@ bin/c_compiler : bin/compiler src/wrapper.sh
 	cp src/wrapper.sh bin/c_compiler
 	chmod u+x bin/c_compiler
 
-bin/compiler : src/compiler.cpp lexer $(fAST)
+bin/compiler : src/compiler.cpp lexer $(AST)
 	mkdir -p bin
 	g++ $(CPPFLAGS) -c src/compiler.cpp -o build/compiler.o
 	g++ $(CPPFLAGS) -o bin/compiler build/lexer.yy.o build/parser.tab.o build/compiler.o $(AST)

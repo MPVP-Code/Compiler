@@ -1,3 +1,4 @@
+#include "ast_stack.hpp"
 #include "ast_variable.hpp"
 #include "../register_allocator.hpp"
 
@@ -15,8 +16,9 @@ std::string *Variable::getVariableType() {
 }
 
 std::string Variable::compileToMIPS(const Node *parent_scope) const {
-    int registerIndex = RegisterAllocator::getRegisterNumberForVariable(&(this->name));
-    return "li $" + std::to_string(registerIndex) + ", 0x0000";
+    std::string result = "li $15, 0x0000\n";
+    result += store_mapped_variable((Scope *) parent_scope, this, "$15");
+    return result;
 }
 
 void Variable::generate_var_maps(Node *parent) {
