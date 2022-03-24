@@ -52,11 +52,10 @@ std::string Assign::compileToMIPS(const Node *parent_scope) const {
             if (addition->isLInt() && addition->isRInt()) {
                 Variable *LVar = (Variable *) addition->getL();
                 Variable *RVar = (Variable *) addition->getR();
-                int lOpReg = RegisterAllocator::getRegisterNumberForVariable(LVar->getName());
-                int rOpReg = RegisterAllocator::getRegisterNumberForVariable(RVar->getName());
-                int resultReg = RegisterAllocator::getRegisterNumberForVariable(destination->getName());
-                result = "add $" + std::to_string(resultReg) + ", $" + std::to_string(lOpReg) + ", $" +
-                         std::to_string(rOpReg);
+                result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";
+                result += load_mapped_variable((Scope*) parent_scope, RVar, "$14") + "\n";
+                result += "add $13, $14, $15\n";
+                result += store_mapped_variable((Scope*) parent_scope, destination, "$13");
             }
         } else if (source->type == "Subtraction" ||
                    (source->type == "BinaryOperator" && source->subtype == "Subtraction")) {
