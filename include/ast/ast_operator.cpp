@@ -37,11 +37,11 @@ Node* BinaryOperator::getR() const {
 };
 
 bool BinaryOperator::isLInt() const {
-    return L->get_type().compare("Variable") == 0 && ((Variable *) L)->getVariableType()->compare("int") == 0;
+    return L->data_type.compare("int") == 0;
 };
 
 bool BinaryOperator::isRInt() const {
-    return R->get_type().compare("Variable") == 0 && ((Variable *) R)->getVariableType()->compare("int") == 0;
+    return R->data_type.compare("int") == 0;
 }
 
 

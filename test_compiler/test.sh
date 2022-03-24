@@ -7,7 +7,7 @@ echo "========================================"
 echo "========================================"
 echo " Cleaning the temporaries and outputs"
 ./test_complier/clean.sh
-make clean
+make clean --always-make
 echo " Force building bin/c_compiler"
 make bin/c_compiler -B
 if [[ "$?" -ne 0 ]]; then
@@ -30,7 +30,7 @@ for filename in compiler_tests/*/*.c; do
 
     set +e
     echo "  Compiling C to MIPS32"
-    ./bin/c_compiler -S "$TEST.c" -o "$TEST.s" > /dev/null 2> "$TEST.errorlog"
+    timeout 10 ./bin/c_compiler -S "$TEST.c" -o "$TEST.s" > /dev/null 2> "$TEST.errorlog"
 
     echo "  Building MIPS32 binary"
     mips-linux-gnu-gcc -mfp32 -static -march=mips32 -o "$TEST.o" -c "$TEST.s" > /dev/null 2>&1

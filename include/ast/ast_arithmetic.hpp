@@ -8,7 +8,6 @@
 class Addition : public BinaryOperator {
 public:
     Addition(Node *_L, Node *_R);
-
 };
 
 class Subtraction : public BinaryOperator {

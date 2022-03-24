@@ -1,6 +1,3 @@
-//
-// Created by michal on 15. 3. 2022.
-//
 #include "ast_flow_control.hpp"
 #include "ast_assignment.hpp"
 
@@ -26,9 +23,7 @@ std::string While::compileToMIPS(const Node *parent_scope) const {
         result += "beq $" + std::to_string(conditionRegister) + ", $0, " + whileEnd + "\nnop\n";
 
         for (Node *statement : statements) {
-            std::cerr << "while statement type: " << statement->get_type() << std::endl;
             std::string generatedCode = statement->compileToMIPS(this);
-            std::cerr << "while generatedCode: " << generatedCode << std::endl;
             if (generatedCode.length() != 0) {
                 result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
             }

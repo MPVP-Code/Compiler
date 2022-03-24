@@ -13,7 +13,7 @@ bin/c_compiler : bin/compiler src/wrapper.sh
 bin/compiler : src/compiler.cpp lexer $(fAST)
 	mkdir -p bin
 	g++ $(CPPFLAGS) -c src/compiler.cpp -o build/compiler.o
-	g++ $(CPPFLAGS) -o bin/compiler build/lexer.yy.o build/parser.tab.o build/compiler.o $(fAST)
+	g++ $(CPPFLAGS) -o bin/compiler build/lexer.yy.o build/parser.tab.o build/compiler.o $(AST)
 
 syntax_test: src/syntax_test.cpp $(AST)
 	g++ $(CPPFLAGS) -o bin/syntax_test src/syntax_test.cpp $(AST)
