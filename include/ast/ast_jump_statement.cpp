@@ -10,8 +10,12 @@ Return::Return(Node *_expression) : expression(_expression) {
 
 std::string Return::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
-    if (expression->data_type == "int") {
+    if (expression->data_type == "int" && expression->type == "Variable") {
         result += load_mapped_variable((Scope *) parent_scope, expression, "$v0") + "\n";
+        result += "\njr $31\nnop\n";
+    } else if (expression->data_type == "int" && expression->type == "Constant") {
+        Constant* constant = (Constant*) expression;
+        result += "li $v0, " + intToHex(constant->getValue());
         result += "\njr $31\nnop\n";
     }
 

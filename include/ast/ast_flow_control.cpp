@@ -1,5 +1,6 @@
 #include "ast_flow_control.hpp"
 #include "ast_assignment.hpp"
+#include "ast_stack.hpp"
 
 While::While(Node* _condition, std::vector<Node*> _statements): Scope(), condition(_condition){
         this->subtype = "While";
@@ -19,8 +20,8 @@ std::string While::compileToMIPS(const Node *parent_scope) const {
         std::string whileStart = "$WHILE" + std::to_string(whileId) + "START";
         std::string whileEnd = "$WHILE" + std::to_string(whileId) + "END";
         result += whileStart + ":\n";
-        //int conditionRegister = RegisterAllocator::getRegisterNumberForVariable(conditionVariable->getName());
-        //result += "beq $" + std::to_string(conditionRegister) + ", $0, " + whileEnd + "\nnop\n";
+        result += load_mapped_variable((Scope*) parent_scope, conditionVariable, "$15");
+        result += "beq $15, $0, " + whileEnd + "\nnop\n";
 
         for (Node *statement : statements) {
             std::string generatedCode = statement->compileToMIPS(this);
@@ -77,10 +78,10 @@ std::string If::compileToMIPS(const Node *parent_scope) const {
     } else if (condition->get_type().compare("Variable") == 0) {
         Variable *variableCondition = (Variable*) condition;
         int ifId = Global::getIdForIf();
-        //int registerNumber = RegisterAllocator::getRegisterNumberForVariable(variableCondition->getName());
+        result += load_mapped_variable((Scope*) parent_scope, variableCondition, "$15");
         std::string elseLabel = "$ELSE" + std::to_string(ifId);
         std::string ifEndLabel = "$IFEND" + std::to_string(ifId);
-        //result = "beq $" + std::to_string(registerNumber) + ", $0, " + elseLabel + "\nnop\n";
+        result += "beq $15, $0, " + elseLabel + "\nnop\n";
         if (truestatements != nullptr) {
             result += this->compileStatementsToMIPS(this->truestatements) + "\n";
             result += "b " + ifEndLabel + "\nnop\n";
