@@ -31,6 +31,8 @@ public:
 
     virtual void generate_var_maps(Node *parent);
 
+    std::string getDataType() const;
+
 };
 
 

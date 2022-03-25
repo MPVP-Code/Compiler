@@ -3,6 +3,7 @@
 #include "ast_node.hpp"
 #include "ast_arithmetic.hpp"
 #include "ast_assignment.hpp"
+#include "ast_stack.hpp"
 #include <string>
 
 
@@ -24,12 +25,12 @@ Assign::Assign(Variable *_destination, Node *_source) : destination(_destination
 }
 
 void Assign::generate_var_maps(Node *parent) {
-    Scope *parentScope = (Scope*) parent;
+    Scope *parentScope = (Scope *) parent;
 
     //Destination var mapping
-    auto temp = (Node*)this->destination;
+    auto temp = (Node *) this->destination;
     try_replace_variable(temp, parent);
-    this->destination = (Variable*) temp;
+    this->destination = (Variable *) temp;
 
     //Source varmapping
     try_replace_variable(source, parent);
@@ -44,19 +45,20 @@ std::string Assign::compileToMIPS(const Node *parent_scope) const {
         if (source->type == "Constant") {
             Constant *constant = (Constant *) source;
             std::string hexValue = RegisterAllocator::intToHex(constant->getValue());
-            int registerNumber = RegisterAllocator::getRegisterNumberForVariable(destination->getName());
-            result = "li $" + std::to_string(registerNumber) + ", " + hexValue;
+            result = "li $15, " + hexValue + "\n";
+            result += store_mapped_variable((Scope *) parent_scope, destination, "$15");
         } else if (source->type == "Addition" || (source->type == "BinaryOperator" && source->subtype == "Addition")) {
             Addition *addition = (Addition *) source;
             if (addition->isLInt() && addition->isRInt()) {
                 Variable *LVar = (Variable *) addition->getL();
                 Variable *RVar = (Variable *) addition->getR();
-                int lOpReg = RegisterAllocator::getRegisterNumberForVariable(LVar->getName());
-                int rOpReg = RegisterAllocator::getRegisterNumberForVariable(RVar->getName());
-                int resultReg = RegisterAllocator::getRegisterNumberForVariable(destination->getName());
-                result = "add $" + std::to_string(resultReg) + ", $" + std::to_string(lOpReg) + ", $" + std::to_string(rOpReg);
+                result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";
+                result += load_mapped_variable((Scope*) parent_scope, RVar, "$14") + "\n";
+                result += "add $13, $14, $15\n";
+                result += store_mapped_variable((Scope*) parent_scope, destination, "$13");
             }
-        } else if (source->type == "Subtraction" || (source->type == "BinaryOperator" && source->subtype == "Subtraction")) {
+        } else if (source->type == "Subtraction" ||
+                   (source->type == "BinaryOperator" && source->subtype == "Subtraction")) {
             Subtraction *subtraction = (Subtraction *) source;
             if (subtraction->isLInt() && subtraction->isRInt()) {
                 Variable *LVar = (Variable *) subtraction->getL();
@@ -64,9 +66,11 @@ std::string Assign::compileToMIPS(const Node *parent_scope) const {
                 int lOpReg = RegisterAllocator::getRegisterNumberForVariable(LVar->getName());
                 int rOpReg = RegisterAllocator::getRegisterNumberForVariable(RVar->getName());
                 int resultReg = RegisterAllocator::getRegisterNumberForVariable(destination->getName());
-                result = "sub $" + std::to_string(resultReg) + ", $" + std::to_string(lOpReg) + ", $" + std::to_string(rOpReg);
+                result = "sub $" + std::to_string(resultReg) + ", $" + std::to_string(lOpReg) + ", $" +
+                         std::to_string(rOpReg);
             }
-        } else if (source->type == "Multiplication" || (source->type == "BinaryOperator" && source->subtype == "Multiplication")) {
+        } else if (source->type == "Multiplication" ||
+                   (source->type == "BinaryOperator" && source->subtype == "Multiplication")) {
             Multiplication *multiplication = (Multiplication *) source;
             if (multiplication->isLInt() && multiplication->isRInt()) {
                 Variable *LVar = (Variable *) multiplication->getL();
@@ -74,7 +78,8 @@ std::string Assign::compileToMIPS(const Node *parent_scope) const {
                 int lOpReg = RegisterAllocator::getRegisterNumberForVariable(LVar->getName());
                 int rOpReg = RegisterAllocator::getRegisterNumberForVariable(RVar->getName());
                 int resultReg = RegisterAllocator::getRegisterNumberForVariable(destination->getName());
-                result = "mult $" + std::to_string(lOpReg) + ", $" + std::to_string(rOpReg) + "\nmflo $" + std::to_string(resultReg);
+                result = "mult $" + std::to_string(lOpReg) + ", $" + std::to_string(rOpReg) + "\nmflo $" +
+                         std::to_string(resultReg);
             }
         } else if (source->type == "Division" || (source->type == "BinaryOperator" && source->subtype == "Division")) {
             Division *division = (Division *) source;
@@ -84,7 +89,8 @@ std::string Assign::compileToMIPS(const Node *parent_scope) const {
                 int lOpReg = RegisterAllocator::getRegisterNumberForVariable(LVar->getName());
                 int rOpReg = RegisterAllocator::getRegisterNumberForVariable(RVar->getName());
                 int resultReg = RegisterAllocator::getRegisterNumberForVariable(destination->getName());
-                result = "div $" + std::to_string(lOpReg) + ", $" + std::to_string(rOpReg) + "\nmflo $" + std::to_string(resultReg);
+                result = "div $" + std::to_string(lOpReg) + ", $" + std::to_string(rOpReg) + "\nmflo $" +
+                         std::to_string(resultReg);
             }
         } else if (source->type == "Modulo" || (source->type == "BinaryOperator" && source->subtype == "Modulo")) {
             Modulo *modulo = (Modulo *) source;
@@ -94,7 +100,8 @@ std::string Assign::compileToMIPS(const Node *parent_scope) const {
                 int lOpReg = RegisterAllocator::getRegisterNumberForVariable(LVar->getName());
                 int rOpReg = RegisterAllocator::getRegisterNumberForVariable(RVar->getName());
                 int resultReg = RegisterAllocator::getRegisterNumberForVariable(destination->getName());
-                result = "div $" + std::to_string(lOpReg) + ", $" + std::to_string(rOpReg) + "\nmfhi $" + std::to_string(resultReg);
+                result = "div $" + std::to_string(lOpReg) + ", $" + std::to_string(rOpReg) + "\nmfhi $" +
+                         std::to_string(resultReg);
             }
         }
     }

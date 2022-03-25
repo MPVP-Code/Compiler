@@ -5,7 +5,7 @@
 #include "../register_allocator.hpp"
 #include "ast_stack.hpp"
 
-Return::Return(Node* _expression): expression(_expression) {
+Return::Return(Node *_expression) : expression(_expression) {
     this->type = "ReturnExpression";
 };
 
@@ -13,11 +13,10 @@ std::string Return::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
 
     if (expression->type.compare("Variable") == 0) {
-        Variable *variable = (Variable*) expression;
-        int registerNumber = RegisterAllocator::getRegisterNumberForVariable(variable->getName());
-        result = "add $2, $" + std::to_string(registerNumber) + ", $0" + "\njr $31\nnop";
+        Variable *variable = (Variable *) expression;
+        result = load_mapped_variable((Scope *) parent_scope, variable, "$2") + "\njr $31\nnop";
     } else if (expression->type.compare("Constant") == 0) {
-        Constant *constant = (Constant*) expression;
+        Constant *constant = (Constant *) expression;
         result = "li $2, " + RegisterAllocator::intToHex(constant->getValue()) + "\njr $31\nnop";
     }
 

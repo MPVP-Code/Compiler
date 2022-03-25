@@ -76,3 +76,6 @@ compiler_tests/*/*
 test_codegen/bin/*
 test_lexer/bin/*
 test_parser/bin/*
+
+include/*.o
+include/*/*.o

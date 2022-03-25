@@ -37,4 +37,6 @@ void Node::generate_var_maps(Node *parent) {
     std::cerr << this->type << " failed to generate map\n";
 }
 
-
+std::string Node::getDataType() const {
+    return data_type;
+}
