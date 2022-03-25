@@ -29,7 +29,7 @@ std::string Node::to_string() const {
     throw std::runtime_error("Node print not implemented.");
 }
 
-std::string Node::compileToMIPS( const Node *parent_scope) const {
+std::string Node::compileToMIPS(const Node *parent_scope) const {
     throw std::runtime_error(this->type + " compileToMIPS not implemented.");
 }
 
@@ -39,4 +39,9 @@ void Node::generate_var_maps(Node *parent) {
 
 std::string Node::getDataType() const {
     return data_type;
+}
+
+Node* Node::get_intermediate_variable() {
+    std::cerr<<"get_intermediate_variable not implemented\n";
+    return NULL;
 }

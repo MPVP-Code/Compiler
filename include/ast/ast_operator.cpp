@@ -44,6 +44,10 @@ bool BinaryOperator::isRInt() const {
     return R->data_type.compare("int") == 0;
 }
 
+Node* BinaryOperator::get_intermediate_variable() {
+    return this->temp_variable;
+}
+
 
 UnaryOperator::UnaryOperator(Node* _in) {
     this->type = "UnaryOperator";
@@ -56,9 +60,10 @@ void UnaryOperator::generate_var_maps(Node *parent){
 
     //Propagate data types
     data_type = in -> data_type;
-    std::string tmpname = "!tmp" + std::to_string(((Scope*) parent)->tmp_var_counter++);
-    this->temp_variable = new Variable(this->data_type, tmpname , true);
 
-    auto scope = (Scope*) parent;
-    scope->var_map[tmpname] = this->temp_variable;
+    temp_variable = allocate_temp_var(parent, data_type);
+}
+
+Node* UnaryOperator::get_intermediate_variable(){
+    return this->temp_variable;
 }

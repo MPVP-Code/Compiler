@@ -16,13 +16,18 @@ std::string *Variable::getVariableType() {
 }
 
 std::string Variable::compileToMIPS(const Node *parent_scope) const {
-    std::string result = "li $15, 0x0000\n";
-    result += store_mapped_variable((Scope *) parent_scope, this, "$15");
-    return result;
+//    std::string result = "li $15, 0x0000\n";
+//    result += store_mapped_variable((Scope *) parent_scope, this, "$15");
+//    return result;
+    return  "";
 }
 
 void Variable::generate_var_maps(Node *parent) {
     return;
+}
+
+Node *Variable::get_intermediate_variable() {
+    return this;
 }
 
 Variable_type::Variable_type(std::string _name, std::string alias, int _size): name(_name), size(_size), aliasof(alias){}

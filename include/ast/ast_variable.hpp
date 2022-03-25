@@ -21,6 +21,8 @@ public:
     virtual void generate_var_maps(Node *parent) override;
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
+
+    Node* get_intermediate_variable() override;
 };
 
 class Variable_type{

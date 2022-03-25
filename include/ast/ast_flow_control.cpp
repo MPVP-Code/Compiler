@@ -62,7 +62,7 @@ std::string If::compileStatementsToMIPS(std::vector<Node*>* statements) const {
     return result.substr(0, result.length() - 1);
 }
 
-std::string If::compileToMIPS(const Node* parent_scope) const {
+std::string If::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
 
     if (condition->get_type().compare("Constant") == 0) {

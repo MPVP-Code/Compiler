@@ -13,11 +13,18 @@ private:
     int value;
 
 public:
+    Variable* const_var;
+
     Constant(int _value);
 
     int getValue();
 
     virtual void generate_var_maps(Node *parent) override;
+
+    std::string compileToMIPS(const Node *parent_scope) const override;
+
+    Node* get_intermediate_variable() override;
+
 };
 
 class Assign : public Node {

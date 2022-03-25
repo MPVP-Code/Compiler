@@ -83,7 +83,8 @@ int resolve_variable_offset(std::string name, const Scope *current) {
     return -1;
 };
 
-std::string load_mapped_variable(const Scope* scope, const Variable* var, std::string reg_name) {
+std::string load_mapped_variable(const Scope* scope, const Node* _var, std::string reg_name) {
+    auto var = (Variable*) _var;
     int offset = resolve_variable_offset(var->name, scope);
     std::string out = "";
     if (offset % 4 == 0) {
@@ -92,11 +93,12 @@ std::string load_mapped_variable(const Scope* scope, const Variable* var, std::s
         out += "lwl " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
         out += "lwr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
     }
-    out += "nop";
+    out += "nop\n";
     return out;
 }
 
-std::string store_mapped_variable(const Scope *scope, const Variable *var, std::string reg_name) {
+std::string store_mapped_variable(const Scope *scope, const Node *_var, std::string reg_name) {
+    auto var = (Variable*) _var;
     int offset = resolve_variable_offset(var->name, scope);
     std::string out = "";
     if (offset % 4 == 0) {
@@ -105,7 +107,7 @@ std::string store_mapped_variable(const Scope *scope, const Variable *var, std::
         out += "lwl " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
         out += "lwr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
     }
-    out += "nop";
+    out += "nop\n";
     return out;
 
 }
@@ -133,4 +135,15 @@ std::string intToHex(int value) {
     std::stringstream stream;
     stream << "0x" << std::setfill('0') << std::setw(sizeof(value)) << std::hex << value;
     return stream.str();
+}
+
+Variable* allocate_temp_var(Node* _current, std::string type){
+    auto current = (Scope*) _current;
+
+    std::string tmpname = "!tmp" + std::to_string(current->tmp_var_counter++);
+    auto var = new Variable(type, tmpname , true);
+
+    current->var_map[tmpname] = var;
+
+    return var;
 }

@@ -26,6 +26,8 @@ public:
     bool isRInt() const;
 
     virtual void generate_var_maps(Node *parent) override;
+
+    Node* get_intermediate_variable() override;
 };
 
 
@@ -38,6 +40,8 @@ public:
     UnaryOperator(Node* _in);
 
     virtual void generate_var_maps(Node *parent) override;
+
+    Node* get_intermediate_variable() override;
 };
 
 #endif

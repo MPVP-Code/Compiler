@@ -4,15 +4,51 @@
 
 Addition::Addition(Node *_L, Node *_R) : BinaryOperator(_L, _R){
     this->subtype = "Addition";
+}
+
+std::string Addition::compileToMIPS(const Node *parent_scope) const {
+    std::string result = "";
+    //Resolve wether to use temp variable or actual variable
+    if (this->data_type == "int") {
+        //Finds temporary / constant/ normal variables in which results have been previously stored
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+
+        result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";
+        result += load_mapped_variable((Scope*) parent_scope, RVar, "$14") + "\n";
+        result += "add $13, $14, $15\n";
+        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+    }
+    return result;
 };
 
 Subtraction::Subtraction(Node *_L, Node *_R): BinaryOperator(_L, _R) {
     this->type = "Subtraction";
+}
+
+std::string Subtraction::compileToMIPS(const Node *parent_scope) const {
+    std::string result = "";
+    //Resolve wether to use temp variable or actual variable
+    if (this->data_type == "int") {
+        //Finds temporary / constant/ normal variables in which results have been previously stored
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+
+        result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";
+        result += load_mapped_variable((Scope*) parent_scope, RVar, "$14") + "\n";
+        result += "sub $13, $14, $15\n";
+        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+    }
+    return result;
 };
 
 
 Multiplication::Multiplication(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
     this->type = "Multiplication";
+}
+
+std::string Multiplication::compileToMIPS(const Node *parent_scope) const {
+    return "Not implemented";
 };
 
 
@@ -20,7 +56,15 @@ Division::Division(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
     this->type = "Division";
 }
 
+std::string Division::compileToMIPS(const Node *parent_scope) const {
+    return "Not implemented";
+}
+
 
 Modulo::Modulo(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
     this->type = "Division";
+}
+
+std::string Modulo::compileToMIPS(const Node *parent_scope) const {
+    return "Not implemented";
 }

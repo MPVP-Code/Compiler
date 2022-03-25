@@ -18,13 +18,18 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
         std::cerr << "Compiling statement " << statement->get_type() << std::endl;
         std::string compiledCode = statement->compileToMIPS(this);
         if (compiledCode.length() != 0) {
-            result += compiledCode + "\n";
+            result += compiledCode;
         }
     }
     result = result.substr(0, result.length() - 1);
 
-    if (statements[statements.size() - 1]->get_type() != "ReturnExpression") {
+    //Appends implicit returns for void and it types
+    if (return_type == "void") {
         result += "\njr $31\nnop";
+    }if (return_type == "int") {
+        //implicit error code 0
+        result += "li $v0, 0\n";
+        result += "\njr $31\nnop\n";
     }
     return result;
 };
