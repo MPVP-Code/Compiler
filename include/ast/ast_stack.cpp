@@ -147,3 +147,13 @@ Variable* allocate_temp_var(Node* _current, std::string type){
 
     return var;
 }
+
+
+Node* resolve_function_call(std::string name, Scope* current){
+    while (current->parent_scope != NULL){
+        current = current ->parent_scope;
+    }
+
+    auto global = (Global*) current;
+    return global->declaration_map[name];
+}

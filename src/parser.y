@@ -263,6 +263,12 @@ declaration
 				if (temp->declaration){
 					temp->data_type = *$1;
 				}
+			} else if (statement->type == "FunctionDeclaration"){
+				auto temp = (FunctionDeclaration*) statement;
+				temp->return_type = *$1;
+				temp->forward_declaration = true;
+			//Forward function declarations parsed through here
+
 			}
 		}
 		$$ = $2;
@@ -542,11 +548,21 @@ jump_statement
 translation_unit
 	: external_declaration { global_root = new Global();
 				global_root->statements.insert(global_root->statements.end(), $1->begin(), $1->end());
-				std::cerr << "Found function\n";
+
+				//Adds function declarations to declaration map
+				if ($1->size() && (*$1)[0]->type == "FunctionDeclaration"){
+					auto func = (FunctionDeclaration*) (*$1)[0];
+					global_root->declaration_map[func->name] = func;
+				}
 	 			}
 	| translation_unit external_declaration {
 				global_root->statements.insert(global_root->statements.end(), $2->begin(), $2->end());
-				std::cerr << "Found another";
+
+				//Adds function declarations to declaration map
+				if ($2->size() && (*$2)[0]->type == "FunctionDeclaration"){
+					auto func = (FunctionDeclaration*) (*$2)[0];
+					global_root->declaration_map[func->name] = func;
+				}
 				}
 	;
 
@@ -564,8 +580,7 @@ function_definition
 	auto func = (FunctionDeclaration*) $2;
 	func->return_type = *$1;
 	func->statements = *$3;
-	$$ = func;
-	//$$ = new FunctionDeclaration(*$1,*$2,*$3);
+	$$ = (Node*) func;
 	}
 	//| declaration_specifiers declarator declaration_list compound_statement {}
 	//| declarator declaration_list compound_statement {}

@@ -8,28 +8,35 @@ FunctionDeclaration::FunctionDeclaration(){  //std::string _return_type, std::st
     //Type specification
     this->type = "Scope";
     this->subtype = "FunctionDeclaration";
+    this->forward_declaration = false;
 }
 
 std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
     std::cerr << "Compiling function " << this->name << std::endl;
-    std::string result = this->name + ":\n.set noreorder\n";
+    std::string result = "";
 
-    for (Node *statement : statements) {
-        std::cerr << "Compiling statement " << statement->get_type() << std::endl;
-        std::string compiledCode = statement->compileToMIPS(this);
-        if (compiledCode.length() != 0) {
-            result += compiledCode;
+    //Do not compile forward declarations
+    if (!forward_declaration) {
+        result = this->name + ":\n.set noreorder\n";
+
+        for (Node *statement: statements) {
+            std::cerr << "Compiling statement " << statement->get_type() << std::endl;
+            std::string compiledCode = statement->compileToMIPS(this);
+            if (compiledCode.length() != 0) {
+                result += compiledCode;
+            }
         }
-    }
-    result = result.substr(0, result.length() - 1);
+        result = result.substr(0, result.length() - 1);
 
-    //Appends implicit returns for void and it types
-    if (return_type == "void") {
-        result += "\njr $31\nnop";
-    }if (return_type == "int") {
-        //implicit error code 0
-        result += "li $v0, 0\n";
-        result += "\njr $31\nnop\n";
+        //Appends implicit returns for void and int types
+        if (return_type == "void") {
+            result += "\njr $31\nnop";
+        }
+        if (return_type == "int") {
+            //implicit error code 0
+            result += "\nli $v0, 0\n";
+            result += "jr $31\nnop\n";
+        }
     }
     return result;
 };
@@ -51,5 +58,33 @@ void FunctionCall::generate_var_maps(Node *parent){
     for(auto param : *this->arguments){
         try_replace_variable(param, scope);
     }
+}
+
+std::string FunctionCall::generate_function_signature() const {
+    return function_name +"():";
+}
+
+std::string FunctionCall::compileToMIPS(const Node *parent_scope) const {
+    std::string result  = "";
+
+    //Load parameters into registers
+    int idx = 0;
+    for (auto param : *arguments){
+        if (idx<4){
+            result += load_mapped_variable((Scope*) parent_scope, param->get_intermediate_variable(), "$a" + std::to_string(idx)) + "\n";
+        }else if (idx < 12){
+            result += load_mapped_variable((Scope*) parent_scope, param->get_intermediate_variable(), "$t" + std::to_string(idx-4)) + "\n";
+        }
+    }
+
+    //Save return address
+    //result += "sw $ra, "+ to_string(this->stack_frame_size) + "($sp)";
+
+    //Jump
+    result += "jal " + this->generate_function_signature() + "\n";
+
+    //Restore return address
+
+    return result;
 }
 
