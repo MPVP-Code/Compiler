@@ -18,7 +18,7 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
         std::cerr << "Compiling statement " << statement->get_type() << std::endl;
         std::string compiledCode = statement->compileToMIPS(this);
         if (compiledCode.length() != 0) {
-            result += compiledCode;
+            result += compiledCode + "\n";
         }
     }
     result = result.substr(0, result.length() - 1);
@@ -28,7 +28,7 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
         result += "\njr $31\nnop";
     }if (return_type == "int") {
         //implicit error code 0
-        result += "li $v0, 0\n";
+        result += "\nli $v0, 0\n";
         result += "\njr $31\nnop\n";
     }
     return result;

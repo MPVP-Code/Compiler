@@ -36,7 +36,7 @@ std::string Subtraction::compileToMIPS(const Node *parent_scope) const {
 
         result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";
         result += load_mapped_variable((Scope*) parent_scope, RVar, "$14") + "\n";
-        result += "sub $13, $14, $15\n";
+        result += "sub $13, $15, $14\n";
         result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
     }
     return result;
@@ -48,7 +48,18 @@ Multiplication::Multiplication(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 }
 
 std::string Multiplication::compileToMIPS(const Node *parent_scope) const {
-    return "Not implemented";
+    std::string result = "";
+
+    if (this->data_type == "int") {
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";
+        result += load_mapped_variable((Scope*) parent_scope, RVar, "$14") + "\n";
+        result += "mult $15, $14\nmflo $13\n";
+        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+    }
+
+    return result;
 };
 
 
@@ -57,7 +68,18 @@ Division::Division(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 }
 
 std::string Division::compileToMIPS(const Node *parent_scope) const {
-    return "Not implemented";
+    std::string result = "";
+
+    if (this->data_type == "int") {
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";
+        result += load_mapped_variable((Scope*) parent_scope, RVar, "$14") + "\n";
+        result += "div $15, $14\nmflo $13\n";
+        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+    }
+
+    return result;
 }
 
 
@@ -66,5 +88,16 @@ Modulo::Modulo(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 }
 
 std::string Modulo::compileToMIPS(const Node *parent_scope) const {
-    return "Not implemented";
+    std::string result = "";
+
+    if (this->data_type == "int") {
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";
+        result += load_mapped_variable((Scope*) parent_scope, RVar, "$14") + "\n";
+        result += "div $15, $14\nmfhi $13\n";
+        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+    }
+
+    return result;
 }

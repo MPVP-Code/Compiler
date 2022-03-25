@@ -1,7 +1,8 @@
 #include <iostream>
+#include <iomanip>
+#include <string>
 #include "ast_stack.hpp"
 #include "ast_syntax.hpp"
-#include "ast_assignment.hpp"
 #include "ast_assignment.hpp"
 
 Variable *resolve_variable_name(std::string name, Scope *current) {
