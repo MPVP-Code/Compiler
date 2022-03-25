@@ -9,30 +9,26 @@ While::While(Node* _condition, std::vector<Node*> _statements): Scope(), conditi
 
 std::string While::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
-    if (condition->get_type().compare("Constant") == 0) {
-        Constant *constant = (Constant*) condition;
-        if (constant->getValue() == 0) {
-            return "";
-        }
-    } else if (condition->get_type().compare("Variable") == 0) {
-        Variable *conditionVariable = (Variable *) condition;
-        int whileId = Global::getIdForWhile();
-        std::string whileStart = "$WHILE" + std::to_string(whileId) + "START";
-        std::string whileEnd = "$WHILE" + std::to_string(whileId) + "END";
-        result += whileStart + ":\n";
-        result += load_mapped_variable((Scope*) parent_scope, conditionVariable, "$15");
-        result += "beq $15, $0, " + whileEnd + "\nnop\n";
+    result += condition->compileToMIPS(parent_scope) + "\n";
+    result += allocate_stack_frame((Scope *) this);
+    int whileId = Global::getIdForWhile();
+    std::string whileStart = "$WHILE" + std::to_string(whileId) + "START";
+    std::string whileEnd = "$WHILE" + std::to_string(whileId) + "END";
+    result += whileStart + ":\n";
+    result += load_mapped_variable((Scope*) parent_scope, condition, "$15");
+    result += "beq $15, $0, " + whileEnd + "\nnop\n";
 
-        for (Node *statement : statements) {
-            std::string generatedCode = statement->compileToMIPS(this);
-            if (generatedCode.length() != 0) {
-                result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
-            }
+    for (Node *statement : statements) {
+        std::string generatedCode = statement->compileToMIPS(this);
+        if (generatedCode.length() != 0) {
+            result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
         }
-
-        result += "b " + whileStart + "\nnop\n";
-        result += whileEnd + ":" + "\n";
     }
+
+    result += "b " + whileStart + "\nnop\n";
+    result += whileEnd + ":" + "\n";
+
+    result += deallocate_stack_frame((Scope *) this);
 
     return result.substr(0, result.length() - 1);
 }

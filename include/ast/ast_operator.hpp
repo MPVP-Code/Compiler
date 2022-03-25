@@ -28,6 +28,8 @@ public:
     virtual void generate_var_maps(Node *parent) override;
 
     Node* get_intermediate_variable() override;
+
+    std::string compileBinaryOperatorToMIPS(const Node *parent_scope, std::string instructionName) const;
 };
 
 
