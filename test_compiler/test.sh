@@ -30,7 +30,7 @@ for filename in compiler_tests/*/*.c; do
 
     set +e
     echo "  Compiling C to MIPS32"
-    timeout 10 ./bin/c_compiler -S "$TEST.c" -o "$TEST.s" > /dev/null 2> "$TEST.errorlog"
+    timeout 5 ./bin/c_compiler -S "$TEST.c" -o "$TEST.s" > /dev/null 2> "$TEST.errorlog"
 
     echo "  Building MIPS32 binary"
     mips-linux-gnu-gcc -mfp32 -static -march=mips32 -o "$TEST.o" -c "$TEST.s" > /dev/null 2>&1
@@ -41,7 +41,7 @@ for filename in compiler_tests/*/*.c; do
     if [[ $RESULT == 0 ]]; then
       echo "  Simulating"
       set +e
-      timeout 10 qemu-mips "$TEST"
+      timeout 5 qemu-mips "$TEST"
       RESULT=${?}
       set -e
 

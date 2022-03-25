@@ -1,6 +1,5 @@
 #include "ast_stack.hpp"
 #include "ast_variable.hpp"
-#include "../register_allocator.hpp"
 
 Variable::Variable(const std::string &_type, const std::string &_name, const bool _declaration) : name(_name), declaration(_declaration) {
     this->type = "Variable";

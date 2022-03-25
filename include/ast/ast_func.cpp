@@ -19,24 +19,22 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
     if (!forward_declaration) {
         result = this->name + ":\n.set noreorder\n";
 
-        for (Node *statement: statements) {
-            std::cerr << "Compiling statement " << statement->get_type() << std::endl;
-            std::string compiledCode = statement->compileToMIPS(this);
-            if (compiledCode.length() != 0) {
-                result += compiledCode;
-            }
+    for (Node *statement : statements) {
+        std::cerr << "Compiling statement " << statement->get_type() << std::endl;
+        std::string compiledCode = statement->compileToMIPS(this);
+        if (compiledCode.length() != 0) {
+            result += compiledCode + "\n";
         }
-        result = result.substr(0, result.length() - 1);
+    }
+    result = result.substr(0, result.length() - 1);
 
-        //Appends implicit returns for void and int types
-        if (return_type == "void") {
-            result += "\njr $31\nnop";
-        }
-        if (return_type == "int") {
-            //implicit error code 0
-            result += "\nli $v0, 0\n";
-            result += "jr $31\nnop\n";
-        }
+    //Appends implicit returns for void and it types
+    if (return_type == "void") {
+        result += "\njr $31\nnop";
+    }if (return_type == "int") {
+        //implicit error code 0
+        result += "\nli $v0, 0\n";
+        result += "\njr $31\nnop\n";
     }
     return result;
 };
