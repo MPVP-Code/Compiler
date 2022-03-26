@@ -131,7 +131,8 @@ std::string allocate_stack_frame(Scope *scope) {
     int frame_size = -1 * (scope->stack_frame_size +
                            (scope->stack_frame_size % 4 != 0)); //Stack counts down in mips, rounds to full word
     out += "addiu $sp, $sp, " + std::to_string(frame_size) + "\n";
-    out += "addiu $fp, $fp, " + std::to_string(frame_size) + "\n";
+    //out += "addiu $fp, $sp\n";
+    //out += "addiu $fp, $fp, " + std::to_string(frame_size) + "\n";
 
     return out;
 }
@@ -141,7 +142,7 @@ std::string deallocate_stack_frame(Scope *scope) {
     int frame_size = (scope->stack_frame_size +
                       (scope->stack_frame_size % 4 != 0)); //Stack counts down in mips, deallocation increases pointer
     out += "addiu $sp, $sp, " + std::to_string(frame_size) + "\n";
-    out += "addiu $fp, $fp, " + std::to_string(frame_size) + "\n";
+    //out += "addiu $fp, $fp, " + std::to_string(frame_size) + "\n";
     return out;
 }
 

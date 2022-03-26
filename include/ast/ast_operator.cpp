@@ -48,6 +48,20 @@ Node* BinaryOperator::get_intermediate_variable() {
     return this->temp_variable;
 }
 
+std::string BinaryOperator::compileLandRNodesToMIPS(const Node* parent_scope, Node* L, Node* R) const {
+    std::string result = "";
+    std::string LCode = L->compileToMIPS(parent_scope);
+    std::string RCode = R->compileToMIPS(parent_scope);
+    if (!LCode.empty() && !RCode.empty()) {
+        result += LCode + "\n" + RCode;
+    } else if (!LCode.empty()) {
+        result = LCode;
+    } else if (!RCode.empty()) {
+        result = RCode;
+    }
+
+    return result;
+}
 
 UnaryOperator::UnaryOperator(Node* _in) {
     this->type = "UnaryOperator";
@@ -66,4 +80,19 @@ void UnaryOperator::generate_var_maps(Node *parent){
 
 Node* UnaryOperator::get_intermediate_variable(){
     return this->temp_variable;
+}
+
+std::string BinaryOperator::compileBinaryOperatorToMIPS(const Node *parent_scope, std::string instructionName) const {
+    std::string result = "";
+
+    if (this->data_type == "int") {
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";
+        result += load_mapped_variable((Scope*) parent_scope, RVar, "$14") + "\n";
+        result += instructionName + " $13, $14, $15\n";
+        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+    }
+
+    return result;
 }

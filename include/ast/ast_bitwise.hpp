@@ -1,7 +1,3 @@
-////
-//// Created by michal on 15. 3. 2022.
-////
-
 #ifndef AST_BITWISE_HPP
 #define AST_BITWISE_HPP
 
@@ -12,18 +8,21 @@ class BitAnd : public BinaryOperator {
 public:
     BitAnd(Node *_L, Node *_R);
 
+    std::string compileToMIPS(const Node *parent_scope) const;
 };
 
 class BitOr : public BinaryOperator {
 public:
     BitOr(Node *_L, Node *_R);
 
+    std::string compileToMIPS(const Node *parent_scope) const;
 };
 
 class BitXor : public BinaryOperator {
 public:
     BitXor(Node *_L, Node *_R);
 
+    std::string compileToMIPS(const Node *parent_scope) const;
 };
 
 class BitNot : public UnaryOperator {
@@ -34,11 +33,15 @@ public:
 class BitASL : public BinaryOperator {
 public:
     BitASL(Node *_L, Node *_R); //Value, shift
+
+    std::string compileToMIPS(const Node *parent_scope) const;
 };
 
 class BitASR : public BinaryOperator {
 public:
     BitASR(Node *_L, Node *_R); //Value, shift
+
+    std::string compileToMIPS(const Node *parent_scope) const;
 };
 
 #endif

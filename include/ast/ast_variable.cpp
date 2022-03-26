@@ -15,9 +15,6 @@ std::string *Variable::getVariableType() {
 }
 
 std::string Variable::compileToMIPS(const Node *parent_scope) const {
-//    std::string result = "li $15, 0x0000\n";
-//    result += store_mapped_variable((Scope *) parent_scope, this, "$15");
-//    return result;
     return  "";
 }
 

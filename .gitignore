@@ -79,3 +79,4 @@ test_parser/bin/*
 
 include/*.o
 include/*/*.o
+test_compiler/assembly_test/*
