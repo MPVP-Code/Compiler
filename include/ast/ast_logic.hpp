@@ -13,6 +13,7 @@ class LogicOr : public BinaryOperator {
 public:
     LogicOr(Node *_L, Node *_R);
 
+    std::string compileToMIPS(const Node *parent_scope) const override;
 };
 
 class LogicNot : public UnaryOperator {

@@ -34,7 +34,7 @@ for filename in compiler_tests/*/*.c; do
 
     echo "  Building MIPS32 binary"
     mips-linux-gnu-gcc -mfp32 -static -march=mips32 -o "$TEST.o" -c "$TEST.s" > "$TEST.assembler" 2>&1
-    mips-linux-gnu-gcc -mfp32 -static -march=mips32 -o "$TEST" "$TEST.o" "${TEST}_driver.c" > /dev/null 2>&1
+    mips-linux-gnu-gcc -mfp32 -static -march=mips32 -o "$TEST" "$TEST.o" "${TEST}_driver.c" 2>&1
     RESULT=${?}
     set -e
 

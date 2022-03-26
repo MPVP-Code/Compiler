@@ -8,55 +8,56 @@ Scope::Scope() {
     this->type = "Scope";
 }
 
-void Scope::generate_var_maps(Node* parent) {
-    Scope *parentScope = (Scope*) parent;
+void Scope::generate_var_maps(Node *parent) {
+    Scope *parentScope = (Scope *) parent;
 
     this->parent_scope = parentScope;
 
     //Applies varmaps to conditions
     if (this->subtype == "While") {
-        While* flow = (While *) this;
+        While *flow = (While *) this;
         try_replace_variable(flow->condition, this);
 
-    }if (this->subtype == "DoWhile") {
+    }
+    if (this->subtype == "DoWhile") {
         auto flow = (DoWhile *) this;
         try_replace_variable(flow->condition, this);
 
     } else if (this->subtype == "If") {
-        If* flow = (If *) this;
+        If *flow = (If *) this;
         try_replace_variable(flow->condition, this);
 
-    } else if (this->subtype == "FunctionDeclaration"){
+    } else if (this->subtype == "FunctionDeclaration") {
         //Applies varmapping to declared variables
-        auto func = (FunctionDeclaration*) this;
-        for(auto const arg : *(func->arguments)){
+        auto func = (FunctionDeclaration *) this;
+        for (auto const arg: *(func->arguments)) {
             func->var_map[arg->name] = arg;
         }
     }
 
 
     for (auto &node: this->statements) {
-            try_replace_variable(node, this);
+        try_replace_variable(node, this);
     }
 
     //Generates variable offsets
     int offset = 0;
-    auto scp = (Scope*) this;
-    for(auto &var : scp->var_map){
-        var.second ->offset = offset;
+    auto scp = (Scope *) this;
+    for (auto &var: scp->var_map) {
+        var.second->offset = offset;
         offset += resolve_variable_size(var.second->name, scp);
     }
 
 
     //Allocates two extra words for future system use $ra backup, $fp backup
     int extra_words = 2;
-    offset += 4*extra_words;
+    offset += 4 * extra_words;
     this->stack_frame_size = offset;
 
 };
 
 
-std::vector<Node*>* Scope::getBranches() {
+std::vector<Node *> *Scope::getBranches() {
     return &(this->statements);
 };
 
@@ -79,7 +80,7 @@ Global::Global() {
 std::string Global::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
 
-    for (Node *statement : this->statements) {
+    for (Node *statement: this->statements) {
         //Todo Implement switch for global variables
         result += statement->compileToMIPS(this) + "\n";
     }
@@ -89,6 +90,7 @@ std::string Global::compileToMIPS(const Node *parent_scope) const {
 
 int Global::whileCount = 0;
 int Global::ifCount = 0;
+int Global::logicOrCount = 0;
 
 int Global::getIdForWhile() {
     return whileCount++;
@@ -96,4 +98,8 @@ int Global::getIdForWhile() {
 
 int Global::getIdForIf() {
     return ifCount++;
+}
+
+int Global::getIdForLogicOr() {
+    return logicOrCount++;
 }
