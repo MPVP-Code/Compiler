@@ -13,6 +13,7 @@ FunctionDeclaration::FunctionDeclaration(){  //std::string _return_type, std::st
 std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
     std::cerr << "Compiling function " << this->name << std::endl;
     std::string result = this->name + ":\n.set noreorder\n";
+    result += allocate_stack_frame((Scope *) this);
 
     for (Node *statement : statements) {
         std::cerr << "Compiling statement " << statement->get_type() << std::endl;
