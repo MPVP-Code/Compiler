@@ -33,6 +33,7 @@ void try_replace_variable(Node *&varptr, Node *inscope) {
         try_replace_variable(temp->in, inscope);
         int varsize = resolve_variable_size(temp->in->data_type, scope);
         varptr = new Constant(varsize);
+        varptr->generate_var_maps(scope);
     } else {
         varptr->generate_var_maps(scope);
     }
