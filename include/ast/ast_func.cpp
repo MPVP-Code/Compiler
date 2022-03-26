@@ -33,10 +33,10 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
         int idx = 4;
         for (auto param : *arguments) {
 
-            result += store_mapped_variable((Scope*)parent_scope, param, "$" + std::to_string(idx) );
+            result += store_mapped_variable((Scope*)this, param, "$" + std::to_string(idx) );
 
             //Two word store - skip register
-            if (resolve_variable_size(param->name, (Scope*)parent_scope)>4){
+            if (resolve_variable_size(param->name, (Scope*)this)>4){
                 idx +=2;
             }else{
                 idx++;
