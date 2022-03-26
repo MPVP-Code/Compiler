@@ -22,6 +22,7 @@ public:
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
 
+    std::string generate_function_signature() const;
 };
 
 class FunctionCall : public Node {
@@ -35,7 +36,7 @@ public:
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
 
-    std::string generate_function_signature() const;
+
 };
 
 #endif

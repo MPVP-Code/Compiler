@@ -79,15 +79,8 @@ Global::Global() {
 std::string Global::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
 
-    for (Node *statement: this->statements) {
-        std::cerr << "statement->get_type(): " << statement->get_type()  << "subtype: " << statement->getSubtype() << std::endl;
-        if (statement->get_type().compare("FunctionDeclaration") == 0 || statement->getSubtype().compare("FunctionDeclaration") == 0) {
-            FunctionDeclaration *function = (FunctionDeclaration*) statement;
-            result += ".globl " + *(function->getName()) + "\n";
-        }
-    }
-
     for (Node *statement : this->statements) {
+        //Todo Implement switch for global variables
         result += statement->compileToMIPS(this) + "\n";
     }
 

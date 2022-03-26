@@ -9,6 +9,9 @@ FunctionDeclaration::FunctionDeclaration(){  //std::string _return_type, std::st
     this->type = "Scope";
     this->subtype = "FunctionDeclaration";
     this->forward_declaration = false;
+
+    //Allocate one variable for return address
+    this->var_map["!ra"] = new Variable("int", "!ra", true);
 }
 
 std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
@@ -17,8 +20,28 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
 
     //Do not compile forward declarations
     if (!forward_declaration) {
-        result = this->name + ":\n.set noreorder\n";
 
+        //Function signature generation
+        result += ".globl " + generate_function_signature() + "\n";
+        result += generate_function_signature()+ ":\n";
+        result += ".set noreorder\n";
+
+        //Saving passed parameters
+        int idx = 4;
+        for (auto param : *arguments) {
+
+            result += store_mapped_variable((Scope*)parent_scope, param, "$" + std::to_string(idx) );
+
+            //Two word store - skip register
+            if (resolve_variable_size(param->name, (Scope*)parent_scope)>4){
+                idx +=2;
+            }else{
+                idx++;
+            }
+
+        }
+
+        //Compile body
         for (Node *statement: statements) {
             std::cerr << "Compiling statement " << statement->get_type() << std::endl;
             std::string compiledCode = statement->compileToMIPS(this);
@@ -28,17 +51,18 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
         }
         result = result.substr(0, result.length() - 1);
 
-        //Appends implicit returns for void and it types
+        //Appends implicit returns for void and int types
         if (return_type == "void") {
-            result += "\njr $31\nnop";
+            result += "\njr $31\nnop\n";
         }
         if (return_type == "int") {
             //implicit error code 0
             result += "\nli $v0, 0\n";
             result += "\njr $31\nnop\n";
         }
-        return result;
+
     }
+    return result;
 };
 
 std::string* FunctionDeclaration::getName() {
@@ -46,6 +70,10 @@ std::string* FunctionDeclaration::getName() {
 }
 
 FunctionDeclaration::~FunctionDeclaration() {}
+
+std::string FunctionDeclaration::generate_function_signature() const {
+    return name + "()";
+}
 
 FunctionCall::FunctionCall(std::string _function_name, std::vector<Node*>* _arguments): function_name(_function_name) {
     this->arguments = _arguments;
@@ -60,31 +88,42 @@ void FunctionCall::generate_var_maps(Node *parent){
     }
 }
 
-std::string FunctionCall::generate_function_signature() const {
-    return function_name +"():";
-}
+
 
 std::string FunctionCall::compileToMIPS(const Node *parent_scope) const {
     std::string result  = "";
 
     //Load parameters into registers
-    int idx = 0;
+    int idx = 4; // First arg register
+
     for (auto param : *arguments){
-        if (idx<4){
-            result += load_mapped_variable((Scope*) parent_scope, param->get_intermediate_variable(), "$a" + std::to_string(idx)) + "\n";
-        }else if (idx < 12){
-            result += load_mapped_variable((Scope*) parent_scope, param->get_intermediate_variable(), "$t" + std::to_string(idx-4)) + "\n";
+        //Compile code in parameters
+        result+= param->compileToMIPS(parent_scope);
+
+        result += load_mapped_variable((Scope*)parent_scope, param->get_intermediate_variable(), "$" + std::to_string(idx) );
+
+        //Two word load - skip register
+        if (resolve_variable_size(((Variable*)param->get_intermediate_variable())->name, (Scope*)parent_scope)>4){
+            idx +=2;
+        }else{
+            idx++;
         }
+
     }
 
     //Save return address
-    //result += "sw $ra, "+ to_string(this->stack_frame_size) + "($sp)";
+    Variable* ra = ((Scope*) parent_scope)->var_map["!ra"];
+    result+= store_mapped_variable((Scope*)parent_scope, ra , "$ra" );
+
+    //Get corresponding function declaration
+    auto declaration = (FunctionDeclaration*)resolve_function_call(function_name, ((Scope*) parent_scope));
 
     //Jump
-    result += "jal " + this->generate_function_signature() + "\n";
+    result += "jal " + declaration->generate_function_signature() + "\n";
+    result += "nop\n";
 
     //Restore return address
-
+    result+= load_mapped_variable((Scope*)parent_scope, ra , "$ra" );
     return result;
 }
 

@@ -263,40 +263,52 @@ declaration
 				if (temp->declaration){
 					temp->data_type = *$1;
 				}
-			} else if (statement->type == "FunctionDeclaration"){
+			} else if (statement->subtype == "FunctionDeclaration"){
+				//Forward function declarations parsed through here
 				auto temp = (FunctionDeclaration*) statement;
 				temp->return_type = *$1;
-				temp->forward_declaration = true;
-			//Forward function declarations parsed through here
+				std::cerr << "Found fwd declaration\n";
+
 
 			}
 		}
 		$$ = $2;
 
 	}
-//	| declaration_specifiers ';' {}
+	//| declaration_specifiers ';' {}
 	;
 
 declaration_specifiers
-	: type_specifier {$$ = $1; }
-	| type_specifier declaration_specifiers {}
+	: type_specifier {$$ = $1;}
+	| type_specifier declaration_specifiers {$$ = $1;}
 //	| storage_class_specifier declaration_specifiers  {}
 //	| storage_class_specifier {}
 	;
 
 init_declarator_list
-	: init_declarator {$$ = $1;}
-	| init_declarator_list ',' init_declarator {$1->insert($1->end(), $3->begin(), $3->end());
-						$$ = $1;
-						delete $3;
-						}
+	: init_declarator {$$ = $1;
+		std::cerr << "found init_declarator\n" << ((*$1)[0])->type;}
+	| init_declarator_list ',' init_declarator {
+		$1->insert($1->end(), $3->begin(), $3->end());
+		$$ = $1;
+		}
 	;
 
 init_declarator
 	: declarator {$$ = new std::vector<Node*>;
-			auto id = (Identifier*)$1;
-			auto temp = new Variable("None", id->identifier, true);
-			$$-> push_back(temp);
+			std::cerr<< $1->type;
+			std::cerr<< $1->subtype;
+
+			if ($1->type == "Identifier"){
+				auto id = (Identifier*)$1;
+				auto temp = new Variable("None", id->identifier, true);
+				$$-> push_back(temp);
+			}else if ($1->subtype == "FunctionDeclaration"){
+				auto func = (FunctionDeclaration*)$1;
+				//If a function declaration got here it is a fwd declaration
+				func->forward_declaration = true;
+				$$->push_back(func);
+			}
 	}
 	| declarator '=' initializer {
 			$$ = new std::vector<Node*>;
@@ -550,7 +562,7 @@ translation_unit
 				global_root->statements.insert(global_root->statements.end(), $1->begin(), $1->end());
 
 				//Adds function declarations to declaration map
-				if ($1->size() && (*$1)[0]->type == "FunctionDeclaration"){
+				if ($1->size() && (*$1)[0]->subtype == "FunctionDeclaration"){
 					auto func = (FunctionDeclaration*) (*$1)[0];
 					global_root->declaration_map[func->name] = func;
 				}
@@ -559,7 +571,7 @@ translation_unit
 				global_root->statements.insert(global_root->statements.end(), $2->begin(), $2->end());
 
 				//Adds function declarations to declaration map
-				if ($2->size() && (*$2)[0]->type == "FunctionDeclaration"){
+				if ($2->size() && (*$2)[0]->subtype == "FunctionDeclaration"){
 					auto func = (FunctionDeclaration*) (*$2)[0];
 					global_root->declaration_map[func->name] = func;
 				}
@@ -569,8 +581,9 @@ translation_unit
 external_declaration
 	: function_definition { $$ = new std::vector<Node*>();
 	$$->push_back($1);
-	std::cerr << "found funcdef\n";}
+	std::cerr << "found global funcdef\n";}
 	| declaration {
+	std::cerr << "found global declaration\n";
 	$$ = $1;}
 	;
 
