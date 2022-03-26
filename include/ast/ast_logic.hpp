@@ -1,7 +1,3 @@
-//
-// Created by michal on 15. 3. 2022.
-//
-
 #ifndef AST_LOGIC_HPP
 #define AST_LOGIC_HPP
 #include "ast_node.hpp"
@@ -40,12 +36,14 @@ class LogicLT : public BinaryOperator { //Less than or equal
 public:
     LogicLT(Node *_L, Node *_R);
 
+    std::string compileToMIPS(const Node *parent_scope) const override;
 };
 
 class LogicGT : public BinaryOperator { // Greater than or equal
 public:
     LogicGT(Node *_L, Node *_R);
 
+    std::string compileToMIPS(const Node *parent_scope) const override;
 };
 
 class LogicLE : public BinaryOperator { //Less than or equal

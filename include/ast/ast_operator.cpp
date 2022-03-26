@@ -48,7 +48,7 @@ Node* BinaryOperator::get_intermediate_variable() {
     return this->temp_variable;
 }
 
-std::string BinaryOperator::compileLandRNodesToMIPS(const Node* parent_scope, Node* L, Node* R) const {
+std::string BinaryOperator::compileLandRNodesToMIPS(const Node* parent_scope) const {
     std::string result = "";
     std::string LCode = L->compileToMIPS(parent_scope);
     std::string RCode = R->compileToMIPS(parent_scope);
@@ -60,7 +60,7 @@ std::string BinaryOperator::compileLandRNodesToMIPS(const Node* parent_scope, No
         result = RCode;
     }
 
-    return result;
+    return result +  "\n";
 }
 
 UnaryOperator::UnaryOperator(Node* _in) {
@@ -86,6 +86,7 @@ std::string BinaryOperator::compileBinaryOperatorToMIPS(const Node *parent_scope
     std::string result = "";
 
     if (this->data_type == "int") {
+        result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
         result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";
