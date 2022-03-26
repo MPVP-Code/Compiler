@@ -6,6 +6,7 @@
 #define AST_STACK_HPP
 
 #include "ast_scope.hpp"
+#include "ast_func.hpp"
 
 
 std::string load_mapped_variable(const Scope* scope, const Node* var, std::string reg_name); //reg_name inserted directly into lw instruction.
@@ -19,6 +20,8 @@ int resolve_variable_size(std::string name, Scope* child_scope);
 int resolve_variable_offset(std::string name, Scope* current);
 std::string intToHex(int value);
 Variable* allocate_temp_var(Node* current, std::string type);
+
+Node* resolve_function_call(std::string name, Scope* current);
 
 //void save_function_context();
 //void restore_function_context();

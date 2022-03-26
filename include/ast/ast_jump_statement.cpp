@@ -10,14 +10,17 @@ Return::Return(Node *_expression) : expression(_expression) {
 
 std::string Return::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
-    if (expression->data_type == "int" && expression->type == "Variable") {
-        result += load_mapped_variable((Scope *) parent_scope, expression, "$v0") + "\n";
-        result += "\njr $31\nnop\n";
-    } else if (expression->data_type == "int" && expression->type == "Constant") {
-        Constant* constant = (Constant*) expression;
-        result += "li $v0, " + intToHex(constant->getValue());
-        result += "\njr $31\nnop\n";
-    }
+
+    //Compile result
+    result += expression->compileToMIPS(parent_scope);
+
+    auto var = expression->get_intermediate_variable();
+    result += load_mapped_variable((Scope *) parent_scope, (Variable*) var , "$v0") + "\n";
+
+    //Deallocate scope
+    result+= deallocate_stack_frame((Scope *) parent_scope);
+
+    result += "\njr $31\nnop\n";
 
     return result;
 }

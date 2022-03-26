@@ -33,13 +33,14 @@ void try_replace_variable(Node *&varptr, Node *inscope) {
         try_replace_variable(temp->in, inscope);
         int varsize = resolve_variable_size(temp->in->data_type, scope);
         varptr = new Constant(varsize);
+        varptr->generate_var_maps(scope);
     } else {
         varptr->generate_var_maps(scope);
     }
 }
 
 int resolve_variable_size(std::string name, Scope *child_scope) {
-    Scope *current = child_scope;
+    Scope *current = (Scope *)child_scope;
 
 
     //Try interpreting name as variable name
@@ -57,7 +58,7 @@ int resolve_variable_size(std::string name, Scope *child_scope) {
     //If success, resolve length
     //If failure, interpret name as type name
 
-    current = child_scope;
+    current = (Scope *) child_scope;
     if (type_name == "none") type_name = name;
 
     while (current != NULL) {
@@ -86,15 +87,27 @@ int resolve_variable_offset(std::string name, const Scope *current) {
 
 std::string load_mapped_variable(const Scope* scope, const Node* _var, std::string reg_name) {
     auto var = (Variable*) _var;
-    int offset = resolve_variable_offset(var->name, scope);
     std::string out = "";
-    if (offset % 4 == 0) {
-        out = "lw " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-    } else { //Load from unaligned memory addresses
-        out += "lwl " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-        out += "lwr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
+
+    //Check if variable refers to function return
+    if(var->name != "!return") {
+        int offset = resolve_variable_offset(var->name, scope);
+
+        if (offset % 4 == 0) {
+            out = "lw " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
+        } else { //Load from unaligned memory addresses
+            out += "lwl " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
+            out += "lwr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
+        }
+        out += "nop\n";
+    }else {
+        //Only load one register if small type
+        if (resolve_variable_size(var->data_type, (Scope*) scope)<=4){
+            out+= "move " + reg_name + ", $v0";
+        }
+
     }
-    out += "nop\n";
+
     return out;
 }
 
@@ -148,4 +161,14 @@ Variable* allocate_temp_var(Node* _current, std::string type){
     current->var_map[tmpname] = var;
 
     return var;
+}
+
+
+Node* resolve_function_call(std::string name, Scope* current){
+    while (current -> parent_scope != NULL){
+        current = current ->parent_scope;
+    }
+
+    auto global = (Global*) current;
+    return global->declaration_map[name];
 }

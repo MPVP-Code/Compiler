@@ -31,6 +31,8 @@ private:
     static int ifCount;
 
 public:
+    std::map<std::string, Node*> declaration_map;
+
     Global();
 
     static int getIdForWhile();
