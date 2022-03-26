@@ -14,22 +14,26 @@ public:
     LogicOr(Node *_L, Node *_R);
 
 };
+
 class LogicNot : public UnaryOperator {
 public:
     LogicNot(Node *_source);
 
+    std::string compileToMIPS(const Node *parent_scope) const override;
 };
 
 class LogicEQ : public BinaryOperator { //Equality operator
 public:
     LogicEQ(Node *_L, Node *_R);
 
+    std::string compileToMIPS(const Node *parent_scope) const override;
 };
 
 class LogicNE : public BinaryOperator { // Not equal operator
 public:
     LogicNE(Node *_L, Node *_R);
 
+    std::string compileToMIPS(const Node *parent_scope) const override;
 };
 
 class LogicLT : public BinaryOperator { //Less than or equal
@@ -50,12 +54,14 @@ class LogicLE : public BinaryOperator { //Less than or equal
 public:
     LogicLE(Node *_L, Node *_R);
 
+    std::string compileToMIPS(const Node *parent_scope) const override;
 };
 
 class LogicGE : public BinaryOperator { // Greater than or equal
 public:
     LogicGE(Node *_L, Node *_R);
 
+    std::string compileToMIPS(const Node *parent_scope) const override;
 };
 
 

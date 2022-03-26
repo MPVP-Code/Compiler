@@ -9,15 +9,70 @@ LogicAnd::LogicAnd(Node *_L, Node *_R) : BinaryOperator(_L, _R){
 LogicOr::LogicOr(Node *_L, Node *_R) : BinaryOperator(_L, _R){
     this->subtype = "LogicOr";
 }
+
 LogicNot::LogicNot(Node *_source) : UnaryOperator(_source){
     this->subtype = "LogicNot";
 }
+
+std::string LogicNot::compileToMIPS(const Node *parent_scope) const {
+    std::string result = "";
+
+    if (this->data_type == "int") {
+        result += in->compileToMIPS(parent_scope);
+        Node *inVar = in->get_intermediate_variable();
+        result += load_mapped_variable((Scope*) parent_scope, inVar, "$15") + "\n";
+        result += "sltu $15, $15, 1\n";
+        result += "andi $15, $15, 0x00ff\n";
+        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$15");
+    }
+
+    return result;
+}
+
 LogicEQ::LogicEQ(Node *_L, Node *_R) : BinaryOperator(_L, _R){
     this->subtype = "Equal";
 }
+
+std::string LogicEQ::compileToMIPS(const Node *parent_scope) const {
+    std::string result = "";
+
+    if (this->data_type == "int") {
+        result += compileLandRNodesToMIPS(parent_scope);
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";
+        result += load_mapped_variable((Scope*) parent_scope, RVar, "$14") + "\n";
+        result += "xor $15, $14, $15\n";
+        result += "sltu $13, $15, 1\n";
+        result += "andi $13, $13, 0x00ff\n";
+        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+    }
+
+    return result;
+}
+
 LogicNE::LogicNE(Node *_L, Node *_R) : BinaryOperator(_L, _R){
     this->subtype = "NotEqual";
 }
+
+std::string LogicNE::compileToMIPS(const Node *parent_scope) const {
+    std::string result = "";
+
+    if (this->data_type == "int") {
+        result += compileLandRNodesToMIPS(parent_scope);
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";
+        result += load_mapped_variable((Scope*) parent_scope, RVar, "$14") + "\n";
+        result += "xor $15, $14, $15\n";
+        result += "sltu $13, $0, $15\n";
+        result += "andi $13, $13, 0x00ff\n";
+        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+    }
+
+    return result;
+}
+
 LogicLT::LogicLT(Node *_L, Node *_R) : BinaryOperator(_L, _R){
     this->subtype = "LessThan";
 }
@@ -31,7 +86,11 @@ std::string LogicLT::compileToMIPS(const Node *parent_scope) const {
         Node *RVar = R->get_intermediate_variable();
         result += load_mapped_variable((Scope*) parent_scope, LVar, "$14") + "\n";
         result += load_mapped_variable((Scope*) parent_scope, RVar, "$15") + "\n";
-        result += "slt $13, $14, $15\n";
+        if (this->data_type == "unsigned") {
+            result += "sltu $13, $14, $15\n";
+        } else {
+            result += "slt $13, $14, $15\n";
+        }
         result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
     }
 
@@ -50,7 +109,50 @@ LogicGE::LogicGE(Node *_L, Node *_R) : BinaryOperator(_L, _R){
     this->subtype = "GreaterEqual";
 }
 
+std::string LogicGE::compileToMIPS(const Node *parent_scope) const {
+    std::string result = "";
+
+    if (this->data_type == "int" || this->data_type == "unsigned") {
+        result += compileLandRNodesToMIPS(parent_scope);
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";
+        result += load_mapped_variable((Scope*) parent_scope, RVar, "$14") + "\n";
+        if (this->data_type == "unsigned") {
+            result += "sltu $13, $15, $14\n";
+        } else {
+            result += "slt $13, $15, $14\n";
+        }
+        result += "xori $13, $13, 0x1\n";
+        result += "andi $13, $13, 0x00ff\n";
+        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+    }
+
+    return result;
+}
+
 LogicLE::LogicLE(Node *_L, Node *_R) : BinaryOperator(_L, _R){
     this->subtype = "LessEqual";
 }
 
+std::string LogicLE::compileToMIPS(const Node *parent_scope) const {
+    std::string result = "";
+
+    if (this->data_type == "int" || this->data_type == "unsigned") {
+        result += compileLandRNodesToMIPS(parent_scope);
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";
+        result += load_mapped_variable((Scope*) parent_scope, RVar, "$14") + "\n";
+        if (this->data_type == "unsigned") {
+            result += "sltu $13, $14, $15\n";
+        } else {
+            result += "slt $13, $14, $15\n";
+        }
+        result += "xori $13, $13, 0x1\n";
+        result += "andi $13, $13, 0x00ff\n";
+        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+    }
+
+    return result;
+}
