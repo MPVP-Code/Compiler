@@ -18,6 +18,15 @@ std::string Addition::compileToMIPS(const Node *parent_scope) const {
         result += load_mapped_variable((Scope*) parent_scope, RVar, "$14") + "\n";
         result += "add $13, $14, $15\n";
         result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+    }if (this->data_type == "float") {
+        //Finds temporary / constant/ normal variables in which results have been previously stored
+        result += compileLandRNodesToMIPS(parent_scope);
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable((Scope*) parent_scope, LVar, "$f4") + "\n";
+        result += load_mapped_variable((Scope*) parent_scope, RVar, "$f6") + "\n";
+        result += "add.s $f2, $f4, $f6\n";
+        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
     }
     return result;
 };
