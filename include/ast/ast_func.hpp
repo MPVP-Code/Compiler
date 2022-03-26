@@ -8,7 +8,7 @@
 
 class FunctionDeclaration : public Scope{
 public:
-    std::string return_type;
+    std::string* return_type;
     std::string name;
     std::vector<Variable*>* arguments;
     bool forward_declaration;
@@ -35,6 +35,8 @@ public:
     void generate_var_maps(Node *parent) override;
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
+
+    Node* get_intermediate_variable() override;
 
 
 };

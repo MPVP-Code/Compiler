@@ -34,7 +34,7 @@ std::string Node::compileToMIPS(const Node *parent_scope) const {
 }
 
 void Node::generate_var_maps(Node *parent) {
-    std::cerr << this->type << " failed to generate map\n";
+    std::cerr << this->type << " Node: failed to generate map\n";
 }
 
 std::string Node::getDataType() const {
@@ -42,6 +42,6 @@ std::string Node::getDataType() const {
 }
 
 Node* Node::get_intermediate_variable() {
-    std::cerr<<"get_intermediate_variable not implemented\n";
+    std::cerr<<"Node: get_intermediate_variable not implemented\n";
     return NULL;
 }

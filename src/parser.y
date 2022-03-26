@@ -266,7 +266,7 @@ declaration
 			} else if (statement->subtype == "FunctionDeclaration"){
 				//Forward function declarations parsed through here
 				auto temp = (FunctionDeclaration*) statement;
-				temp->return_type = *$1;
+				temp->return_type = $1;
 				std::cerr << "Found fwd declaration\n";
 
 
@@ -591,7 +591,7 @@ function_definition
 	: declaration_specifiers declarator compound_statement {
 	std::cerr<<"found function";
 	auto func = (FunctionDeclaration*) $2;
-	func->return_type = *$1;
+	func->return_type = $1;
 	func->statements = *$3;
 	$$ = (Node*) func;
 	}

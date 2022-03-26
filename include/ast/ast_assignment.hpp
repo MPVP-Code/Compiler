@@ -22,7 +22,7 @@ public:
 
     std::string compileToMIPS(const Node *parent_scope) const override;
 
-    Node* get_intermediate_variable() override;
+    virtual Node* get_intermediate_variable() override;
 
 };
 

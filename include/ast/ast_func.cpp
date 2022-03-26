@@ -24,7 +24,10 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
         //Function signature generation
         result += ".globl " + generate_function_signature() + "\n";
         result += generate_function_signature()+ ":\n";
-        result += ".set noreorder\n";
+        result += ".set noreorder\n\n";
+
+        //Allocate scope
+        result+= allocate_stack_frame((Scope *) this);
 
         //Saving passed parameters
         int idx = 4;
@@ -51,13 +54,17 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
         }
 
         //Appends implicit returns for void and int types
-        if (return_type == "void") {
-            result += "\njr $31\nnop\n";
+
+        //Deallocate scope if not already returned
+        result+= deallocate_stack_frame((Scope *) this);
+
+        if (*return_type == "void") {
+            result += "\njr $31\nnop\n\n";
         }
-        if (return_type == "int") {
+        if (*return_type == "int") {
             //implicit error code 0
             result += "\nli $v0, 0\n";
-            result += "\njr $31\nnop\n";
+            result += "\njr $31\nnop\n\n";
         }
 
     }
@@ -75,8 +82,10 @@ std::string FunctionDeclaration::generate_function_signature() const {
     for (auto arg : *arguments){
         result += arg->data_type + ", ";
     }
-    result = result.substr(0, result.length() - 1) + ")";
-    return result;
+    if (arguments->size()>0) {
+        result = result.substr(0, result.length() - 1) ;
+    }
+    return result+ ")";
 }
 
 FunctionCall::FunctionCall(std::string _function_name, std::vector<Node*>* _arguments): function_name(_function_name) {
@@ -96,6 +105,12 @@ void FunctionCall::generate_var_maps(Node *parent){
 
 std::string FunctionCall::compileToMIPS(const Node *parent_scope) const {
     std::string result  = "";
+
+    //Get corresponding function declaration
+    auto declaration = (FunctionDeclaration*)resolve_function_call(function_name, ((Scope*) parent_scope));
+
+    //Link types :(
+    const_cast<FunctionCall*> (this)->data_type = *(declaration->return_type);
 
     //Load parameters into registers
     int idx = 4; // First arg register
@@ -119,8 +134,7 @@ std::string FunctionCall::compileToMIPS(const Node *parent_scope) const {
     Variable* ra = ((Scope*) parent_scope)->var_map["!ra"];
     result+= store_mapped_variable((Scope*)parent_scope, ra , "$ra" );
 
-    //Get corresponding function declaration
-    auto declaration = (FunctionDeclaration*)resolve_function_call(function_name, ((Scope*) parent_scope));
+
 
     //Jump
     result += "jal " + declaration->generate_function_signature() + "\n";
@@ -129,6 +143,11 @@ std::string FunctionCall::compileToMIPS(const Node *parent_scope) const {
     //Restore return address
     result+= load_mapped_variable((Scope*)parent_scope, ra , "$ra" );
     return result;
+}
+
+Node *FunctionCall::get_intermediate_variable() {
+    //Crate "false", load mapped variable will be moving from function return registers instead
+    return new Variable(this->data_type, "!return", true);
 }
 
 

@@ -19,7 +19,7 @@ void Constant::generate_var_maps(Node *parent) {
     const_var = allocate_temp_var(parent, data_type);
 }
 
-Node* Constant::get_intermediate_variable() {
+Node* Constant::get_intermediate_variable(){
     return const_var;
 }
 

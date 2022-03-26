@@ -3,7 +3,9 @@
 
 int main(int argc, char *argv[]) {
     Node *ast = parseAST();
-    ast->generate_var_maps(ast);
+
+    //Important global parent is NULL!
+    ast->generate_var_maps(NULL);
 
 //    RegisterAllocator::initCurrentRegister();
 //    RegisterAllocator::reinitRegistersMappingMap();
