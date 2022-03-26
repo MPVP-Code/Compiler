@@ -49,7 +49,6 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
                 result += compiledCode + "\n";
             }
         }
-        result = result.substr(0, result.length() - 1);
 
         //Appends implicit returns for void and int types
         if (return_type == "void") {
@@ -72,7 +71,12 @@ std::string* FunctionDeclaration::getName() {
 FunctionDeclaration::~FunctionDeclaration() {}
 
 std::string FunctionDeclaration::generate_function_signature() const {
-    return name + "()";
+    std::string result = name + "(";
+    for (auto arg : *arguments){
+        result += arg->data_type + ", ";
+    }
+    result = result.substr(0, result.length() - 1) + ")";
+    return result;
 }
 
 FunctionCall::FunctionCall(std::string _function_name, std::vector<Node*>* _arguments): function_name(_function_name) {
