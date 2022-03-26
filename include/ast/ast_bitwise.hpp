@@ -28,6 +28,8 @@ public:
 class BitNot : public UnaryOperator {
 public:
     BitNot(Node *_in);
+
+    std::string compileToMIPS(const Node *parent_scope) const;
 };
 
 class BitASL : public BinaryOperator {

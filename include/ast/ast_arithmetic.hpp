@@ -42,4 +42,12 @@ public:
 
 };
 
+class UnaryMinus : public UnaryOperator {
+public:
+
+    UnaryMinus(Node *in);
+    std::string compileToMIPS(const Node *parent_scope) const;
+
+};
+
 #endif

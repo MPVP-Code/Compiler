@@ -96,6 +96,10 @@ unary_expression
 		$$ = new BitNot ($2);
 	} else if ($1 == '!'){
 		$$ = new LogicNot($2);
+	} else if ($1 == '-'){
+		$$ = new UnaryMinus($2);
+	}else if ($1 == '+'){
+		$$ = $2;
 	}
 
 	}

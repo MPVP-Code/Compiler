@@ -105,3 +105,21 @@ std::string Modulo::compileToMIPS(const Node *parent_scope) const {
 
     return result;
 }
+
+UnaryMinus::UnaryMinus(Node *in) : UnaryOperator(in) {
+    this->subtype = "minus";
+}
+
+std::string UnaryMinus::compileToMIPS(const Node *parent_scope) const {
+    std::string result = "";
+    //Resolve wether to use temp variable or actual variable
+    if (this->data_type == "int") {
+        //Finds temporary / constant/ normal variables in which results have been previously stored
+        result += in->compileToMIPS(parent_scope);
+        Node *InVar = in->get_intermediate_variable();
+        result += load_mapped_variable((Scope*) parent_scope, InVar, "$14") + "\n";
+        result += "sub $13, $0, $14\n";
+        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+    }
+    return result;
+}

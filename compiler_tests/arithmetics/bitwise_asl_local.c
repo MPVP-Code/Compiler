@@ -1,6 +1,5 @@
 int f() {
     int b = 4;
-    int c = 2;
-    int d = b << c;
+    int d = b << 2;
     return d;
 }
