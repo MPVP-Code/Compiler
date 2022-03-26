@@ -7,7 +7,17 @@ BitAnd::BitAnd(Node *_L, Node *_R) : BinaryOperator(_L, _R){
 }
 
 std::string BitAnd::compileToMIPS(const Node *parent_scope) const {
-    return compileBinaryOperatorToMIPS(parent_scope, "and");
+    std::string result = "";
+
+    result += compileLandRNodesToMIPS(parent_scope);
+    Node *LVar = L->get_intermediate_variable();
+    Node *RVar = R->get_intermediate_variable();
+    result += load_mapped_variable((Scope*) parent_scope, LVar, "$14") + "\n";
+    result += load_mapped_variable((Scope*) parent_scope, RVar, "$15") + "\n";
+    result += "and $13, $14, $15\n";
+    result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+
+    return result;
 }
 
 BitOr::BitOr(Node *_L, Node *_R) : BinaryOperator(_L, _R){
@@ -15,7 +25,16 @@ BitOr::BitOr(Node *_L, Node *_R) : BinaryOperator(_L, _R){
 }
 
 std::string BitOr::compileToMIPS(const Node *parent_scope) const {
-    return compileBinaryOperatorToMIPS(parent_scope, "or");
+    std::string result = "";
+    result += compileLandRNodesToMIPS(parent_scope);
+    Node *LVar = L->get_intermediate_variable();
+    Node *RVar = R->get_intermediate_variable();
+    result += load_mapped_variable((Scope*) parent_scope, LVar, "$14") + "\n";
+    result += load_mapped_variable((Scope*) parent_scope, RVar, "$15") + "\n";
+    result += "or $13, $14, $15\n";
+    result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+
+    return result;
 }
 
 BitXor::BitXor(Node *_L, Node *_R) : BinaryOperator(_L, _R){
@@ -23,11 +42,33 @@ BitXor::BitXor(Node *_L, Node *_R) : BinaryOperator(_L, _R){
 }
 
 std::string BitXor::compileToMIPS(const Node *parent_scope) const {
-    return compileBinaryOperatorToMIPS(parent_scope, "xor");
+    std::string result = "";
+
+    result += compileLandRNodesToMIPS(parent_scope);
+    Node *LVar = L->get_intermediate_variable();
+    Node *RVar = R->get_intermediate_variable();
+    result += load_mapped_variable((Scope*) parent_scope, LVar, "$14") + "\n";
+    result += load_mapped_variable((Scope*) parent_scope, RVar, "$15") + "\n";
+    result += "xor $13, $14, $15\n";
+    result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+
+    return result;
 }
 
 BitNot::BitNot(Node *_in) : UnaryOperator(_in){
     this->type = "BitNot";
+}
+
+std::string BitNot::compileToMIPS(const Node *parent_scope) const {
+    std::string result = "";
+
+    result += in->compileToMIPS(parent_scope);
+    Node *InVar = in->get_intermediate_variable();
+    result += load_mapped_variable((Scope*) parent_scope, InVar, "$14") + "\n";
+    result += "nor $13, $14, $14\n";
+    result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+
+    return result;
 }
 
 BitASL::BitASL(Node *_L, Node* _R) : BinaryOperator(_L, _R){
@@ -35,7 +76,17 @@ BitASL::BitASL(Node *_L, Node* _R) : BinaryOperator(_L, _R){
 }
 
 std::string BitASL::compileToMIPS(const Node *parent_scope) const {
-    return compileBinaryOperatorToMIPS(parent_scope, "sll");
+    std::string result = "";
+
+        result += compileLandRNodesToMIPS(parent_scope);
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable((Scope*) parent_scope, LVar, "$14") + "\n";
+        result += load_mapped_variable((Scope*) parent_scope, RVar, "$15") + "\n";
+        result += "sllv $13, $14, $15\n";
+        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+
+    return result;
 }
 
 BitASR::BitASR(Node *_L, Node* _R) : BinaryOperator(_L, _R){
@@ -43,5 +94,26 @@ BitASR::BitASR(Node *_L, Node* _R) : BinaryOperator(_L, _R){
 }
 
 std::string BitASR::compileToMIPS(const Node *parent_scope) const {
-    return compileBinaryOperatorToMIPS(parent_scope, "srav");
+    std::string result = "";
+
+    if (this->data_type == "int") {
+        result += compileLandRNodesToMIPS(parent_scope);
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable((Scope*) parent_scope, LVar, "$14") + "\n";
+        result += load_mapped_variable((Scope*) parent_scope, RVar, "$15") + "\n";
+        result += "srav $13, $14, $15\n";
+        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+
+    }else if (this->data_type == "unsigned") {
+        result += compileLandRNodesToMIPS(parent_scope);
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable((Scope*) parent_scope, LVar, "$14") + "\n";
+        result += load_mapped_variable((Scope*) parent_scope, RVar, "$15") + "\n";
+        result += "srlv $13, $14, $15\n";
+        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+    }
+
+    return result;
 }

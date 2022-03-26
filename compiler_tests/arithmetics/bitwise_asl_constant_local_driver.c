@@ -1,5 +1,6 @@
-int f() {
-    int b = 4;
-    int d = b << 2;
-    return d;
+int f();
+
+int main()
+{
+    return !(f()==24);
 }
