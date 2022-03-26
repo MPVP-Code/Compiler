@@ -78,14 +78,16 @@ std::string* FunctionDeclaration::getName() {
 FunctionDeclaration::~FunctionDeclaration() {}
 
 std::string FunctionDeclaration::generate_function_signature() const {
-    std::string result = name + "(";
-    for (auto arg : *arguments){
-        result += arg->data_type + ", ";
-    }
-    if (arguments->size()>0) {
-        result = result.substr(0, result.length() - 1) ;
-    }
-    return result+ ")";
+//    std::string result = name + "(";
+//    for (auto arg : *arguments){
+//        result += arg->data_type + ", ";
+//    }
+//    if (arguments->size()>0) {
+//        result = result.substr(0, result.length() - 1) ;
+//    }
+//    return result+ ")";
+
+    return name;
 }
 
 FunctionCall::FunctionCall(std::string _function_name, std::vector<Node*>* _arguments): function_name(_function_name) {
