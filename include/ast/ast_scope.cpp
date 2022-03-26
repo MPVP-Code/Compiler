@@ -90,6 +90,7 @@ std::string Global::compileToMIPS(const Node *parent_scope) const {
 
 int Global::whileCount = 0;
 int Global::ifCount = 0;
+int Global::logicAndCount = 0;
 int Global::logicOrCount = 0;
 
 int Global::getIdForWhile() {
@@ -98,6 +99,10 @@ int Global::getIdForWhile() {
 
 int Global::getIdForIf() {
     return ifCount++;
+}
+
+int Global::getIdForLogicAnd() {
+    return logicAndCount++;
 }
 
 int Global::getIdForLogicOr() {

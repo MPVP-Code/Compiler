@@ -7,6 +7,7 @@ class LogicAnd : public BinaryOperator {
 public:
     LogicAnd(Node *_L, Node *_R);
 
+    std::string compileToMIPS(const Node *parent_scope) const override;
 };
 
 class LogicOr : public BinaryOperator {

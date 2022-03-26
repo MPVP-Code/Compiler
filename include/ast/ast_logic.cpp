@@ -6,6 +6,37 @@ LogicAnd::LogicAnd(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
     this->subtype = "LogicAnd";
 }
 
+std::string LogicAnd::compileToMIPS(const Node *parent_scope) const {
+    std::string result = "";
+    //Resolve wether to use temp variable or actual variable
+    if (this->data_type == "int") {
+        //Finds temporary / constant/ normal variables in which results have been previously stored
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+
+        int id = Global::getIdForLogicAnd();
+        std::string logicAndFalseLabel = "$LogicAndFalse" + std::to_string(id);
+        std::string logicAndEndLabel = "$LogicAndEnd" + std::to_string(id);
+
+        result += L->compileToMIPS(parent_scope) + "\n";
+        result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";
+        result += "beq $15, $0, " + logicAndFalseLabel + "\n";
+        result += "nop\n";
+        result += R->compileToMIPS(parent_scope) + "\n";
+        result += load_mapped_variable((Scope*) parent_scope, RVar, "$14") + "\n";
+        result += "beq $14, $0, " + logicAndFalseLabel + "\n";
+        result += "nop\n";
+        result += "li $13, 1\n";
+        result += "b " + logicAndEndLabel + "\n";
+        result += "nop\n";
+        result += logicAndFalseLabel + ":\n";
+        result += "li $13, 0\n";
+        result += logicAndEndLabel + ":\n";
+        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+    }
+    return result;
+}
+
 LogicOr::LogicOr(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
     this->subtype = "LogicOr";
 }

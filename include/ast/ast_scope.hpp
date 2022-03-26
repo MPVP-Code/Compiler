@@ -27,9 +27,10 @@ public:
 };
 class Global : public Scope {
 private:
+    static int logicAndCount;
+    static int logicOrCount;
     static int whileCount;
     static int ifCount;
-    static int logicOrCount;
 public:
     std::map<std::string, Node*> declaration_map;
 
@@ -38,6 +39,8 @@ public:
     static int getIdForWhile();
 
     static int getIdForIf();
+
+    static int getIdForLogicAnd();
 
     static int getIdForLogicOr();
 
