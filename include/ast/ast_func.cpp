@@ -4,7 +4,7 @@
 
 #include <vector>
 
-FunctionDeclaration::FunctionDeclaration(){  //std::string _return_type, std::string _name, std::vector<Node*> _statements
+FunctionDeclaration::FunctionDeclaration() {  //std::string _return_type, std::string _name, std::vector<Node*> _statements
     //Type specification
     this->type = "Scope";
     this->subtype = "FunctionDeclaration";
@@ -23,22 +23,22 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
 
         //Function signature generation
         result += ".globl " + generate_function_signature() + "\n";
-        result += generate_function_signature()+ ":\n";
+        result += generate_function_signature() + ":\n";
         result += ".set noreorder\n\n";
 
         //Allocate scope
-        result+= allocate_stack_frame((Scope *) this);
+        result += allocate_stack_frame((Scope *) this);
 
         //Saving passed parameters
         int idx = 4;
-        for (auto param : *arguments) {
+        for (auto param: *arguments) {
 
-            result += store_mapped_variable((Scope*)this, param, "$" + std::to_string(idx) );
+            result += store_mapped_variable((Scope *) this, param, "$" + std::to_string(idx));
 
             //Two word store - skip register
-            if (resolve_variable_size(param->name, (Scope*)this)>4){
-                idx +=2;
-            }else{
+            if (resolve_variable_size(param->name, (Scope *) this) > 4) {
+                idx += 2;
+            } else {
                 idx++;
             }
 
@@ -56,7 +56,7 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
         //Appends implicit returns for void and int types
 
         //Deallocate scope if not already returned
-        result+= deallocate_stack_frame((Scope *) this);
+        result += deallocate_stack_frame((Scope *) this);
 
         if (*return_type == "void") {
             result += "\njr $31\nnop\n\n";
@@ -71,7 +71,7 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
     return result;
 };
 
-std::string* FunctionDeclaration::getName() {
+std::string *FunctionDeclaration::getName() {
     return &(this->name);
 }
 
@@ -90,51 +90,53 @@ std::string FunctionDeclaration::generate_function_signature() const {
     return name;
 }
 
-FunctionCall::FunctionCall(std::string _function_name, std::vector<Node*>* _arguments): function_name(_function_name) {
+FunctionCall::FunctionCall(std::string _function_name, std::vector<Node *> *_arguments) : function_name(
+        _function_name) {
     this->arguments = _arguments;
 };
 
-void FunctionCall::generate_var_maps(Node *parent){
+void FunctionCall::generate_var_maps(Node *parent) {
 
     //Applies varmapping to parameters
-    auto scope = (Scope*) parent;
-    for(auto param : *this->arguments){
+    auto scope = (Scope *) parent;
+    for (auto param: *this->arguments) {
         try_replace_variable(param, scope);
     }
 }
 
 
-
 std::string FunctionCall::compileToMIPS(const Node *parent_scope) const {
-    std::string result  = "";
+    std::string result = "";
 
     //Get corresponding function declaration
-    auto declaration = (FunctionDeclaration*)resolve_function_call(function_name, ((Scope*) parent_scope));
+    auto declaration = (FunctionDeclaration *) resolve_function_call(function_name, ((Scope *) parent_scope));
 
     //Link types :(
-    const_cast<FunctionCall*> (this)->data_type = *(declaration->return_type);
+    const_cast<FunctionCall *> (this)->data_type = *(declaration->return_type);
 
     //Load parameters into registers
     int idx = 4; // First arg register
 
-    for (auto param : *arguments){
+    for (auto param: *arguments) {
         //Compile code in parameters
-        result+= param->compileToMIPS(parent_scope);
+        result += param->compileToMIPS(parent_scope);
 
-        result += load_mapped_variable((Scope*)parent_scope, param->get_intermediate_variable(), "$" + std::to_string(idx) );
+        result += load_mapped_variable((Scope *) parent_scope, param->get_intermediate_variable(),
+                                       "$" + std::to_string(idx));
 
         //Two word load - skip register
-        if (resolve_variable_size(((Variable*)param->get_intermediate_variable())->name, (Scope*)parent_scope)>4){
-            idx +=2;
-        }else{
+        if (resolve_variable_size(((Variable *) param->get_intermediate_variable())->name, (Scope *) parent_scope) >
+            4) {
+            idx += 2;
+        } else {
             idx++;
         }
 
     }
 
     //Save return address
-    Variable* ra = ((Scope*) parent_scope)->var_map["!ra"];
-    result+= store_mapped_variable((Scope*)parent_scope, ra , "$ra" );
+    Variable *ra = ((Scope *) parent_scope)->var_map["!ra"];
+    result += store_mapped_variable((Scope *) parent_scope, ra, "$ra");
 
 
 
@@ -143,7 +145,7 @@ std::string FunctionCall::compileToMIPS(const Node *parent_scope) const {
     result += "nop\n";
 
     //Restore return address
-    result+= load_mapped_variable((Scope*)parent_scope, ra , "$ra" );
+    result += load_mapped_variable((Scope *) parent_scope, ra, "$ra");
     return result;
 }
 

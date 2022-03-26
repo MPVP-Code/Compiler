@@ -40,6 +40,22 @@ void Scope::generate_var_maps(Node *parent) {
         try_replace_variable(node, this);
     }
 
+    if (this->subtype == "If") {
+        If *ifScope = (If*) this;
+
+        if (ifScope->truestatements != nullptr) {
+            for (auto &node: *ifScope->truestatements) {
+                try_replace_variable(node, this);
+            }
+        }
+
+        if (ifScope->falsestatements != nullptr) {
+            for (auto &node: *ifScope->falsestatements) {
+                try_replace_variable(node, this);
+            }
+        }
+    }
+
     //Generates variable offsets
     int offset = 0;
     auto scp = (Scope *) this;

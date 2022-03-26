@@ -60,34 +60,27 @@ std::string If::compileStatementsToMIPS(std::vector<Node*>* statements) const {
 }
 
 std::string If::compileToMIPS(const Node *parent_scope) const {
-    std::string result = "";
+    std::string result = allocate_stack_frame((Scope *) this);
+    int ifId = Global::getIdForIf();
 
-    if (condition->get_type().compare("Constant") == 0) {
-        Constant *constantCondition = (Constant*) condition;
-        if (constantCondition->getValue() == 0 && falsestatements == nullptr) {
-            return "";
-        } else if (constantCondition->getValue() == 0 && falsestatements != nullptr) {
-            result = compileStatementsToMIPS(falsestatements);
-        } else if (constantCondition->getValue() != 0 && truestatements != nullptr) {
-            result = compileStatementsToMIPS(truestatements);
-        }
-    } else if (condition->get_type().compare("Variable") == 0) {
-        Variable *variableCondition = (Variable*) condition;
-        int ifId = Global::getIdForIf();
-        result += load_mapped_variable((Scope*) parent_scope, variableCondition, "$15");
-        std::string elseLabel = "$ELSE" + std::to_string(ifId);
-        std::string ifEndLabel = "$IFEND" + std::to_string(ifId);
-        result += "beq $15, $0, " + elseLabel + "\nnop\n";
-        if (truestatements != nullptr) {
-            result += this->compileStatementsToMIPS(this->truestatements) + "\n";
-            result += "b " + ifEndLabel + "\nnop\n";
-        }
-        result += elseLabel + ":\n";
-        if (falsestatements != nullptr) {
-            result += this->compileStatementsToMIPS(this->falsestatements) + "\n";
-        }
-        result += ifEndLabel + ":";
+    result += condition->compileToMIPS(parent_scope);
+    result += load_mapped_variable((Scope*) parent_scope, condition->get_intermediate_variable(), "$15");
+    std::string elseLabel = "$ELSE" + std::to_string(ifId);
+    std::string ifEndLabel = "$IFEND" + std::to_string(ifId);
+    result += "beq $15, $0, " + elseLabel + "\nnop\n";
+
+    if (truestatements != nullptr) {
+        result += this->compileStatementsToMIPS(this->truestatements) + "\n";
+        result += "b " + ifEndLabel + "\nnop\n";
     }
+
+    result += elseLabel + ":\n";
+
+    if (falsestatements != nullptr) {
+        result += this->compileStatementsToMIPS(this->falsestatements) + "\n";
+    }
+    result += ifEndLabel + ":";
+    result += deallocate_stack_frame((Scope *) this);
 
     return result;
 };
