@@ -48,6 +48,20 @@ Node* BinaryOperator::get_intermediate_variable() {
     return this->temp_variable;
 }
 
+std::string BinaryOperator::compileLandRNodesToMIPS(const Node* parent_scope, Node* L, Node* R) const {
+    std::string result = "";
+    std::string LCode = L->compileToMIPS(parent_scope);
+    std::string RCode = R->compileToMIPS(parent_scope);
+    if (!LCode.empty() && !RCode.empty()) {
+        result += LCode + "\n" + RCode;
+    } else if (!LCode.empty()) {
+        result = LCode;
+    } else if (!RCode.empty()) {
+        result = RCode;
+    }
+
+    return result;
+}
 
 UnaryOperator::UnaryOperator(Node* _in) {
     this->type = "UnaryOperator";

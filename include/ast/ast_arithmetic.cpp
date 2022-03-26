@@ -11,9 +11,9 @@ std::string Addition::compileToMIPS(const Node *parent_scope) const {
     //Resolve wether to use temp variable or actual variable
     if (this->data_type == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
+        result += compileLandRNodesToMIPS(parent_scope, L, R);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
-
         result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";
         result += load_mapped_variable((Scope*) parent_scope, RVar, "$14") + "\n";
         result += "add $13, $14, $15\n";
@@ -31,6 +31,7 @@ std::string Subtraction::compileToMIPS(const Node *parent_scope) const {
     //Resolve wether to use temp variable or actual variable
     if (this->data_type == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
+        result += compileLandRNodesToMIPS(parent_scope, L, R);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
 
@@ -51,6 +52,7 @@ std::string Multiplication::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
 
     if (this->data_type == "int") {
+        result += compileLandRNodesToMIPS(parent_scope, L, R);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
         result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";
@@ -71,6 +73,7 @@ std::string Division::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
 
     if (this->data_type == "int") {
+        result += compileLandRNodesToMIPS(parent_scope, L, R);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
         result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";
@@ -84,13 +87,14 @@ std::string Division::compileToMIPS(const Node *parent_scope) const {
 
 
 Modulo::Modulo(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
-    this->type = "Division";
+    this->type = "Modulo";
 }
 
 std::string Modulo::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
 
     if (this->data_type == "int") {
+        result += compileLandRNodesToMIPS(parent_scope, L, R);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
         result += load_mapped_variable((Scope*) parent_scope, LVar, "$15") + "\n";

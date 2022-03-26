@@ -9,13 +9,13 @@ While::While(Node* _condition, std::vector<Node*> _statements): Scope(), conditi
 
 std::string While::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
-    result += condition->compileToMIPS(parent_scope) + "\n";
     result += allocate_stack_frame((Scope *) this);
+    result += condition->compileToMIPS(parent_scope) + "\n";
     int whileId = Global::getIdForWhile();
     std::string whileStart = "$WHILE" + std::to_string(whileId) + "START";
     std::string whileEnd = "$WHILE" + std::to_string(whileId) + "END";
     result += whileStart + ":\n";
-    result += load_mapped_variable((Scope*) parent_scope, condition, "$15");
+    result += load_mapped_variable((Scope*) parent_scope, condition->get_intermediate_variable(), "$15");
     result += "beq $15, $0, " + whileEnd + "\nnop\n";
 
     for (Node *statement : statements) {

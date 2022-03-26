@@ -29,6 +29,8 @@ public:
 
     Node* get_intermediate_variable() override;
 
+    std::string compileLandRNodesToMIPS(const Node* parent_scope, Node* L, Node* R) const;
+
     std::string compileBinaryOperatorToMIPS(const Node *parent_scope, std::string instructionName) const;
 };
 
