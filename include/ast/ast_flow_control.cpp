@@ -99,7 +99,6 @@ std::string For::compileToMIPS(const Node *parent_scope) const {
 
     result += allocate_stack_frame((Scope *) this);
     result += initialization->compileToMIPS((Scope *) this) + "\n";
-    result += load_mapped_variable((Scope *) this, condition->get_intermediate_variable(), "$15");
     result += "b " + forCondLabel + "\n";
     result += forStatementLabel + ":\n";
 

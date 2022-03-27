@@ -45,7 +45,7 @@ void Scope::generate_var_maps(Node *parent) {
     }
 
     if (this->subtype == "If") {
-        If *ifScope = (If*) this;
+        If *ifScope = (If *) this;
 
         if (ifScope->truestatements != nullptr) {
             for (auto &node: *ifScope->truestatements) {
@@ -72,8 +72,11 @@ void Scope::generate_var_maps(Node *parent) {
     //Allocates two extra words for future system use $ra backup, $fp backup
     int extra_words = 2;
     offset += 4 * extra_words;
-    this->stack_frame_size = offset;
-
+    if (offset % 4 == 0) {
+        this->stack_frame_size = offset;
+    } else {
+        this->stack_frame_size = offset + (4 - offset % 4);
+    }
 };
 
 

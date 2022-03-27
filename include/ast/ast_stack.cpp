@@ -280,15 +280,8 @@ std::string store_mapped_variable_coprocessor(const Scope *scope, const Node *_v
 }
 std::string allocate_stack_frame(Scope *scope) {
     std::string out = "";
-    int frame_size;
-    //Rounds up to next full word;
-    if (scope->stack_frame_size == 0){
-        frame_size = -1 * (scope->stack_frame_size);
-    } else{
-        frame_size = -1 * (scope->stack_frame_size +  (4 - scope->stack_frame_size % 4));
-    }
 
-    out += "addiu $sp, $sp, " + std::to_string(frame_size) + "\n";
+    out += "addiu $sp, $sp, " + std::to_string(-1 * (scope->stack_frame_size)) + "\n";
 
     //fp operations
     //out += "addiu $fp, $sp\n";
@@ -300,15 +293,7 @@ std::string allocate_stack_frame(Scope *scope) {
 std::string deallocate_stack_frame(Scope *scope) {
     std::string out = "";
 
-    int frame_size;
-    //Rounds up to next full word;
-    if (scope->stack_frame_size == 0){
-        frame_size = scope->stack_frame_size;
-    } else{
-        frame_size = scope->stack_frame_size +  (4 - scope->stack_frame_size % 4);
-    }
-
-    out += "addiu $sp, $sp, " + std::to_string(frame_size) + "\n";
+    out += "addiu $sp, $sp, " + std::to_string(scope->stack_frame_size) + "\n";
 
     //fp operations
     //out += "addiu $fp, $fp, " + std::to_string(frame_size) + "\n";
