@@ -9,8 +9,10 @@
 #include "ast_func.hpp"
 
 
-std::string load_mapped_variable(const Scope* scope, const Node* var, std::string reg_name); //reg_name inserted directly into lw instruction.
+std::string load_mapped_variable(const Scope* scope, const Node* var, std::string reg_name);
+std::string load_mapped_variable_rec(const Scope* scope, const Node* var, std::string reg_name, int size_remaining); //reg_name inserted directly into lw instruction.
 std::string store_mapped_variable(const Scope* scope, const Node* var, std::string reg_name);
+std::string get_next_register(std::string reg);
 std::string allocate_stack_frame(Scope* scope);
 std::string deallocate_stack_frame(Scope* scope);
 
