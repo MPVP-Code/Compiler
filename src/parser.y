@@ -66,8 +66,8 @@ postfix_expression
 //	| postfix_expression '[' expression ']' {}
 //	| postfix_expression '.' IDENTIFIER {}
 //	| postfix_expression PTR_OP IDENTIFIER {}
-//	| postfix_expression INC_OP {}
-//	| postfix_expression DEC_OP {}
+	| postfix_expression INC_OP { $$ = new PostIncOp ($1); }
+	| postfix_expression DEC_OP { $$ = new PostDecOp ($1); }
 	;
 
 argument_expression_list
@@ -89,8 +89,8 @@ unary_expression
 					$$ = $1;
 				}
 				}
-//	| INC_OP unary_expression {}
-//	| DEC_OP unary_expression {}
+//	| INC_OP unary_expression {$$ = new PreIncOp ($2);}
+//	| DEC_OP unary_expression {$$ = new PreDecOp ($2);}
 	| unary_operator unary_expression {
 	if ($1 == '~'){
 		$$ = new BitNot ($2);
@@ -546,8 +546,8 @@ selection_statement
 iteration_statement
 	: WHILE '(' expression ')' statement { $$ = new While($3, *$5);	}
 	| DO statement WHILE '(' expression ')' ';' {$$ = new DoWhile($5, *$2);	}
-//	| FOR '(' expression_statement expression_statement ')' statement {}
-//	| FOR '(' expression_statement expression_statement expression ')' statement {}
+	| FOR '(' expression_statement expression_statement ')' statement { $$ = new For($3, $4, NULL, *$6); }
+	| FOR '(' expression_statement expression_statement expression ')' statement { $$ = new For($3, $4, $5, *$7); }
 	;
 
 jump_statement

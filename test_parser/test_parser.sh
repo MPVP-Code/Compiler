@@ -32,7 +32,7 @@ for i in test_parser/in/*.txt; do
     echo ""
     echo "Input file : ${i}"
     BASENAME=$(basename $i .txt);
-    cat $i | ${DOS2UNIX} | ./test_parser/bin/parsertest  > test_parser/out/$BASENAME.stdout.txt  2> test_parser/out/$BASENAME.stderr.txt
+    timetout 5 cat $i | ${DOS2UNIX} | ./test_parser/bin/parsertest  > test_parser/out/$BASENAME.stdout.txt  2> test_parser/out/$BASENAME.stderr.txt
 
     diff <(cat test_parser/ref/$BASENAME.stdout.txt | ${DOS2UNIX}) <(cat test_parser/out/$BASENAME.stdout.txt) > test_parser/out/$BASENAME.diff.txt
 

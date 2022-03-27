@@ -4,6 +4,7 @@
 #include "ast_stack.hpp"
 #include "ast_syntax.hpp"
 #include "ast_assignment.hpp"
+#include "ast_arithmetic.hpp"
 
 Variable *resolve_variable_name(std::string name, Scope *current) {
     while (current != NULL) {
@@ -34,6 +35,8 @@ void try_replace_variable(Node *&varptr, Node *inscope) {
         int varsize = resolve_variable_size(temp->in->data_type, scope);
         varptr = new Constant(varsize);
         varptr->generate_var_maps(scope);
+    } else if (varptr->type == "UnaryOperator" && (varptr->subtype == "PostIncOp" || varptr->subtype == "PostDecOp")) {
+        auto temp = (PostIncOp *) varptr;
     } else {
         varptr->generate_var_maps(scope);
     }

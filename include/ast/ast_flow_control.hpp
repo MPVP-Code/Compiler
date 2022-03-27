@@ -1,7 +1,3 @@
-//
-// Created by michal on 3. 3. 2022.
-//
-
 #ifndef AST_TYPE_H
 #define AST_TYPE_H
 
@@ -40,15 +36,13 @@ public:
 
 class For: public Scope {
 public:
+    Node* initialization;
     Node* condition;
-    std::vector<Node*>* truestatements;
-    std::vector<Node*>* falsestatements;
+    Node* update;
 
-
-    //If(Node* _condition, std::vector<Node*>* _truestatements, std::vector<Node*>* _falsestatements);
+    For(Node* _initialization, Node* _condition, Node* _update, std::vector<Node*> _statements);
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
-    std::string compileStatementsToMIPS(std::vector<Node*>* statements) const;
 };
 
 #endif

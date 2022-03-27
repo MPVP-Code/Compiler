@@ -50,4 +50,21 @@ public:
 
 };
 
+class PostDecOp : public UnaryOperator {
+public:
+
+    PostDecOp(Node *in);
+    std::string compileToMIPS(const Node *parent_scope) const;
+
+};
+
+class PostIncOp : public UnaryOperator {
+public:
+
+    PostIncOp(Node *in);
+    std::string compileToMIPS(const Node *parent_scope) const;
+
+};
+
+
 #endif

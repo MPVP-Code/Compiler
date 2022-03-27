@@ -70,6 +70,7 @@ UnaryOperator::UnaryOperator(Node* _in) {
 
 void UnaryOperator::generate_var_maps(Node *parent){
     //Generate maps
+    std::cerr << "generating var maps for unary operator"<< std::endl;
     try_replace_variable(this->in, parent);
 
     //Propagate data types

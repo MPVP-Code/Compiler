@@ -22,11 +22,14 @@ void Scope::generate_var_maps(Node *parent) {
     if (this->subtype == "DoWhile") {
         auto flow = (DoWhile *) this;
         try_replace_variable(flow->condition, this);
-
     } else if (this->subtype == "If") {
         If *flow = (If *) this;
         try_replace_variable(flow->condition, this);
-
+    } else if (this->subtype == "For") {
+        For *flow = (For *) this;
+        try_replace_variable(flow->initialization, this);
+        try_replace_variable(flow->condition, this);
+        try_replace_variable(flow->update, this);
     } else if (this->subtype == "FunctionDeclaration") {
         //Applies varmapping to declared variables
         auto func = (FunctionDeclaration *) this;
@@ -105,12 +108,17 @@ std::string Global::compileToMIPS(const Node *parent_scope) const {
 }
 
 int Global::whileCount = 0;
+int Global::forCount = 0;
 int Global::ifCount = 0;
 int Global::logicAndCount = 0;
 int Global::logicOrCount = 0;
 
 int Global::getIdForWhile() {
     return whileCount++;
+}
+
+int Global::getIdForForLoop() {
+    return forCount++;
 }
 
 int Global::getIdForIf() {

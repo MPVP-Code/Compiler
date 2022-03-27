@@ -1,10 +1,9 @@
 #include "ast_flow_control.hpp"
-#include "ast_assignment.hpp"
 #include "ast_stack.hpp"
 
-While::While(Node* _condition, std::vector<Node*> _statements): Scope(), condition(_condition){
-        this->subtype = "While";
-        this->statements = _statements;
+While::While(Node *_condition, std::vector<Node *> _statements) : Scope(), condition(_condition) {
+    this->subtype = "While";
+    this->statements = _statements;
 }
 
 std::string While::compileToMIPS(const Node *parent_scope) const {
@@ -15,10 +14,10 @@ std::string While::compileToMIPS(const Node *parent_scope) const {
     std::string whileStart = "$WHILE" + std::to_string(whileId) + "START";
     std::string whileEnd = "$WHILE" + std::to_string(whileId) + "END";
     result += whileStart + ":\n";
-    result += load_mapped_variable((Scope*) this, condition->get_intermediate_variable(), "$15");
+    result += load_mapped_variable((Scope *) this, condition->get_intermediate_variable(), "$15");
     result += "beq $15, $0, " + whileEnd + "\nnop\n";
 
-    for (Node *statement : statements) {
+    for (Node *statement: statements) {
         std::string generatedCode = statement->compileToMIPS(this);
         if (generatedCode.length() != 0) {
             result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
@@ -33,23 +32,25 @@ std::string While::compileToMIPS(const Node *parent_scope) const {
     return result.substr(0, result.length() - 1);
 }
 
-DoWhile::DoWhile(Node* _condition, std::vector<Node*> _statements): Scope(), condition(_condition){
+DoWhile::DoWhile(Node *_condition, std::vector<Node *> _statements) : Scope(), condition(_condition) {
     this->subtype = "DoWhile";
     this->statements = _statements;
 }
+
 std::string DoWhile::compileToMIPS(const Node *parent_scope) const {}
 
 
-If::If(Node* _condition, std::vector<Node*>* _truestatements, std::vector<Node*>* _falsestatements): Scope(), condition(_condition) {
-        this->subtype = "If";
-        this->truestatements = _truestatements;
-        this->falsestatements = _falsestatements;
+If::If(Node *_condition, std::vector<Node *> *_truestatements, std::vector<Node *> *_falsestatements)
+        : Scope(), condition(_condition) {
+    this->subtype = "If";
+    this->truestatements = _truestatements;
+    this->falsestatements = _falsestatements;
 }
 
-std::string If::compileStatementsToMIPS(std::vector<Node*>* statements) const {
+std::string If::compileStatementsToMIPS(std::vector<Node *> *statements) const {
     std::string result = "";
 
-    for (Node *statement : *statements) {
+    for (Node *statement: *statements) {
         std::string generatedCode = statement->compileToMIPS(this);
         if (generatedCode.length() != 0) {
             result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
@@ -62,7 +63,7 @@ std::string If::compileStatementsToMIPS(std::vector<Node*>* statements) const {
 std::string If::compileToMIPS(const Node *parent_scope) const {
     std::string result = condition->compileToMIPS(parent_scope);
     int ifId = Global::getIdForIf();
-    result += load_mapped_variable((Scope*) parent_scope, condition->get_intermediate_variable(), "$15");
+    result += load_mapped_variable((Scope *) parent_scope, condition->get_intermediate_variable(), "$15");
     result += allocate_stack_frame((Scope *) this);
     std::string elseLabel = "$ELSE" + std::to_string(ifId);
     std::string ifEndLabel = "$IFEND" + std::to_string(ifId);
@@ -82,4 +83,38 @@ std::string If::compileToMIPS(const Node *parent_scope) const {
     result += deallocate_stack_frame((Scope *) this);
 
     return result;
-};
+}
+
+For::For(Node *_initialization, Node *_condition, Node *_update, std::vector<Node *> _statements)
+        : Scope(), initialization(_initialization), condition(_condition), update(_update) {
+    this->subtype = "For";
+    this->statements = _statements;
+}
+
+std::string For::compileToMIPS(const Node *parent_scope) const {
+    std::string result = "";
+    int forId = Global::getIdForForLoop();
+    std::string forCondLabel = "$FORCOND" + std::to_string(forId);
+    std::string forStatementLabel = "$FORSTATEMENTS" + std::to_string(forId);
+
+    result += allocate_stack_frame((Scope *) this);
+    result += initialization->compileToMIPS((Scope *) this) + "\n";
+    result += load_mapped_variable((Scope *) this, condition->get_intermediate_variable(), "$15");
+    result += "b " + forCondLabel + "\n";
+    result += forStatementLabel + ":\n";
+
+    for (Node *statement: statements) {
+        std::string generatedCode = statement->compileToMIPS(this);
+        if (generatedCode.length() != 0) {
+            result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
+        }
+    }
+    result += update->compileToMIPS((Scope *) this) + "\n";
+    result += forCondLabel + ":\n";
+    result += condition->compileToMIPS((Scope *) this) + "\n";
+    result += load_mapped_variable((Scope *) this, condition->get_intermediate_variable(), "$15") + "\n";
+    result += "bne $15, $0, " + forStatementLabel + "\n";
+    result += "nop\n";
+    result += deallocate_stack_frame((Scope *) this);
+    return result;
+}
