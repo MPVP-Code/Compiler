@@ -89,8 +89,8 @@ std::string load_mapped_variable(const Scope* scope, const Node* _var, std::stri
     auto var = (Variable*) _var;
     std::string out = "";
 
-    //Check if variable refers to function return
-    if(var->name != "!return") {
+//Check if variable refers to function return
+    if (var->name != "!return") {
         int offset = resolve_variable_offset(var->name, scope);
 
         if (offset % 4 == 0) {
@@ -100,13 +100,37 @@ std::string load_mapped_variable(const Scope* scope, const Node* _var, std::stri
             out += "lwr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
         }
         out += "nop\n";
-    }else {
+    } else {
         //Only load one register if small type
-        if (resolve_variable_size(var->data_type, (Scope*) scope)<=4){
-            out+= "move " + reg_name + ", $v0";
+        if (resolve_variable_size(var->data_type, (Scope *) scope) <= 4) {
+            out += "move " + reg_name + ", $v0";
         }
 
     }
+
+    return out;
+}
+
+std::string load_mapped_variable_coprocessor(const Scope* scope, const Node* _var, std::string reg_name) {
+    auto var = (Variable*) _var;
+    std::string out = "";
+
+
+    if (var->name != "!return") {
+        int offset = resolve_variable_offset(var->name, scope);
+        //Only spports aligned offsets
+        if (offset % 4 == 0) {
+            out = "lwc1 " + reg_name + ", " + std::to_string(offset) + "($sp) \n";
+        }
+        out += "nop\n";
+    } else {
+        //Only load one register if small type
+        if (resolve_variable_size(var->data_type, (Scope *) scope) <= 4) {
+            out += "move " + reg_name + ", $v0";
+        }
+
+    }
+
 
     return out;
 }
@@ -123,9 +147,31 @@ std::string store_mapped_variable(const Scope *scope, const Node *_var, std::str
     }
     out += "nop\n";
     return out;
-
 }
 
+std::string store_mapped_variable_coprocessor(const Scope *scope, const Node *_var, std::string reg_name) {
+    auto var = (Variable*) _var;
+    std::string out = "";
+
+
+    if (var->name != "!return") {
+        int offset = resolve_variable_offset(var->name, scope);
+        //Only spports aligned offsets
+        if (offset % 4 == 0) {
+            out = "swc1 " + reg_name + ", " + std::to_string(offset) + "($sp) \n";
+        }
+        out += "nop\n";
+    } else {
+        //Only load one register if small type
+        if (resolve_variable_size(var->data_type, (Scope *) scope) <= 4) {
+            out += "mfc1 " + reg_name + ", $v0";
+        }
+
+    }
+
+
+    return out;
+}
 std::string allocate_stack_frame(Scope *scope) {
     std::string out = "";
     int frame_size = -1 * (scope->stack_frame_size +
