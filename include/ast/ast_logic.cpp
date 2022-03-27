@@ -86,7 +86,8 @@ std::string LogicNot::compileToMIPS(const Node *parent_scope) const {
         result += in->compileToMIPS(parent_scope);
         Node *inVar = in->get_intermediate_variable();
         result += load_mapped_variable((Scope *) parent_scope, inVar, "$15") + "\n";
-        result += "sltu $15, $15, 1\n";
+        result += "li $14, 0x1\n";
+        result += "sltu $15, $15, $14\n";
         result += "andi $15, $15, 0x00ff\n";
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$15");
     }
@@ -108,7 +109,8 @@ std::string LogicEQ::compileToMIPS(const Node *parent_scope) const {
         result += load_mapped_variable((Scope *) parent_scope, LVar, "$15") + "\n";
         result += load_mapped_variable((Scope *) parent_scope, RVar, "$14") + "\n";
         result += "xor $15, $14, $15\n";
-        result += "sltu $13, $15, 1\n";
+        result += "li $12, 0x1\n";
+        result += "sltu $13, $15, $12\n";
         result += "andi $13, $13, 0x00ff\n";
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
     }

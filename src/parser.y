@@ -18,7 +18,7 @@ void yyerror(const char *);
   char character;
 }
 
-%token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF
+%token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF NEW_TYPE_NAME
 %token PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
 %token AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
 %token SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
@@ -37,7 +37,7 @@ void yyerror(const char *);
 %type <node> primary_expression postfix_expression unary_expression jump_statement iteration_statement declarator direct_declarator
 %type <string> CONSTANT
 %type <string> IDENTIFIER
-%type <string> type_specifier declaration_specifiers specifier_qualifier_list type_name
+%type <string> type_specifier declaration_specifiers specifier_qualifier_list type_name NEW_TYPE_NAME storage_class_specifier
 %type <statements> compound_statement statement_list external_declaration declaration init_declarator_list init_declarator
 %type <statements> declaration_list statement parameter_list parameter_type_list argument_expression_list
 %type <character> unary_operator assignment_operator
@@ -89,8 +89,8 @@ unary_expression
 					$$ = $1;
 				}
 				}
-//	| INC_OP unary_expression {$$ = new PreIncOp ($2);}
-//	| DEC_OP unary_expression {$$ = new PreDecOp ($2);}
+	| INC_OP unary_expression {$$ = new PreIncOp ($2);}
+	| DEC_OP unary_expression {$$ = new PreDecOp ($2);}
 	| unary_operator unary_expression {
 	if ($1 == '~'){
 		$$ = new BitNot ($2);
@@ -285,8 +285,8 @@ declaration
 declaration_specifiers
 	: type_specifier {$$ = $1;}
 	| type_specifier declaration_specifiers {$$ = $1;}
-//	| storage_class_specifier declaration_specifiers  {}
-//	| storage_class_specifier {}
+	//| storage_class_specifier declaration_specifiers  {$$ = new TypeDef(*$1, *$2);}
+	//| storage_class_specifier {$$ = $1;}
 	;
 
 init_declarator_list
@@ -326,7 +326,7 @@ init_declarator
 	;
 
 storage_class_specifier
-	: TYPEDEF {}
+	: TYPEDEF { $$ = new std::string("typedef");}
 	;
 
 type_specifier

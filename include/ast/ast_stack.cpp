@@ -37,13 +37,16 @@ void try_replace_variable(Node *&varptr, Node *inscope) {
         varptr->generate_var_maps(scope);
     } else if (varptr->type == "UnaryOperator" && (varptr->subtype == "PostIncOp" || varptr->subtype == "PostDecOp")) {
         auto temp = (PostIncOp *) varptr;
+    } else if (varptr->type == "Identifier") {
+        auto identifier = (Identifier *) varptr;
+        varptr = resolve_variable_name(identifier->identifier, scope);
     } else {
         varptr->generate_var_maps(scope);
     }
 }
 
 int resolve_variable_size(std::string name, Scope *child_scope) {
-    Scope *current = (Scope *)child_scope;
+    Scope *current = (Scope *) child_scope;
 
 
     //Try interpreting name as variable name
@@ -88,11 +91,11 @@ int resolve_variable_offset(std::string name, const Scope *current) {
     return -1;
 };
 
-std::string get_next_register(std::string reg){
-    if (std::isdigit(reg.at(1))){
+std::string get_next_register(std::string reg) {
+    if (std::isdigit(reg.at(1))) {
         //Name is of type $number
-        return "$" + std::to_string( std::stoi(reg.substr(1, reg.size()-1))+1);
-    }else if(std::isdigit(reg.at(2))){
+        return "$" + std::to_string(std::stoi(reg.substr(1, reg.size() - 1)) + 1);
+    } else if (std::isdigit(reg.at(2))) {
 
         //Easiest solution :(
         if (reg == "$v0") return "$v1";
@@ -110,28 +113,28 @@ std::string get_next_register(std::string reg){
         else if (reg == "$t6") return "$t7";
         else if (reg == "$t7") return "$t8";
         else if (reg == "$t8") return "$t9";
-        else{
+        else {
             std::cerr << "failed to determine next register\n";
             return "";
         }
-    }else{
+    } else {
         std::cerr << "failed to determine next register\n";
         return "";
     }
 
 }
 
-std::string load_mapped_variable(const Scope* scope, const Node* _var, std::string reg_name) {
-    auto var = (Variable*) _var;
+std::string load_mapped_variable(const Scope *scope, const Node *_var, std::string reg_name) {
+    auto var = (Variable *) _var;
     std::string out = "";
     int var_size = resolve_variable_size(var->data_type, (Scope *) scope);
 
 //Check if variable refers to function return
     if (var->name == "!return") {
         //If sub 1 word type
-        if ( var_size<= 4) {
+        if (var_size <= 4) {
             out += "move " + reg_name + ", $v0\n";
-        }else {
+        } else {
             //If 2 word type
             out += "move " + reg_name + ", $v0\n";
             out += "move " + get_next_register(reg_name) + ", $v1\n";
@@ -147,19 +150,19 @@ std::string load_mapped_variable(const Scope* scope, const Node* _var, std::stri
                 out = "lw " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
             } else { //Load from unaligned memory addresses
                 out += "lwr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-                out += "lwl " + reg_name + ", " + std::to_string(offset+3) + "($sp)\n";
+                out += "lwl " + reg_name + ", " + std::to_string(offset + 3) + "($sp)\n";
             }
             out += "nop\n";
         }
-        //Load 8 byte word
-        else if (var_size  == 8) {
+            //Load 8 byte word
+        else if (var_size == 8) {
 
             //Load left word
             if (offset % 4 == 0) {
-                out = "lw " + reg_name + ", " + std::to_string(offset+ 4) + "($sp)\n";
+                out = "lw " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
             } else { //Load from unaligned memory addresses
                 out += "lwr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-                out += "lwl " + reg_name + ", " + std::to_string(offset+3) + "($sp)\n";
+                out += "lwl " + reg_name + ", " + std::to_string(offset + 3) + "($sp)\n";
             }
             out += "nop\n";
 
@@ -168,12 +171,12 @@ std::string load_mapped_variable(const Scope* scope, const Node* _var, std::stri
                 out = "lw " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
             } else { //Load from unaligned memory addresses
                 out += "lwr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-                out += "lwl " + reg_name + ", " + std::to_string(offset+3) + "($sp)\n";
+                out += "lwl " + reg_name + ", " + std::to_string(offset + 3) + "($sp)\n";
             }
             out += "nop\n";
 
-        //Load byte
-        } else if (var_size == 1){
+            //Load byte
+        } else if (var_size == 1) {
             out += "lb " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
         }
 
@@ -182,8 +185,8 @@ std::string load_mapped_variable(const Scope* scope, const Node* _var, std::stri
 }
 
 
-std::string load_mapped_variable_coprocessor(const Scope* scope, const Node* _var, std::string reg_name) {
-    auto var = (Variable*) _var;
+std::string load_mapped_variable_coprocessor(const Scope *scope, const Node *_var, std::string reg_name) {
+    auto var = (Variable *) _var;
     std::string out = "";
 
 
@@ -207,34 +210,33 @@ std::string load_mapped_variable_coprocessor(const Scope* scope, const Node* _va
 }
 
 
-
 std::string store_mapped_variable(const Scope *scope, const Node *_var, std::string reg_name) {
-    auto var = (Variable*) _var;
+    auto var = (Variable *) _var;
     int offset = resolve_variable_offset(var->name, scope);
     int var_size = resolve_variable_size(var->data_type, (Scope *) scope);
 
     std::string out = "";
 
-        //Store 4 byte var
+    //Store 4 byte var
     if (var_size == 4) {
         if (offset % 4 == 0) {
             out += "sw " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-        }else { //Storing in unaligned memory addresses
+        } else { //Storing in unaligned memory addresses
             out += "swr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-            out += "swl " + reg_name + ", " + std::to_string(offset+3) + "($sp)\n";
+            out += "swl " + reg_name + ", " + std::to_string(offset + 3) + "($sp)\n";
         }
         out += "nop\n";
 
 
         //Load 8 byte var
-    }else if (var_size  == 8) {
+    } else if (var_size == 8) {
 
         //Load left word
         if (offset % 4 == 0) {
-            out = "sw " + reg_name + ", " + std::to_string(offset+ 4) + "($sp)\n";
+            out = "sw " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
         } else { //Load from unaligned memory addresses
             out += "swr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-            out += "swl " + reg_name + ", " + std::to_string(offset+3) + "($sp)\n";
+            out += "swl " + reg_name + ", " + std::to_string(offset + 3) + "($sp)\n";
         }
         out += "nop\n";
 
@@ -242,13 +244,13 @@ std::string store_mapped_variable(const Scope *scope, const Node *_var, std::str
         if (offset % 4 == 0) {
             out = "sw" + reg_name + ", " + std::to_string(offset) + "($sp)\n";
         } else { //Load from unaligned memory addresses
-            out += "swr " + reg_name + ", " + std::to_string(offset+4) + "($sp)\n";
-            out += "swl " + reg_name + ", " + std::to_string(offset+3+4) + "($sp)\n";
+            out += "swr " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
+            out += "swl " + reg_name + ", " + std::to_string(offset + 3 + 4) + "($sp)\n";
         }
         out += "nop\n";
 
         //store byte
-    } else if (var_size == 1){
+    } else if (var_size == 1) {
         out += "sb " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
     }
 
@@ -256,7 +258,7 @@ std::string store_mapped_variable(const Scope *scope, const Node *_var, std::str
 }
 
 std::string store_mapped_variable_coprocessor(const Scope *scope, const Node *_var, std::string reg_name) {
-    auto var = (Variable*) _var;
+    auto var = (Variable *) _var;
     std::string out = "";
 
 
@@ -278,6 +280,7 @@ std::string store_mapped_variable_coprocessor(const Scope *scope, const Node *_v
 
     return out;
 }
+
 std::string allocate_stack_frame(Scope *scope) {
     std::string out = "";
 
@@ -306,11 +309,11 @@ std::string intToHex(int value) {
     return stream.str();
 }
 
-Variable* allocate_temp_var(Node* _current, std::string type){
-    auto current = (Scope*) _current;
+Variable *allocate_temp_var(Node *_current, std::string type) {
+    auto current = (Scope *) _current;
 
     std::string tmpname = "!tmp" + std::to_string(current->tmp_var_counter++);
-    auto var = new Variable(type, tmpname , true);
+    auto var = new Variable(type, tmpname, true);
 
     current->var_map[tmpname] = var;
 
@@ -318,11 +321,11 @@ Variable* allocate_temp_var(Node* _current, std::string type){
 }
 
 
-Node* resolve_function_call(std::string name, Scope* current){
-    while (current -> parent_scope != NULL){
-        current = current ->parent_scope;
+Node *resolve_function_call(std::string name, Scope *current) {
+    while (current->parent_scope != NULL) {
+        current = current->parent_scope;
     }
 
-    auto global = (Global*) current;
+    auto global = (Global *) current;
     return global->declaration_map[name];
 }

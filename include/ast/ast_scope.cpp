@@ -2,6 +2,7 @@
 #include "ast_func.hpp"
 #include "ast_flow_control.hpp"
 #include "ast_stack.hpp"
+#include "ast_typedef.hpp"
 #include <string>
 #include <cctype>
 
@@ -36,6 +37,14 @@ void Scope::generate_var_maps(Node *parent) {
         auto func = (FunctionDeclaration *) this;
         for (auto const arg: *(func->arguments)) {
             func->var_map[arg->name] = arg;
+        }
+    }
+
+    if (this->type == "TypeDef") {
+        TypeDef* typeDef = (TypeDef*) this;
+        auto basicType = parent_scope->type_map.find(typeDef->getBasicType());
+        if (basicType != parentScope->type_map.end()) {
+            parentScope->type_map[typeDef->getBasicType()] = basicType->second;
         }
     }
 
