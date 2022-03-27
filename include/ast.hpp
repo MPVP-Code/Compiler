@@ -18,7 +18,7 @@
 #include "ast/ast_syntax.hpp"
 #include "ast/ast_stack.hpp"
 #include "ast/ast_variable.hpp"
-#include "ast_pointer.hpp"
+#include "ast/ast_pointer.hpp"
 
 
 extern Node *parseAST();

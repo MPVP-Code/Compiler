@@ -100,6 +100,10 @@ unary_expression
 		$$ = new UnaryMinus($2);
 	}else if ($1 == '+'){
 		$$ = $2;
+	}else if ($1 == '&'){
+		$$ = new AddressOf($2);
+	}else if ($1 == '*'){
+		$$ = new Dereference($2);
 	}
 
 	}
@@ -265,7 +269,11 @@ declaration
 			if(statement -> type == "Variable"){
 				auto temp = (Variable*) statement;
 				if (temp->declaration){
+					if (temp->data_type != "None"){
+						temp->data_type = *$1 + temp->data_type;
+					}else {
 					temp->data_type = *$1;
+					}
 				}
 			} else if (statement->subtype == "FunctionDeclaration"){
 				//Forward function declarations parsed through here

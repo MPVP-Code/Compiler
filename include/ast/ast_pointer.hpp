@@ -11,7 +11,7 @@ class AddressOf : public UnaryOperator {
 public:
 
     AddressOf(Node *in);
-    std::string compileToMIPS(const Node *parent_scope) const;
+    std::string compileToMIPS(const Node *parent_scope) const override;
 
 };
 
@@ -19,7 +19,7 @@ class Dereference : public UnaryOperator {
 public:
 
     Dereference(Node *in);
-    std::string compileToMIPS(const Node *parent_scope) const;
+    std::string compileToMIPS(const Node *parent_scope) const override;
 
 };
-#endif //LANGPROC_2021_CW_MPVP_AST_POINTER_HPP
+#endif
