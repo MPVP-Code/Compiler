@@ -117,3 +117,35 @@ std::string For::compileToMIPS(const Node *parent_scope) const {
     result += deallocate_stack_frame((Scope *) this);
     return result;
 }
+
+Switch::Switch(Node *_expression, std::vector<Node *> _statements) : expression(_expression), statements(_statements) {
+    this->type = "Switch";
+}
+
+std::string Switch::compileToMIPS(const Node *parent_scope) const {
+    return "";
+}
+
+Case::Case(Node *_constant, std::vector<Node*> _statements): constant(_constant), statements(_statements) {
+    this->type = "Case";
+}
+
+std::string Case::compileToMIPS(const Node *parent_scope) const {
+    return "";
+}
+
+DefaultCase::DefaultCase(std::vector<Node*> _statements): statements(_statements) {
+    this->type = "DefaultCase";
+}
+
+std::string DefaultCase::compileToMIPS(const Node *parent_scope) const {
+    return "";
+}
+
+Break::Break() {
+    this->type = "Break";
+}
+
+std::string Break::compileToMIPS(const Node *parent_scope) const {
+    return "";
+}

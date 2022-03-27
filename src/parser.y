@@ -32,8 +32,8 @@ void yyerror(const char *);
 %type <node>  multiplicative_expression additive_expression shift_expression relational_expression equality_expression
 %type <node> and_expression exclusive_or_expression inclusive_or_expression logical_and_expression conditional_expression
 %type <node> assignment_expression logical_or_expression initializer translation_unit
-%type <node>  expression function_definition
-%type <node> expression_statement selection_statement parameter_declaration
+%type <node>  expression function_definition constant_expression
+%type <node>  labeled_statement expression_statement selection_statement parameter_declaration
 %type <node> primary_expression postfix_expression unary_expression jump_statement iteration_statement declarator direct_declarator
 %type <string> CONSTANT
 %type <string> IDENTIFIER
@@ -506,7 +506,8 @@ statement
 				$$->push_back($1); }
 	| compound_statement {	$$ = $1;}
 
-//	| labeled_statement {}
+	| labeled_statement {$$ = new std::vector<Node*>();
+                            	$$->push_back($1);}
 	| selection_statement {$$ = new std::vector<Node*>();
 				$$->push_back($1);}
 	| iteration_statement {	$$ = new std::vector<Node*>();
@@ -517,11 +518,11 @@ statement
 				$$->push_back($1);}
 	;
 
-//labeled_statement
-//	: IDENTIFIER ':' statement {}
-//	| CASE constant_expression ':' statement {}
-//	| DEFAULT ':' statement {}
-//	;
+labeled_statement
+	: CASE constant_expression ':' statement { $$ = new Case($2, *$4); }
+	| IDENTIFIER ':' statement { $$ = new DefaultCase(*$3); }
+	//| DEFAULT ':' statement { $$ = new DefaultCase(*$3); }
+	;
 
 compound_statement
 	: '{' '}' { $$ = new std::vector<Node*>();}
@@ -554,8 +555,8 @@ expression_statement
 
 selection_statement
 	: IF '(' expression ')' statement { $$ = new If($3, $5, NULL);}
-	| IF '(' expression ')' statement ELSE statement {$$ = new If($3, $5, $7);}
-	//| SWITCH '(' expression ')' statement {}
+	| IF '(' expression ')' statement ELSE statement {$$ = new If($3, $5, $7); /*TODO: could be problematic, because passing pointers*/}
+	| SWITCH '(' expression ')' statement {$$ = new Switch($3, *$5); }
 	;
 
 iteration_statement
@@ -573,7 +574,7 @@ jump_statement
 	| RETURN ';' { $$ = new Return(NULL);}
 	;
 //	: CONTINUE ';' {}
-//	| BREAK ';' {}
+	| BREAK ';' { $$ = new Break(); }
 
 
 translation_unit

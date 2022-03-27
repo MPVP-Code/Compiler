@@ -145,3 +145,7 @@ int Global::getIdForLogicAnd() {
 int Global::getIdForLogicOr() {
     return logicOrCount++;
 }
+
+int Global::getIdForSwitch() {
+    return switchCount++;
+}
