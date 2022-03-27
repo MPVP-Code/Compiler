@@ -37,7 +37,7 @@ void yyerror(const char *);
 %type <node> primary_expression postfix_expression unary_expression jump_statement iteration_statement declarator direct_declarator
 %type <string> CONSTANT
 %type <string> IDENTIFIER
-%type <string> type_specifier declaration_specifiers specifier_qualifier_list type_name
+%type <string> type_specifier declaration_specifiers specifier_qualifier_list type_name pointer
 %type <statements> compound_statement statement_list external_declaration declaration init_declarator_list init_declarator
 %type <statements> declaration_list statement parameter_list parameter_type_list argument_expression_list
 %type <character> unary_operator assignment_operator
@@ -305,7 +305,7 @@ init_declarator
 
 			if ($1->type == "Identifier"){
 				auto id = (Identifier*)$1;
-				auto temp = new Variable("None", id->identifier, true);
+				auto temp = new Variable(id->pointer, id->identifier, true);
 				$$-> push_back(temp);
 			}else if ($1->subtype == "FunctionDeclaration"){
 				auto func = (FunctionDeclaration*)$1;
@@ -317,7 +317,7 @@ init_declarator
 	| declarator '=' initializer {
 			$$ = new std::vector<Node*>;
 			auto id = (Identifier*)$1;
-			auto temp = new Variable("None", id->identifier, true);
+			auto temp = new Variable(id->pointer, id->identifier, true);
 			$$-> push_back(temp);
 			auto temp2 = new Assign(temp, $3);
 			$$-> push_back(temp2);
@@ -389,7 +389,12 @@ enumerator
 
 declarator
 	: direct_declarator { $$ = $1; }
-	//|  pointer direct_declarator {}
+	|  pointer direct_declarator {
+		auto ptr= (Identifier*) $2;
+		ptr->pointer = *$1;
+		$$ = $2;
+
+		}
 	;
 
 direct_declarator
@@ -423,8 +428,10 @@ direct_declarator
 	;
 
 pointer
-	: '*' {}
-	| '*' pointer {}
+	: '*' {$$ = new std::string("*");}
+	| '*' pointer {
+		auto str = (*$2 + "*");
+		$$ = &str; }
 	;
 
 parameter_type_list

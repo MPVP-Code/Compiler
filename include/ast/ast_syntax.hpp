@@ -8,6 +8,7 @@
 class Identifier : public Node {
 public:
     std::string identifier;
+    std::string pointer;
 
     Identifier(std::string id);
 

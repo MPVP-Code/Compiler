@@ -4,6 +4,7 @@
 
 Identifier::Identifier(std::string id) {
     this->type = "Identifier";
+    this->pointer = "";
     this->identifier = id;
 }
 

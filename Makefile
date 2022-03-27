@@ -2,7 +2,7 @@
 CPPFLAGS += -std=c++2a -W -Wall -g -Wno-unused-parameter
 CPPFLAGS += -I inc
 
-AST := include/ast/ast_arithmetic.cpp include/ast/ast_assignment.cpp include/ast/ast_bitwise.cpp include/ast/ast_flow_control.cpp include/ast/ast_func.cpp include/ast/ast_jump_statement.cpp include/ast/ast_logic.cpp include/ast/ast_node.cpp include/ast/ast_operator.cpp include/ast/ast_scope.cpp include/ast/ast_stack.cpp include/ast/ast_syntax.cpp include/ast/ast_variable.cpp
+AST := include/ast/ast_arithmetic.cpp include/ast/ast_assignment.cpp include/ast/ast_bitwise.cpp include/ast/ast_flow_control.cpp include/ast/ast_func.cpp include/ast/ast_jump_statement.cpp include/ast/ast_logic.cpp include/ast/ast_node.cpp include/ast/ast_operator.cpp include/ast/ast_scope.cpp include/ast/ast_stack.cpp include/ast/ast_syntax.cpp include/ast/ast_variable.cpp include/ast/ast_pointer.cpp
 fAST := include/ast/ast_arithmetic.o include/ast/ast_assignment.o include/ast/ast_bitwise.o include/ast/ast_flow_control.o include/ast/ast_func.o include/ast/ast_jump_statement.o include/ast/ast_logic.o include/ast/ast_node.o include/ast/ast_operator.o include/ast/ast_scope.o include/ast/ast_stack.o include/ast/ast_syntax.o include/ast/ast_variable.o
 all : bin/c_compiler src/lexer.yy.cpp src/parser.tab.cpp
 
