@@ -167,7 +167,23 @@ LogicGT::LogicGT(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 }
 
 std::string LogicGT::compileToMIPS(const Node *parent_scope) const {
-    return compileBinaryOperatorToMIPS(parent_scope, "slt");
+    std::string result = "";
+
+    if (this->data_type == "int") {
+        result += compileLandRNodesToMIPS(parent_scope);
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable((Scope *) parent_scope, LVar, "$14") + "\n";
+        result += load_mapped_variable((Scope *) parent_scope, RVar, "$15") + "\n";
+        if (this->data_type == "unsigned") {
+            result += "sltu $13, $15, $14\n";
+        } else {
+            result += "slt $13, $15, $14\n";
+        }
+        result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
+    }
+
+    return result;
 }
 
 LogicGE::LogicGE(Node *_L, Node *_R) : BinaryOperator(_L, _R) {

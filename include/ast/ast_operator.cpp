@@ -81,19 +81,3 @@ void UnaryOperator::generate_var_maps(Node *parent){
 Node* UnaryOperator::get_intermediate_variable(){
     return this->temp_variable;
 }
-
-std::string BinaryOperator::compileBinaryOperatorToMIPS(const Node *parent_scope, std::string instructionName) const {
-    std::string result = "";
-
-    if (this->data_type == "int") {
-        result += compileLandRNodesToMIPS(parent_scope);
-        Node *LVar = L->get_intermediate_variable();
-        Node *RVar = R->get_intermediate_variable();
-        result += load_mapped_variable((Scope*) parent_scope, LVar, "$14") + "\n";
-        result += load_mapped_variable((Scope*) parent_scope, RVar, "$15") + "\n";
-        result += instructionName + " $13, $14, $15\n";
-        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
-    }
-
-    return result;
-}

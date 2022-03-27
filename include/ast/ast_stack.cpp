@@ -93,12 +93,12 @@ std::string load_mapped_variable(const Scope* scope, const Node* _var, std::stri
     if (var->name != "!return") {
         int offset = resolve_variable_offset(var->name, scope);
 
-        if (offset % 4 == 0) {
+        //if (offset % 4 == 0) {
             out = "lw " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-        } else { //Load from unaligned memory addresses
+        /*} else { //Load from unaligned memory addresses
             out += "lwl " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
             out += "lwr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-        }
+        }*/
         out += "nop\n";
     } else {
         //Only load one register if small type
@@ -139,12 +139,12 @@ std::string store_mapped_variable(const Scope *scope, const Node *_var, std::str
     auto var = (Variable*) _var;
     int offset = resolve_variable_offset(var->name, scope);
     std::string out = "";
-    if (offset % 4 == 0) {
+    //if (offset % 4 == 0) {
         out += "sw " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-    } else { //Storing in unaligned memory addresses
-        out += "lwl " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-        out += "lwr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-    }
+    /*} else { //Storing in unaligned memory addresses
+        out += "swl " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
+        out += "swr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
+    }*/
     out += "nop\n";
     return out;
 }

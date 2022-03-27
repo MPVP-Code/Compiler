@@ -66,7 +66,4 @@ public:
     std::string compileToMIPS(const Node *parent_scope) const override;
 };
 
-
-
-
 #endif

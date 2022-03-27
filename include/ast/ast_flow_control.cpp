@@ -60,11 +60,10 @@ std::string If::compileStatementsToMIPS(std::vector<Node*>* statements) const {
 }
 
 std::string If::compileToMIPS(const Node *parent_scope) const {
-    std::string result = allocate_stack_frame((Scope *) this);
+    std::string result = condition->compileToMIPS(parent_scope);
     int ifId = Global::getIdForIf();
-
-    result += condition->compileToMIPS(parent_scope);
     result += load_mapped_variable((Scope*) parent_scope, condition->get_intermediate_variable(), "$15");
+    result += allocate_stack_frame((Scope *) this);
     std::string elseLabel = "$ELSE" + std::to_string(ifId);
     std::string ifEndLabel = "$IFEND" + std::to_string(ifId);
     result += "beq $15, $0, " + elseLabel + "\nnop\n";
@@ -79,7 +78,7 @@ std::string If::compileToMIPS(const Node *parent_scope) const {
     if (falsestatements != nullptr) {
         result += this->compileStatementsToMIPS(this->falsestatements) + "\n";
     }
-    result += ifEndLabel + ":";
+    result += ifEndLabel + ":\n";
     result += deallocate_stack_frame((Scope *) this);
 
     return result;
