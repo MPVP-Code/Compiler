@@ -10,7 +10,7 @@ While::While(Node* _condition, std::vector<Node*> _statements): Scope(), conditi
 std::string While::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
     result += allocate_stack_frame((Scope *) this);
-    result += condition->compileToMIPS(parent_scope) + "\n";
+    result += condition->compileToMIPS((Scope *) this) + "\n";
     int whileId = Global::getIdForWhile();
     std::string whileStart = "$WHILE" + std::to_string(whileId) + "START";
     std::string whileEnd = "$WHILE" + std::to_string(whileId) + "END";
@@ -24,7 +24,7 @@ std::string While::compileToMIPS(const Node *parent_scope) const {
             result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
         }
     }
-
+    result += condition->compileToMIPS((Scope *) this) + "\n";
     result += "b " + whileStart + "\nnop\n";
     result += whileEnd + ":" + "\n";
 
