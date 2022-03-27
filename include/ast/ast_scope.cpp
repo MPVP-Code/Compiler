@@ -3,6 +3,7 @@
 #include "ast_flow_control.hpp"
 #include "ast_stack.hpp"
 #include <string>
+#include <cctype>
 
 Scope::Scope() {
     this->type = "Scope";
@@ -90,10 +91,10 @@ Global::Global() {
     this->parent_scope = NULL;
 
     this->type_map["int"] = new Variable_type("int", "none", 4);
-    this->type_map["double"] = new Variable_type("double", "none", 4);
-    this->type_map["float"] = new Variable_type("float", "none", 2);
+    this->type_map["double"] = new Variable_type("double", "none", 8);
+    this->type_map["float"] = new Variable_type("float", "none", 4);
     this->type_map["char"] = new Variable_type("char", "none", 1);
-    this->type_map["unsigned"] = new Variable_type("unsigned", "int", 4);
+    this->type_map["unsigned"] = new Variable_type("unsigned", "none", 4);
 }
 
 std::string Global::compileToMIPS(const Node *parent_scope) const {

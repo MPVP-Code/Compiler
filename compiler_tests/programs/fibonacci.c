@@ -1,6 +1,3 @@
-//Writing this to break the program, test sequence compiles indefinnitely otherwise
-int int int int
-
 int fib(int x)
 {
     if(x <= 0){
