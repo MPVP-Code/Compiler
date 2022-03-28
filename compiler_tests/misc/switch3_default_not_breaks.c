@@ -8,6 +8,7 @@ int g(int t)
             x=1;
         case 2:
             x=2;
+            x=10;
         case 1:
             x=x+1;
         default:

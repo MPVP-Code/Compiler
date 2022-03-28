@@ -125,6 +125,7 @@ int Global::forCount = 0;
 int Global::ifCount = 0;
 int Global::logicAndCount = 0;
 int Global::logicOrCount = 0;
+int Global::switchCount = 0;
 
 int Global::getIdForWhile() {
     return whileCount++;

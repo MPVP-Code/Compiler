@@ -3,8 +3,8 @@ found directcdeclarator
 lexmatch 3
 Found const
 1
-unary postfix expression
-found conditional expression
+unary postfix condition
+found conditional condition
 Found function
 found type specifier
 found directcdeclarator
@@ -14,27 +14,27 @@ found directcdeclarator
 lexmatch 3
 Found const
 10
-unary postfix expression
-found conditional expression
+unary postfix condition
+found conditional condition
 found declaration
 found identifier
 b
-unary postfix expression
+unary postfix condition
 Found =
 found identifier
 a
-unary postfix expression
+unary postfix condition
 lexmatch 3
 Found const
 20
-unary postfix expression
-found conditional expression
+unary postfix condition
+found conditional condition
 found statement
 found identifier
 c
-unary postfix expression
-found conditional expression
-Found return expression;
+unary postfix condition
+found conditional condition
+Found return condition;
 found functionfound funcdef
 Found anothergen varmaps not overridden
 gen varmaps not overridden

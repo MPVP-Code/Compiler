@@ -48,10 +48,12 @@ public:
 class Switch: public Node {
 private:
     std::vector<Node*> statements;
-    Node* expression;
+    Node* condition;
 
 public:
-    Switch(Node* _expression, std::vector<Node*> _statements);
+    Switch(Node* _condition, std::vector<Node*> _statements);
+
+    virtual void generate_var_maps(Node *parent) override;
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
 };
@@ -63,6 +65,10 @@ private:
 public:
     Case(Node* _constant, std::vector<Node*> _statements);
 
+    virtual void generate_var_maps(Node *parent) override;
+
+    std::string compileCaseToMIPS(const Node *parent_scope, Variable* condition, std::string caseEndLabel) const;
+
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
 };
 
@@ -72,12 +78,16 @@ private:
 public:
     DefaultCase(std::vector<Node*> statements);
 
+    virtual void generate_var_maps(Node *parent) override;
+
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
 };
 
 class Break: public Node {
 public:
     Break();
+
+    virtual void generate_var_maps(Node *parent) override;
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
 };

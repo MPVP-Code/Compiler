@@ -2,23 +2,23 @@ found type specifier
 found directcdeclarator
 found identifier
 a
-unary postfix expression
+unary postfix condition
 Found =
 lexmatch 3
 Found const
 49
-unary postfix expression
-found conditional expression
+unary postfix condition
+found conditional condition
 found statement
 found identifier
 b
-unary postfix expression
+unary postfix condition
 Found =
 lexmatch 3
 Found const
 44
-unary postfix expression
-found conditional expression
+unary postfix condition
+found conditional condition
 found statement list
 found functionfound funcdef
 Found function
@@ -26,23 +26,23 @@ found type specifier
 found directcdeclarator
 found identifier
 c
-unary postfix expression
+unary postfix condition
 Found =
 lexmatch 3
 Found const
 41
-unary postfix expression
-found conditional expression
+unary postfix condition
+found conditional condition
 found statement
 found identifier
 d
-unary postfix expression
+unary postfix condition
 Found =
 lexmatch 3
 Found const
 40
-unary postfix expression
-found conditional expression
+unary postfix condition
+found conditional condition
 found statement list
 found functionfound funcdef
 Found anotherParsed
