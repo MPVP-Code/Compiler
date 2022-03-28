@@ -59,13 +59,20 @@ std::string Assign::compileToMIPS(const Node *parent_scope) const {
     //Calculate Rvalue
     result += source->compileToMIPS(parent_scope);
     Node *src_var = source->get_intermediate_variable();
-    result += load_mapped_variable((Scope *) parent_scope, src_var, "$14");
+
 
     if (destination->type == "Variable") {
-
+        result += load_mapped_variable((Scope *) parent_scope, src_var, "$14");
         result += store_mapped_variable((Scope *) parent_scope, destination, "$14");
 
     }else if (destination->type == "UnaryOperator" && destination->subtype == "Dereference"){
+
+        //So not dereference, just grab address
+        result += ((UnaryOperator *)destination)->in->compileToMIPS(parent_scope);
+
+        //Load Rvalue
+        result += load_mapped_variable((Scope *) parent_scope, src_var, "$14");
+
         //Load pointer address
         result += load_mapped_variable((Scope *) parent_scope, ((UnaryOperator *) destination)-> in ->get_intermediate_variable(), "$13");
 

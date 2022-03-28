@@ -10,7 +10,7 @@
 class Scope : public Node {
 public:
     std::vector<Node *> statements;  //New instead of branches
-
+    bool array_init_flag;
     Scope *parent_scope;
     std::map<std::string, Variable*> var_map;
     std::map<std::string, Variable_type*> type_map;

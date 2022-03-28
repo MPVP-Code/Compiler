@@ -8,6 +8,7 @@
 
 Scope::Scope() {
     this->type = "Scope";
+    array_init_flag = false;
 }
 
 void Scope::generate_var_maps(Node *parent) {
@@ -75,6 +76,11 @@ void Scope::generate_var_maps(Node *parent) {
     for (auto &var: scp->var_map) {
         var.second->offset = offset;
         offset += resolve_variable_size(var.second->name, scp);
+        //Array allocation
+        if(var.second->array_size>0){
+            std::string subtype = var.second->data_type.substr(0, var.second->data_type.size()-1);
+            offset+= var.second->array_size * resolve_variable_size(subtype, scp);
+        }
     }
 
 

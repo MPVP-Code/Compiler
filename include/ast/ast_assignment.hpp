@@ -8,11 +8,10 @@
 
 
 class Constant : public Node {
-private:
-    int value;
-
 public:
     Variable* const_var;
+
+    int value;
 
     Constant(int _value);
 

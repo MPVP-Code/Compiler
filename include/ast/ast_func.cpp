@@ -18,6 +18,9 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
     std::cerr << "Compiling function " << this->name << std::endl;
     std::string result = "";
 
+    //Set array init flag to false;
+    ((FunctionDeclaration*) this)->array_init_flag = false;
+
     //Do not compile forward declarations
     if (!forward_declaration) {
 
@@ -47,14 +50,21 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
         //Compile body
         for (Node *statement: statements) {
             std::cerr << "Compiling statement " << statement->get_type() << std::endl;
+
+            //Tells array pointer to initialize
+            if (statement->type == "Variable" && ((Variable*) statement)->array_size > 0) ((FunctionDeclaration*) this)->array_init_flag = true;
+
             std::string compiledCode = statement->compileToMIPS(this);
+
+            //Prevents other calls to variable to compile themselves
+            ((FunctionDeclaration*) this)->array_init_flag = false;
+
             if (compiledCode.length() > 0) {
                 result += compiledCode + "\n";
             }
         }
 
         //Appends implicit returns for void and int types
-
         //Deallocate scope if not already returned
         result += deallocate_stack_frame((Scope *) this);
 
