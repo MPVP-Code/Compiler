@@ -43,6 +43,7 @@ Dereference::Dereference(Node *in) : UnaryOperator(in) {
 
 std::string Dereference::compileToMIPS(const Node *parent_scope) const {
     std::string out = "#Dereference \n";
+    out+= in->compileToMIPS(parent_scope);
     out += load_mapped_variable((Scope*) parent_scope, in->get_intermediate_variable(), "$13");
     out += load_raw_variable((Scope*) parent_scope, "$13", "$14", this->temp_variable->data_type);
     out += store_mapped_variable((Scope*) parent_scope, temp_variable, "$14");

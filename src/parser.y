@@ -66,7 +66,10 @@ postfix_expression
 				auto id = (Variable*) $1;
 				$$ = new FunctionCall(id->name, $3);
 	}
-//	| postfix_expression '[' expression ']' {}
+	| postfix_expression '[' expression ']' {
+		auto temp  = new Addition($1, $3);
+		$$ = new Dereference(temp);
+		}
 //	| postfix_expression '.' IDENTIFIER {}
 //	| postfix_expression PTR_OP IDENTIFIER {}
 	| postfix_expression INC_OP { $$ = new PostIncOp ($1); }
@@ -253,7 +256,7 @@ expression
 	;
 
 constant_expression
-	: conditional_expression {}
+	: conditional_expression {$$ = $1;}
 	;
 
 declaration
@@ -426,8 +429,21 @@ direct_declarator
         		$$ = func;
 	}
 	| '(' declarator ')' {$$ = $2;}
-	//| direct_declarator '[' constant_expression ']' {}
-	//| direct_declarator '[' ']' {}
+	| direct_declarator '[' constant_expression ']' {
+		auto var = (Variable*) $1;
+		var->data_type = var->data_type + "*";
+
+		if ($3->type == "Constant"){
+			auto constant = (Constant*) $3;
+			var->array_size = constant->value;
+		}
+
+
+	}
+	| direct_declarator '[' ']' {
+				auto var = (Variable*) $1;
+				var->data_type = var->data_type + "*";
+	}
 
 	//| direct_declarator '(' identifier_list ')' {}
 	;

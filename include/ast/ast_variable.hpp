@@ -11,6 +11,7 @@ public:
     std::string name;
     bool declaration;
     int offset;
+    int array_size;
 
     Variable(const std::string &_type, const std::string &_name, const bool _declaration);
 

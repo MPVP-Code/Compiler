@@ -4,6 +4,7 @@
 Variable::Variable(const std::string &_type, const std::string &_name, const bool _declaration) : name(_name), declaration(_declaration) {
     this->type = "Variable";
     this->data_type = _type;
+    this->array_size = -1;
 };
 
 std::string *Variable::getName() {
@@ -15,7 +16,13 @@ std::string *Variable::getVariableType() {
 }
 
 std::string Variable::compileToMIPS(const Node *parent_scope) const {
-    return  "";
+    std::string out = "";
+    if (this->array_size >0 && ((Scope*) parent_scope) -> array_init_flag){
+        out += "#Local array ptr init\n";
+        out += "addiu $14, $sp, "+ std::to_string(this->offset + 4) + "\n";
+        out += store_mapped_variable((Scope*) parent_scope, this, "$14");
+    }
+    return  out;
 }
 
 void Variable::generate_var_maps(Node *parent) {

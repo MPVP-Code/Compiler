@@ -7,7 +7,7 @@ int main(int argc, char *argv[]) {
     //Important global parent is NULL!
     ast->generate_var_maps(NULL);
 
-    std::cout << ".section .mdebug.abi32\n.previous\n.nan legacy\n.module fp=32\n.module nooddspreg" << std::endl;
+    std::cout << ".section .mdebug.abi32\n.previous\n.nan legacy\n.module fp=32\n.module nooddspreg\n\n" << std::endl;
 
     std::cout << ast->compileToMIPS(NULL);
 
