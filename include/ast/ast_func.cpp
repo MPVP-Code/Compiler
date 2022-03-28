@@ -48,7 +48,7 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
         for (Node *statement: statements) {
             std::cerr << "Compiling statement " << statement->get_type() << std::endl;
             std::string compiledCode = statement->compileToMIPS(this);
-            if (compiledCode.length() != 0) {
+            if (compiledCode.length() > 0) {
                 result += compiledCode + "\n";
             }
         }
@@ -138,11 +138,15 @@ std::string FunctionCall::compileToMIPS(const Node *parent_scope) const {
     Variable *ra = ((Scope *) parent_scope)->var_map["!ra"];
     result += store_mapped_variable((Scope *) parent_scope, ra, "$ra");
 
-
+    // Allocate more stack space to prevent memory violation accesses
+    int offset = arguments->size() * 4;
+    result += "addi $sp, $sp, " + std::to_string(-1 * offset) + "\n";
 
     //Jump
     result += "jal " + declaration->generate_function_signature() + "\n";
     result += "nop\n";
+
+    result += "addi $sp, $sp, " + std::to_string(offset) + "\n";
 
     //Restore return address
     result += load_mapped_variable((Scope *) parent_scope, ra, "$ra");
