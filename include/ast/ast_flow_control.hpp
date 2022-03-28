@@ -45,4 +45,50 @@ public:
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
 };
 
+class Switch: public Node {
+private:
+    std::vector<Node*> statements;
+    Node* condition;
+
+public:
+    Switch(Node* _condition, std::vector<Node*> _statements);
+
+    virtual void generate_var_maps(Node *parent) override;
+
+    virtual std::string compileToMIPS(const Node *parent_scope) const override;
+};
+
+class Case: public Node {
+private:
+    Node *constant;
+    std::vector<Node*> statements;
+public:
+    Case(Node* _constant, std::vector<Node*> _statements);
+
+    virtual void generate_var_maps(Node *parent) override;
+
+    std::string compileCaseToMIPS(const Node *parent_scope, Variable* condition, std::string caseEndLabel) const;
+
+    virtual std::string compileToMIPS(const Node *parent_scope) const override;
+};
+
+class DefaultCase: public Node {
+private:
+    std::vector<Node*> statements;
+public:
+    DefaultCase(std::vector<Node*> statements);
+
+    virtual void generate_var_maps(Node *parent) override;
+
+    virtual std::string compileToMIPS(const Node *parent_scope) const override;
+};
+
+class Break: public Node {
+public:
+    Break();
+
+    virtual void generate_var_maps(Node *parent) override;
+
+    virtual std::string compileToMIPS(const Node *parent_scope) const override;
+};
 #endif

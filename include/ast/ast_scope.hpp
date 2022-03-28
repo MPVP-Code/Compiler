@@ -32,6 +32,7 @@ private:
     static int forCount;
     static int ifCount;
     static int whileCount;
+    static int switchCount;
 public:
     std::map<std::string, Node*> declaration_map;
 
@@ -46,6 +47,8 @@ public:
     static int getIdForLogicAnd();
 
     static int getIdForLogicOr();
+
+    static int getIdForSwitch();
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
 };

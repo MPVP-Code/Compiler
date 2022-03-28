@@ -2,6 +2,7 @@
 #include "ast_func.hpp"
 #include "ast_flow_control.hpp"
 #include "ast_stack.hpp"
+#include "ast_typedef.hpp"
 #include <string>
 #include <cctype>
 
@@ -36,6 +37,14 @@ void Scope::generate_var_maps(Node *parent) {
         auto func = (FunctionDeclaration *) this;
         for (Variable* arg: *(func->arguments)) {
             try_replace_variable(reinterpret_cast<Node *&>(arg), this);
+        }
+    }
+
+    if (this->type == "TypeDef") {
+        TypeDef* typeDef = (TypeDef*) this;
+        auto basicType = parent_scope->type_map.find(typeDef->getBasicType());
+        if (basicType != parentScope->type_map.end()) {
+            parentScope->type_map[typeDef->getBasicType()] = basicType->second;
         }
     }
 
@@ -116,6 +125,7 @@ int Global::forCount = 0;
 int Global::ifCount = 0;
 int Global::logicAndCount = 0;
 int Global::logicOrCount = 0;
+int Global::switchCount = 0;
 
 int Global::getIdForWhile() {
     return whileCount++;
@@ -135,4 +145,8 @@ int Global::getIdForLogicAnd() {
 
 int Global::getIdForLogicOr() {
     return logicOrCount++;
+}
+
+int Global::getIdForSwitch() {
+    return switchCount++;
 }

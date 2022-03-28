@@ -18,7 +18,7 @@ void yyerror(const char *);
   char character;
 }
 
-%token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF
+%token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF NEW_TYPE_NAME
 %token PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
 %token AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
 %token SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
@@ -32,12 +32,12 @@ void yyerror(const char *);
 %type <node>  multiplicative_expression additive_expression shift_expression relational_expression equality_expression
 %type <node> and_expression exclusive_or_expression inclusive_or_expression logical_and_expression conditional_expression
 %type <node> assignment_expression logical_or_expression initializer translation_unit
-%type <node>  expression function_definition
-%type <node> expression_statement selection_statement parameter_declaration
+%type <node>  expression function_definition constant_expression
+%type <node>  labeled_statement expression_statement selection_statement parameter_declaration
 %type <node> primary_expression postfix_expression unary_expression jump_statement iteration_statement declarator direct_declarator
 %type <string> CONSTANT
 %type <string> IDENTIFIER
-%type <string> type_specifier declaration_specifiers specifier_qualifier_list type_name pointer
+%type <string> type_specifier declaration_specifiers specifier_qualifier_list type_name pointer NEW_TYPE_NAME storage_class_specifier
 %type <statements> compound_statement statement_list external_declaration declaration init_declarator_list init_declarator
 %type <statements> declaration_list statement parameter_list parameter_type_list argument_expression_list
 %type <character> unary_operator assignment_operator
@@ -89,8 +89,8 @@ unary_expression
 					$$ = $1;
 				}
 				}
-//	| INC_OP unary_expression {$$ = new PreIncOp ($2);}
-//	| DEC_OP unary_expression {$$ = new PreDecOp ($2);}
+	| INC_OP unary_expression {$$ = new PreIncOp ($2);}
+	| DEC_OP unary_expression {$$ = new PreDecOp ($2);}
 	| unary_operator unary_expression {
 	if ($1 == '~'){
 		$$ = new BitNot ($2);
@@ -297,8 +297,8 @@ declaration
 declaration_specifiers
 	: type_specifier {$$ = $1;}
 	| type_specifier declaration_specifiers {$$ = $1;}
-//	| storage_class_specifier declaration_specifiers  {}
-//	| storage_class_specifier {}
+	//| storage_class_specifier declaration_specifiers  {$$ = new TypeDef(*$1, *$2);}
+	//| storage_class_specifier {$$ = $1;}
 	;
 
 init_declarator_list
@@ -339,7 +339,7 @@ init_declarator
 	;
 
 storage_class_specifier
-	: TYPEDEF {}
+	: TYPEDEF { $$ = new std::string("typedef");}
 	;
 
 type_specifier
@@ -515,7 +515,8 @@ statement
 				$$->push_back($1); }
 	| compound_statement {	$$ = $1;}
 
-//	| labeled_statement {}
+	| labeled_statement {$$ = new std::vector<Node*>();
+                            	$$->push_back($1);}
 	| selection_statement {$$ = new std::vector<Node*>();
 				$$->push_back($1);}
 	| iteration_statement {	$$ = new std::vector<Node*>();
@@ -526,11 +527,11 @@ statement
 				$$->push_back($1);}
 	;
 
-//labeled_statement
-//	: IDENTIFIER ':' statement {}
-//	| CASE constant_expression ':' statement {}
-//	| DEFAULT ':' statement {}
-//	;
+labeled_statement
+	: CASE constant_expression ':' statement { $$ = new Case($2, *$4); }
+	| IDENTIFIER ':' statement { $$ = new DefaultCase(*$3); }
+	//| DEFAULT ':' statement { $$ = new DefaultCase(*$3); }
+	;
 
 compound_statement
 	: '{' '}' { $$ = new std::vector<Node*>();}
@@ -563,8 +564,8 @@ expression_statement
 
 selection_statement
 	: IF '(' expression ')' statement { $$ = new If($3, $5, NULL);}
-	| IF '(' expression ')' statement ELSE statement {$$ = new If($3, $5, $7);}
-	//| SWITCH '(' expression ')' statement {}
+	| IF '(' expression ')' statement ELSE statement {$$ = new If($3, $5, $7); /*TODO: could be problematic, because passing pointers*/}
+	| SWITCH '(' expression ')' statement {$$ = new Switch($3, *$5); }
 	;
 
 iteration_statement
@@ -582,7 +583,7 @@ jump_statement
 	| RETURN ';' { $$ = new Return(NULL);}
 	;
 //	: CONTINUE ';' {}
-//	| BREAK ';' {}
+	| BREAK ';' { $$ = new Break(); }
 
 
 translation_unit

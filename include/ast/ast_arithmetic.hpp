@@ -66,5 +66,20 @@ public:
 
 };
 
+class PreDecOp : public UnaryOperator {
+public:
+
+    PreDecOp(Node *in);
+    std::string compileToMIPS(const Node *parent_scope) const;
+
+};
+
+class PreIncOp : public UnaryOperator {
+public:
+
+    PreIncOp(Node *in);
+    std::string compileToMIPS(const Node *parent_scope) const;
+
+};
 
 #endif

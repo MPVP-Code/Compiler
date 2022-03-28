@@ -148,7 +148,8 @@ std::string PostIncOp::compileToMIPS(const Node *parent_scope) const {
         result += load_mapped_variable((Scope *) parent_scope, InVar, "$15") + "\n";
         result += "li $14, 1\n";
         result += "add $13, $14, $15\n";
-        result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
+        result += store_mapped_variable((Scope *) parent_scope, InVar, "$13");
+        result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$15");
     }
     return result;
 }
@@ -167,7 +168,49 @@ std::string PostDecOp::compileToMIPS(const Node *parent_scope) const {
         result += "li $15, 1\n";
         result += load_mapped_variable((Scope *) parent_scope, InVar, "$14") + "\n";
         result += "sub $13, $14, $15\n";
+        result += store_mapped_variable((Scope *) parent_scope, InVar, "$13");
+        result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$14");
+    }
+    return result;
+}
+
+PreDecOp::PreDecOp(Node *in) : UnaryOperator(in) {
+    this->subtype = "PreDec";
+}
+
+std::string PreDecOp::compileToMIPS(const Node *parent_scope) const {
+    std::string result = "";
+    //Resolve wether to use temp variable or actual variable
+    if (this->data_type == "int") {
+        //Finds temporary / constant/ normal variables in which results have been previously stored
+        result += in->compileToMIPS(parent_scope);
+        Node *InVar = in->get_intermediate_variable();
+        result += "li $15, 1\n";
+        result += load_mapped_variable((Scope *) parent_scope, InVar, "$14") + "\n";
+        result += "sub $13, $14, $15\n";
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
+        result += store_mapped_variable((Scope *) parent_scope, InVar, "$13");
+    }
+    return result;
+}
+
+
+PreIncOp::PreIncOp(Node *in) : UnaryOperator(in) {
+    this->subtype = "PreInc";
+}
+
+std::string PreIncOp::compileToMIPS(const Node *parent_scope) const {
+    std::string result = "";
+    //Resolve wether to use temp variable or actual variable
+    if (this->data_type == "int") {
+        //Finds temporary / constant/ normal variables in which results have been previously stored
+        result += in->compileToMIPS(parent_scope);
+        Node *InVar = in->get_intermediate_variable();
+        result += "li $15, 1\n";
+        result += load_mapped_variable((Scope *) parent_scope, InVar, "$14") + "\n";
+        result += "add $13, $14, $15\n";
+        result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
+        result += store_mapped_variable((Scope *) parent_scope, InVar, "$13");
     }
     return result;
 }
