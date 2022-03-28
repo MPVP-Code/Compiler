@@ -25,6 +25,7 @@ std::string intToHex(int value);
 Variable* allocate_temp_var(Node* current, std::string type);
 
 Node* resolve_function_call(std::string name, Scope* current);
+std::string resolve_base_type(std::string alias, Scope* scope);
 
 //void save_function_context();
 //void restore_function_context();

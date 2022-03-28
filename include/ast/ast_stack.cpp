@@ -377,3 +377,20 @@ Node* resolve_function_call(std::string name, Scope* current){
     auto global = (Global*) current;
     return global->declaration_map[name];
 }
+
+std::string resolve_base_type(std::string alias, Scope* scope) {
+    Scope *current_scope = scope;
+    std::string current_alias = alias;
+    std::string base;
+
+    while (current_alias != "none") {
+        int a = current_scope->type_map.contains(alias);
+        while (!(current_scope->type_map.contains(alias))) {
+            current_scope = current_scope->parent_scope;
+        }
+        base = current_alias;
+        current_alias = current_scope->type_map[current_alias]->aliasof;
+
+    }
+    return base;
+}

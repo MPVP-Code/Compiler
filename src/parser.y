@@ -84,7 +84,7 @@ argument_expression_list
 unary_expression
 	: postfix_expression {
 				if($1->type == "Identifier"){
-					$$ = new Variable ("None", ((Identifier*)$1)->identifier, false);
+					$$ = new Variable ("", ((Identifier*)$1)->identifier, false);
 				}else{
 					$$ = $1;
 				}
@@ -190,49 +190,49 @@ conditional_expression
 assignment_expression
 	: unary_expression assignment_operator assignment_expression {
 		if ($2 == '='){
-			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			$$ = new Assign(temp, $3);
 		}else if($2 == '*'){
-			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new Multiplication(temp, $3);
 			$$ = new Assign(temp, op);
 		}
 		else if($2 == '/'){
-			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new Division(temp, $3);
 			$$ = new Assign(temp, op);
 		}
 		else if($2 == '%'){
-			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new Modulo(temp, $3);
 			$$ = new Assign(temp, op);
 		}else if($2 == '+'){
-			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new Addition(temp, $3);
 			$$ = new Assign(temp, op);
 		}else if($2 == '-'){
-			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new Subtraction(temp, $3);
 			$$ = new Assign(temp, op);
 		}else if($2 == '<'){
-			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new BitASL(temp, $3);
 			$$ = new Assign(temp, op);
 		}else if($2 == '>'){
-			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new BitASR(temp, $3);
 			$$ = new Assign(temp, op);
 		}else if($2 == '&'){
-			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new BitAnd(temp, $3);
 			$$ = new Assign(temp, op);
 		}else if($2 == '^'){
-			Variable* temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new BitXor(temp, $3);
 			$$ = new Assign(temp, op);
 		}
 		else if($2 == '|'){
-			auto temp = new Variable("None", ((Identifier*)$1)->identifier, false);
+			auto temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new BitOr(temp, $3);
 			$$ = new Assign(temp, op);
 		}
@@ -269,7 +269,7 @@ declaration
 			if(statement -> type == "Variable"){
 				auto temp = (Variable*) statement;
 				if (temp->declaration){
-					if (temp->data_type != "None"){
+					if (temp->data_type != ""){
 						std::cerr<<"Merging type:" + *$1 << ": " << temp->data_type;
 						temp->data_type = *$1 + temp->data_type;
 					}else {
@@ -461,7 +461,7 @@ parameter_list
 parameter_declaration
 	: declaration_specifiers declarator {
 		auto id = (Identifier*) $2;
-		$$ = new Variable(*$1, id->identifier, true);
+		$$ = new Variable(*$1 + id->pointer, id->identifier, true);
 	 }
 	//| declaration_specifiers abstract_declarator {}
 	//| declaration_specifiers {}
