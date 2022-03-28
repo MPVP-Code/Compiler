@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <bitset>
 #include "ast_stack.hpp"
 #include "ast_syntax.hpp"
 #include "ast_assignment.hpp"
@@ -407,6 +408,18 @@ void add_to_global_typemap(Variable_type *var, Scope *scope) {
 std::string intToHex(int value) {
     std::stringstream stream;
     stream << "0x" << std::setfill('0') << std::setw(sizeof(value)) << std::hex << value;
+    return stream.str();
+}
+
+std::string convertFloatToBinary(float value) {
+    float_cast d1 = { .f = value };
+
+    std::stringstream mantissaStream;
+    mantissaStream << std::bitset<32>(d1.parts.mantisa);
+    std::string mantissa32BitString = mantissaStream.str();
+
+    std::stringstream stream;
+    stream << "0b" << std::bitset<1>(d1.parts.sign) << std::bitset<8>(d1.parts.exponent) << mantissa32BitString.substr(9, 23);
     return stream.str();
 }
 

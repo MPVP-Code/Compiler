@@ -34,6 +34,37 @@ std::string Constant::compileToMIPS(const Node *parent_scope) const {
     return result;
 }
 
+ConstantFloat::ConstantFloat(float _value): value(_value) {
+    this->type = "Constant";
+    this->data_type = "float";
+}
+
+float ConstantFloat::getValue() {
+    return this->value;
+}
+
+Variable* ConstantFloat::getConstVar() {
+    return this->const_var;
+}
+
+void ConstantFloat::generate_var_maps(Node *parent) {
+    const_var = allocate_temp_var(parent, data_type);
+}
+
+std::string ConstantFloat::compileToMIPS(const Node *parent_scope) const {
+    std::string result = "";
+    if (data_type == "float") {
+        std::string binaryValue = convertFloatToBinary(value);
+        result = "li $15, " + binaryValue + "\n";
+        result += store_mapped_variable((Scope *) parent_scope, const_var, "$15");
+    }
+    return result;
+}
+
+Node* ConstantFloat::get_intermediate_variable() {
+    return const_var;
+}
+
 Assign::Assign(Node *_destination, Node *_source) : destination(_destination), source(_source) {
     this->type = "Assign";
 }
@@ -53,8 +84,7 @@ void Assign::generate_var_maps(Node *parent) {
 }
 
 std::string Assign::compileToMIPS(const Node *parent_scope) const {
-
-    std::string result = "#Assignment \n";
+    std::string result = "";
 
     //Calculate Rvalue
     result += source->compileToMIPS(parent_scope);

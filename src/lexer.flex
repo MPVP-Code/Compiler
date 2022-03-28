@@ -51,9 +51,9 @@ extern "C" int fileno(FILE *stream);
 {D}+{IS}?		        { std::cerr<< "lexmatch 3\n"; yylval.string = new std::string(yytext); return(CONSTANT);}
 L?'(\\.|[^\\'])+'	    { std::cerr<< "lexmatch 4\n"; yylval.string = new std::string(yytext); return(CONSTANT);}
 
-{D}+{E}{FS}?		    {yylval.string = new std::string(yytext); return(CONSTANT); }
-{D}*"."{D}+({E})?{FS}?	{yylval.string = new std::string(yytext); return(CONSTANT); }
-{D}+"."{D}*({E})?{FS}?	{yylval.string = new std::string(yytext); return(CONSTANT); }
+{D}+{E}{FS}?		    { std::cerr<< "float constant 1\n"; yylval.string = new std::string(yytext); return(CONSTANT_FLOAT); }
+{D}*"."{D}+({E})?{FS}?	{ std::cerr<< "float constant 2\n"; yylval.string = new std::string(yytext); return(CONSTANT_FLOAT); }
+{D}+"."{D}*({E})?{FS}?	{ std::cerr<< "float constant 3\n"; yylval.string = new std::string(yytext); return(CONSTANT_FLOAT); }
 
 L?\"(\\.|[^\\"])*\"	    {yylval.string =  new std::string(yytext); return(STRING_LITERAL);  }
 

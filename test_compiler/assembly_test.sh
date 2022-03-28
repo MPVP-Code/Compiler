@@ -33,6 +33,7 @@ if [[ $RESULT == 0 ]]; then
   RESULT=${?}
   set -e
 
+  echo "result $RESULT"
   if [[ $RESULT == 0 ]]; then
     echo "  PASSED";
   else

@@ -8,6 +8,14 @@
 #include "ast_scope.hpp"
 #include "ast_func.hpp"
 
+typedef union {
+    float f;
+    struct {
+        unsigned int mantisa : 23;
+        unsigned int exponent : 8;
+        unsigned int sign : 1;
+    } parts;
+} float_cast;
 
 std::string load_mapped_variable(const Scope* scope, const Node* var, std::string reg_name);
 std::string load_mapped_variable_with_offset(const Scope* scope, const Node* _var, std::string reg_name, int offset);
@@ -25,9 +33,11 @@ void try_replace_variable(Node* &varptr, Node* scope);
 int resolve_variable_size(std::string name, Scope* child_scope);
 int resolve_variable_offset(std::string name, const Scope* current);
 std::string intToHex(int value);
+std::string convertFloatToBinary(float f);
 Variable* allocate_temp_var(Node* current, std::string type);
 
 Node* resolve_function_call(std::string name, Scope* current);
 std::string resolve_base_type(std::string alias, Scope* scope);
 int get_log_ptr_element(std::string ptr_type, Scope* scope);
+
 #endif

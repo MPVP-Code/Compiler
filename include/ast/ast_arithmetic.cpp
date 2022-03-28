@@ -32,15 +32,17 @@ std::string Addition::compileToMIPS(const Node *parent_scope) const {
         result += "add $13, $14, $15\n";
 
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
-    }
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "float") {
+    } else if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "float") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
-        result += load_mapped_variable((Scope *) parent_scope, LVar, "$f4") + "\n";
-        result += load_mapped_variable((Scope *) parent_scope, RVar, "$f6") + "\n";
+        result += load_mapped_variable((Scope *) parent_scope, LVar, "$15") + "\n";
+        result += load_mapped_variable((Scope *) parent_scope, RVar, "$14") + "\n";
+        result += "mtc1 $15, $f4\n";
+        result += "mtc1 $14, $f6\n";
         result += "add.s $f2, $f4, $f6\n";
+        result += "mfc1 $13, $f2\n";
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
     }
     return result;
@@ -63,6 +65,18 @@ std::string Subtraction::compileToMIPS(const Node *parent_scope) const {
         result += load_mapped_variable((Scope *) parent_scope, RVar, "$14") + "\n";
         result += "sub $13, $15, $14\n";
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
+    } else if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "float") { /*might cause segmentation faults*/
+        //Finds temporary / constant/ normal variables in which results have been previously stored
+        result += compileLandRNodesToMIPS(parent_scope);
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable((Scope *) parent_scope, LVar, "$15") + "\n";
+        result += load_mapped_variable((Scope *) parent_scope, RVar, "$14") + "\n";
+        result += "mtc1 $15, $f4\n";
+        result += "mtc1 $14, $f6\n";
+        result += "sub.s $f2, $f4, $f6\n";
+        result += "mfc1 $13, $f2\n";
+        result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
     }
     return result;
 };
@@ -82,6 +96,18 @@ std::string Multiplication::compileToMIPS(const Node *parent_scope) const {
         result += load_mapped_variable((Scope *) parent_scope, LVar, "$15") + "\n";
         result += load_mapped_variable((Scope *) parent_scope, RVar, "$14") + "\n";
         result += "mult $15, $14\nmflo $13\n";
+        result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
+    } else if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "float") {
+        //Finds temporary / constant/ normal variables in which results have been previously stored
+        result += compileLandRNodesToMIPS(parent_scope);
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable((Scope *) parent_scope, LVar, "$15") + "\n";
+        result += load_mapped_variable((Scope *) parent_scope, RVar, "$14") + "\n";
+        result += "mtc1 $15, $f4\n";
+        result += "mtc1 $14, $f6\n";
+        result += "mul.s $f2, $f4, $f6\n";
+        result += "mfc1 $13, $f2\n";
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
     }
 

@@ -44,7 +44,6 @@ for filename in compiler_tests/*/*.c; do
       timeout 5 qemu-mips "$TEST"
       RESULT=${?}
       set -e
-      echo $RESULT;
 
       if [[ $RESULT == 0 ]]; then
         PASSED=$((PASSED+1))

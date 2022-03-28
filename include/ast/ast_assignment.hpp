@@ -26,6 +26,26 @@ public:
 
 };
 
+class ConstantFloat : public Node {
+private:
+    float value;
+    Variable* const_var;
+
+public:
+    ConstantFloat(float _value);
+
+    float getValue();
+
+    Variable* getConstVar();
+
+    virtual void generate_var_maps(Node *parent) override;
+
+    std::string compileToMIPS(const Node *parent_scope) const override;
+
+    virtual Node* get_intermediate_variable() override;
+
+};
+
 class Assign : public Node {
 private:
     Node *destination;

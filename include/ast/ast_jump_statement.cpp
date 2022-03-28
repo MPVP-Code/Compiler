@@ -15,7 +15,12 @@ std::string Return::compileToMIPS(const Node *parent_scope) const {
     result += expression->compileToMIPS(parent_scope);
 
     auto var = expression->get_intermediate_variable();
-    result += load_mapped_variable((Scope *) parent_scope, (Variable*) var , "$v0") + "\n";
+
+    result += load_mapped_variable((Scope *) parent_scope, (Variable*) var , "$2") + "\n";
+
+    if (this->data_type == "float") {
+        result += "mtc1 $2, $f0\nli $2, 0\n";
+    }
 
     //Deallocate scope
     result+= deallocate_stack_frame((Scope *) parent_scope);
