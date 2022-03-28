@@ -130,6 +130,17 @@ std::string Division::compileToMIPS(const Node *parent_scope) const {
         result += load_mapped_variable((Scope *) parent_scope, RVar, "$14") + "\n";
         result += "div $15, $14\nmflo $13\n";
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
+    } else if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "float") {
+        result += compileLandRNodesToMIPS(parent_scope);
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable((Scope *) parent_scope, LVar, "$15") + "\n";
+        result += load_mapped_variable((Scope *) parent_scope, RVar, "$14") + "\n";
+        result += "mtc1 $15, $f4\n";
+        result += "mtc1 $14, $f6\n";
+        result += "div.s $f2, $f4, $f6\n";
+        result += "mfc1 $13, $f2\n";
+        result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
     }
 
     return result;

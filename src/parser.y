@@ -18,7 +18,7 @@ void yyerror(const char *);
   char character;
 }
 
-%token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF NEW_TYPE_NAME
+%token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF NEW_TYPE_NAME CONSTANT_FLOAT
 %token PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
 %token AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
 %token SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
@@ -35,7 +35,7 @@ void yyerror(const char *);
 %type <node>  expression function_definition constant_expression
 %type <node>  labeled_statement expression_statement selection_statement parameter_declaration
 %type <node> primary_expression postfix_expression unary_expression jump_statement iteration_statement declarator direct_declarator
-%type <string> CONSTANT
+%type <string> CONSTANT CONSTANT_FLOAT
 %type <string> IDENTIFIER
 %type <string> type_specifier declaration_specifiers specifier_qualifier_list type_name pointer NEW_TYPE_NAME storage_class_specifier
 %type <statements> compound_statement statement_list external_declaration declaration init_declarator_list init_declarator

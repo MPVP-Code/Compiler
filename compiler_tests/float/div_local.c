@@ -1,5 +1,5 @@
 float f() {
-    float a = 6.6f;
-    float b = 1.1f;
+    float a = 2.5f;
+    float b = 2.0f;
     return a / b;
 }
