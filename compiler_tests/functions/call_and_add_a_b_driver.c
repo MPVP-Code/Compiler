@@ -3,5 +3,5 @@ int f(int n);
 
 int main()
 {
-    return !(f(1)==1);
+    return !(f(10)==13);
 }
