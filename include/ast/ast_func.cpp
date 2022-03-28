@@ -30,18 +30,22 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
         result += allocate_stack_frame((Scope *) this);
 
         //Saving passed parameters
-        int idx = 4;
+        int intIdx = 4;
+        int floatIdx = 12;
         for (auto param: *arguments) {
-
-            result += store_mapped_variable((Scope *) this, param, "$" + std::to_string(idx));
-
-            //Two word store - skip register
-            if (resolve_variable_size(param->name, (Scope *) this) > 4) {
-                idx += 2;
+            if (resolve_base_type(param->data_type, (Scope*) parent_scope) == "float") {
+                result += store_mapped_variable_coprocessor((Scope *) this, param, "$f" + std::to_string(floatIdx));
+                floatIdx += 2;
             } else {
-                idx++;
-            }
+                result += store_mapped_variable((Scope *) this, param, "$" + std::to_string(intIdx));
 
+                //Two word store - skip register
+                if (resolve_variable_size(param->name, (Scope *) this) > 4) {
+                    intIdx += 2;
+                } else {
+                    intIdx++;
+                }
+            }
         }
 
         //Compile body

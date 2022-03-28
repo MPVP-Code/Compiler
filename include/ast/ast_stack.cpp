@@ -39,7 +39,7 @@ void try_replace_variable(Node *&varptr, Node *inscope) {
         if (temp->declaration) {
 
             //If pointer try adding subpointer to type map
-            if (varptr->data_type.at(varptr->data_type.length()-1) == '*'){
+            if (varptr->data_type.at(varptr->data_type.length() - 1) == '*') {
 
                 std::string ptr_name = varptr->data_type;
                 while (resolve_type(ptr_name, scope) == NULL) {
@@ -47,7 +47,7 @@ void try_replace_variable(Node *&varptr, Node *inscope) {
                     add_to_global_typemap(type, scope);
 
                     //Cut down until arrive at base type
-                    ptr_name = ptr_name.substr(0, ptr_name.size()-1);
+                    ptr_name = ptr_name.substr(0, ptr_name.size() - 1);
                 }
             }
             //just resolve type
@@ -185,7 +185,7 @@ std::string load_mapped_variable_with_offset(const Scope *scope, const Node *_va
                 out = "lw " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
             } else { //Load from unaligned memory addresses
                 out += "lwl " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
-                out += "lwr " + reg_name + ", " + std::to_string(offset+3 +4) + "($sp)\n";
+                out += "lwr " + reg_name + ", " + std::to_string(offset + 3 + 4) + "($sp)\n";
             }
             out += "nop\n";
 
@@ -194,7 +194,7 @@ std::string load_mapped_variable_with_offset(const Scope *scope, const Node *_va
                 out = "lw " + get_next_register(reg_name) + ", " + std::to_string(offset) + "($sp)\n";
             } else { //Load from unaligned memory addresses
                 out += "lwl " + get_next_register(reg_name) + ", " + std::to_string(offset) + "($sp)\n";
-                out += "lwr " + get_next_register(reg_name) + ", " + std::to_string(offset+3) + "($sp)\n";
+                out += "lwr " + get_next_register(reg_name) + ", " + std::to_string(offset + 3) + "($sp)\n";
             }
             out += "nop\n";
 
@@ -269,7 +269,6 @@ std::string load_mapped_variable_coprocessor(const Scope *scope, const Node *_va
     return out;
 }
 
-
 std::string store_mapped_variable(const Scope *scope, const Node *_var, std::string reg_name) {
     auto var = (Variable *) _var;
     int offset = resolve_variable_offset(var->name, scope);
@@ -286,36 +285,45 @@ std::string store_mapped_variable(const Scope *scope, const Node *_var, std::str
             out += "swl " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
             out += "swr " + reg_name + ", " + std::to_string(offset + 3) + "($sp)\n";
         }
-        out += "nop\n";
 
         //Store 8 byte word
-    }else if (var_size  == 8) {
+    } else if (var_size == 8) {
 
-            //Store MS word
-            if (offset % 4 == 0) {
-                out = "sw " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
-            } else { //Load from unaligned memory addresses
-                out += "swl " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
-                out += "swr " + reg_name + ", " + std::to_string(offset + 3 + 4) + "($sp)\n";
-            }
-            out += "nop\n";
+        //Store MS word
+        if (offset % 4 == 0) {
+            out = "sw " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
+        } else { //Load from unaligned memory addresses
+            out += "swl " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
+            out += "swr " + reg_name + ", " + std::to_string(offset + 3 + 4) + "($sp)\n";
+        }
+        out += "nop\n";
 
-            //Store LS word
-            if (offset % 4 == 0) {
-                out = "sw " + get_next_register(reg_name) + ", " + std::to_string(offset) + "($sp)\n";
-            } else { //Load from unaligned memory addresses
-                out += "swl " + get_next_register(reg_name) + ", " + std::to_string(offset) + "($sp)\n";
-                out += "swr " + get_next_register(reg_name) + ", " + std::to_string(offset + 3) + "($sp)\n";
-            }
-            out += "nop\n";
-    }else if (var_size == 1){
+        //Store LS word
+        if (offset % 4 == 0) {
+            out = "sw " + get_next_register(reg_name) + ", " + std::to_string(offset) + "($sp)\n";
+        } else { //Load from unaligned memory addresses
+            out += "swl " + get_next_register(reg_name) + ", " + std::to_string(offset) + "($sp)\n";
+            out += "swr " + get_next_register(reg_name) + ", " + std::to_string(offset + 3) + "($sp)\n";
+        }
+        out += "nop\n";
+    } else if (var_size == 1) {
         out += "sb " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
     }
 
     return out;
 }
 
-std::string store_raw_variable(const Scope* scope, std::string addr_reg, std::string reg_name, std::string type_name) {
+/*std::string store_mapped_variable_argument(const Scope *scope, const Node *_var, std::string reg_name) {
+    if (_var->data_type == "float") {
+        Variable* var = (Variable*) _var;
+        int offset = resolve_variable_offset(var->name, scope);
+        return "swc1 " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
+    } else {
+        return store_mapped_variable(scope, _var, reg_name);
+    }
+}*/
+
+std::string store_raw_variable(const Scope *scope, std::string addr_reg, std::string reg_name, std::string type_name) {
     std::string out = "#Raw variable store\n";
     int var_size = resolve_variable_size(type_name, (Scope *) scope);
 
@@ -327,7 +335,7 @@ std::string store_raw_variable(const Scope* scope, std::string addr_reg, std::st
         out += "nop\n";
     }
         //Load 8 byte word
-    else if (var_size  == 8) {
+    else if (var_size == 8) {
 
         //Load left word
         out += "swl " + reg_name + ", 4(" + addr_reg + ")\n";
@@ -340,7 +348,7 @@ std::string store_raw_variable(const Scope* scope, std::string addr_reg, std::st
         out += "nop\n";
 
         //Load byte
-    } else if (var_size == 1){
+    } else if (var_size == 1) {
         out += "sb " + reg_name + ", 0(" + addr_reg + ")\n";
     }
 
@@ -409,14 +417,15 @@ std::string intToHex(int value) {
 }
 
 std::string convertFloatToBinary(float value) {
-    float_cast d1 = { .f = value };
+    float_cast d1 = {.f = value};
 
     std::stringstream mantissaStream;
     mantissaStream << std::bitset<32>(d1.parts.mantisa);
     std::string mantissa32BitString = mantissaStream.str();
 
     std::stringstream stream;
-    stream << "0b" << std::bitset<1>(d1.parts.sign) << std::bitset<8>(d1.parts.exponent) << mantissa32BitString.substr(9, 23);
+    stream << "0b" << std::bitset<1>(d1.parts.sign) << std::bitset<8>(d1.parts.exponent)
+           << mantissa32BitString.substr(9, 23);
     return stream.str();
 }
 
@@ -458,18 +467,18 @@ std::string resolve_base_type(std::string alias, Scope *scope) {
     return base;
 }
 
-std::string get_ptr_base(std::string ptr_type){
+std::string get_ptr_base(std::string ptr_type) {
     std::string base = "";
-    for(char c : ptr_type){
-        if (c != '*'){
+    for (char c: ptr_type) {
+        if (c != '*') {
             base = base + c;
         }
     }
     return base;
 }
 
-int get_log_ptr_element(std::string ptr_type, Scope* scope){
-    std::string base =  ptr_type.substr(0, ptr_type.size()-1);
+int get_log_ptr_element(std::string ptr_type, Scope *scope) {
+    std::string base = ptr_type.substr(0, ptr_type.size() - 1);
     int size = resolve_variable_size(base, scope);
 
     switch (size) {
