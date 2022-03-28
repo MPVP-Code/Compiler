@@ -12,6 +12,8 @@
 std::string load_mapped_variable(const Scope* scope, const Node* var, std::string reg_name);
 std::string load_raw_variable(const Scope* scope, std::string addr_reg, std::string reg_name, std::string type_name);
 std::string store_mapped_variable(const Scope* scope, const Node* var, std::string reg_name);
+std::string store_raw_variable(const Scope* scope, std::string addr_reg, std::string reg_name, std::string type_name);
+std::string store_mapped_variable_coprocessor(const Scope *scope, const Node *_var, std::string reg_name);
 std::string get_next_register(std::string reg);
 std::string allocate_stack_frame(Scope* scope);
 std::string deallocate_stack_frame(Scope* scope);
@@ -26,8 +28,5 @@ Variable* allocate_temp_var(Node* current, std::string type);
 
 Node* resolve_function_call(std::string name, Scope* current);
 std::string resolve_base_type(std::string alias, Scope* scope);
-
-//void save_function_context();
-//void restore_function_context();
 
 #endif

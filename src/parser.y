@@ -116,7 +116,7 @@ unary_expression
 
 unary_operator
 	: '&' {$$ = '&';}
-	| '*' {$$ = '*';}
+	| '*' {$$ = '*'; std::cerr<< "Found unary dereference"; }
 	| '+' {$$ = '+';}
 	| '-' {$$ = '-';}
 	| '~' {$$ = '~';}
@@ -189,50 +189,53 @@ conditional_expression
 
 assignment_expression
 	: unary_expression assignment_operator assignment_expression {
+		//Support for left dereference
+		Node* temp;
+
+		std::cerr<<"assignmentexpression" <<" assop = "<< $2 << "Unexp type" << $1->type << std::endl;
+
+		if ($1->type == "UnaryOperator"){
+			std::cerr<<"detected unaryoperator";
+			temp = new Variable("", ((Identifier*)(((UnaryOperator*)$1)->in))->identifier, false);
+			((UnaryOperator*)$1)->in = temp;
+			temp = $1;
+		}else{
+			temp = new Variable("", ((Identifier*)$1)->identifier, false);
+		}
+
 		if ($2 == '='){
-			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			$$ = new Assign(temp, $3);
 		}else if($2 == '*'){
-			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new Multiplication(temp, $3);
 			$$ = new Assign(temp, op);
 		}
 		else if($2 == '/'){
-			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new Division(temp, $3);
 			$$ = new Assign(temp, op);
 		}
 		else if($2 == '%'){
-			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new Modulo(temp, $3);
 			$$ = new Assign(temp, op);
 		}else if($2 == '+'){
-			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new Addition(temp, $3);
 			$$ = new Assign(temp, op);
 		}else if($2 == '-'){
-			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new Subtraction(temp, $3);
 			$$ = new Assign(temp, op);
 		}else if($2 == '<'){
-			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new BitASL(temp, $3);
 			$$ = new Assign(temp, op);
 		}else if($2 == '>'){
-			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new BitASR(temp, $3);
 			$$ = new Assign(temp, op);
 		}else if($2 == '&'){
-			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new BitAnd(temp, $3);
 			$$ = new Assign(temp, op);
 		}else if($2 == '^'){
-			Variable* temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new BitXor(temp, $3);
 			$$ = new Assign(temp, op);
 		}
 		else if($2 == '|'){
-			auto temp = new Variable("", ((Identifier*)$1)->identifier, false);
 			Node* op = new BitOr(temp, $3);
 			$$ = new Assign(temp, op);
 		}

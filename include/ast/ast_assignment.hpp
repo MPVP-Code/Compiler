@@ -28,11 +28,11 @@ public:
 
 class Assign : public Node {
 private:
-    Variable *destination;
+    Node *destination;
     Node *source;
 
 public:
-    Assign(Variable *_destination, Node *_source);
+    Assign(Node *_destination, Node *_source);
 
     std::string compileToMIPS(const Node *parent_scope) const override;
 

@@ -161,21 +161,21 @@ std::string load_mapped_variable(const Scope* scope, const Node* _var, std::stri
         //Load 8 byte word
         else if (var_size  == 8) {
 
-            //Load left word
+            //Load MS word
             if (offset % 4 == 0) {
                 out = "lw " + reg_name + ", " + std::to_string(offset+ 4) + "($sp)\n";
             } else { //Load from unaligned memory addresses
-                out += "lwr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-                out += "lwl " + reg_name + ", " + std::to_string(offset+3) + "($sp)\n";
+                out += "lwr " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
+                out += "lwl " + reg_name + ", " + std::to_string(offset+3 +4) + "($sp)\n";
             }
             out += "nop\n";
 
-            //Load right word
+            //Load LS word
             if (offset % 4 == 0) {
-                out = "lw " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
+                out = "lw " + get_next_register(reg_name) + ", " + std::to_string(offset) + "($sp)\n";
             } else { //Load from unaligned memory addresses
-                out += "lwr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-                out += "lwl " + reg_name + ", " + std::to_string(offset+3) + "($sp)\n";
+                out += "lwr " + get_next_register(reg_name) + ", " + std::to_string(offset) + "($sp)\n";
+                out += "lwl " + get_next_register(reg_name) + ", " + std::to_string(offset+3) + "($sp)\n";
             }
             out += "nop\n";
 
@@ -191,8 +191,6 @@ std::string load_mapped_variable(const Scope* scope, const Node* _var, std::stri
 std::string load_raw_variable(const Scope* scope, std::string addr_reg, std::string reg_name, std::string type_name) {
     std::string out = "#Raw variable load\n";
     int var_size = resolve_variable_size(type_name, (Scope *) scope);
-
-//Check if variable refers to function return
 
     //Load 4 byte word
     if (var_size == 4) {
@@ -255,43 +253,73 @@ std::string store_mapped_variable(const Scope *scope, const Node *_var, std::str
     int offset = resolve_variable_offset(var->name, scope);
     int var_size = resolve_variable_size(var->data_type, (Scope *) scope);
 
-    std::string out = "";
+    std::string out = "#Mapped store\n";
 
-        //Store 4 byte var
+    //Store 4 byte word
     if (var_size == 4) {
+        //Load first word
         if (offset % 4 == 0) {
-            out += "sw " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-        }else { //Storing in unaligned memory addresses
+            out = "sw " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
+        } else { //Load from unaligned memory addresses
             out += "swr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-            out += "swl " + reg_name + ", " + std::to_string(offset+3) + "($sp)\n";
+            out += "swl " + reg_name + ", " + std::to_string(offset + 3) + "($sp)\n";
         }
         out += "nop\n";
 
-
-        //Load 8 byte var
+        //Store 8 byte word
     }else if (var_size  == 8) {
 
+            //Store MS word
+            if (offset % 4 == 0) {
+                out = "sw " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
+            } else { //Load from unaligned memory addresses
+                out += "swr " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
+                out += "swl " + reg_name + ", " + std::to_string(offset + 3 + 4) + "($sp)\n";
+            }
+            out += "nop\n";
+
+            //Store LS word
+            if (offset % 4 == 0) {
+                out = "sw " + get_next_register(reg_name) + ", " + std::to_string(offset) + "($sp)\n";
+            } else { //Load from unaligned memory addresses
+                out += "swr " + get_next_register(reg_name) + ", " + std::to_string(offset) + "($sp)\n";
+                out += "swl " + get_next_register(reg_name) + ", " + std::to_string(offset + 3) + "($sp)\n";
+            }
+            out += "nop\n";
+    }else if (var_size == 1){
+        out += "sb " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
+    }
+
+    return out;
+}
+
+std::string store_raw_variable(const Scope* scope, std::string addr_reg, std::string reg_name, std::string type_name) {
+    std::string out = "#Raw variable store\n";
+    int var_size = resolve_variable_size(type_name, (Scope *) scope);
+
+    //Load 4 byte word
+    if (var_size == 4) {
+        //Load first word
+        out += "swr " + reg_name + ", 0(" + addr_reg + ")\n";
+        out += "swl " + reg_name + ", 3(" + addr_reg + ")\n";
+        out += "nop\n";
+    }
+        //Load 8 byte word
+    else if (var_size  == 8) {
+
         //Load left word
-        if (offset % 4 == 0) {
-            out = "sw " + reg_name + ", " + std::to_string(offset+ 4) + "($sp)\n";
-        } else { //Load from unaligned memory addresses
-            out += "swr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-            out += "swl " + reg_name + ", " + std::to_string(offset+3) + "($sp)\n";
-        }
+        out += "swr " + reg_name + ", 4(" + addr_reg + ")\n";
+        out += "swl " + reg_name + ", 7(" + addr_reg + ")\n";
         out += "nop\n";
 
         //Load right word
-        if (offset % 4 == 0) {
-            out = "sw" + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-        } else { //Load from unaligned memory addresses
-            out += "swr " + reg_name + ", " + std::to_string(offset+4) + "($sp)\n";
-            out += "swl " + reg_name + ", " + std::to_string(offset+3+4) + "($sp)\n";
-        }
+        out += "swr " + get_next_register(reg_name) + ", 0(" + addr_reg + ")\n";
+        out += "swl " + get_next_register(reg_name) + ", 3(" + addr_reg + ")\n";
         out += "nop\n";
 
-        //store byte
+        //Load byte
     } else if (var_size == 1){
-        out += "sb " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
+        out += "sb " + reg_name + ", 0(" + addr_reg + ")\n";
     }
 
     return out;

@@ -34,8 +34,8 @@ void Scope::generate_var_maps(Node *parent) {
     } else if (this->subtype == "FunctionDeclaration") {
         //Applies varmapping to declared variables
         auto func = (FunctionDeclaration *) this;
-        for (auto const arg: *(func->arguments)) {
-            func->var_map[arg->name] = arg;
+        for (Variable* arg: *(func->arguments)) {
+            try_replace_variable(reinterpret_cast<Node *&>(arg), this);
         }
     }
 
