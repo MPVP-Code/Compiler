@@ -12,7 +12,7 @@ std::string AddressOf::compileToMIPS(const Node *parent_scope) const {
     std::string out = "#Address of \n";
     Variable* var = (Variable*) in->get_intermediate_variable();
     int offset = resolve_variable_offset(var ->name, (Scope*) parent_scope);
-    out += "addi $15, $sp, " + std::to_string(offset) + "\n";
+    out += "addiu $15, $sp, " + std::to_string(offset) + "\n";
     out += store_mapped_variable((Scope*) parent_scope, temp_variable, "$15") + "\n";
     return out;
 

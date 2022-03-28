@@ -291,7 +291,7 @@ declaration
 		$$ = $2;
 
 	}
-	//| declaration_specifiers ';' {}
+	| declaration_specifiers ';' {}
 	;
 
 declaration_specifiers

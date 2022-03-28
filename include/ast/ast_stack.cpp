@@ -156,8 +156,8 @@ std::string load_mapped_variable(const Scope *scope, const Node *_var, std::stri
             if (offset % 4 == 0) {
                 out = "lw " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
             } else { //Load from unaligned memory addresses
-                out += "lwr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-                out += "lwl " + reg_name + ", " + std::to_string(offset + 3) + "($sp)\n";
+                out += "lwl " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
+                out += "lwr " + reg_name + ", " + std::to_string(offset + 3) + "($sp)\n";
             }
             out += "nop\n";
         }
@@ -168,8 +168,8 @@ std::string load_mapped_variable(const Scope *scope, const Node *_var, std::stri
             if (offset % 4 == 0) {
                 out = "lw " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
             } else { //Load from unaligned memory addresses
-                out += "lwr " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
-                out += "lwl " + reg_name + ", " + std::to_string(offset+3 +4) + "($sp)\n";
+                out += "lwl " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
+                out += "lwr " + reg_name + ", " + std::to_string(offset+3 +4) + "($sp)\n";
             }
             out += "nop\n";
 
@@ -177,8 +177,8 @@ std::string load_mapped_variable(const Scope *scope, const Node *_var, std::stri
             if (offset % 4 == 0) {
                 out = "lw " + get_next_register(reg_name) + ", " + std::to_string(offset) + "($sp)\n";
             } else { //Load from unaligned memory addresses
-                out += "lwr " + get_next_register(reg_name) + ", " + std::to_string(offset) + "($sp)\n";
-                out += "lwl " + get_next_register(reg_name) + ", " + std::to_string(offset+3) + "($sp)\n";
+                out += "lwl " + get_next_register(reg_name) + ", " + std::to_string(offset) + "($sp)\n";
+                out += "lwr " + get_next_register(reg_name) + ", " + std::to_string(offset+3) + "($sp)\n";
             }
             out += "nop\n";
 
@@ -198,21 +198,21 @@ std::string load_raw_variable(const Scope* scope, std::string addr_reg, std::str
     //Load 4 byte word
     if (var_size == 4) {
         //Load first word
-        out += "lwr " + reg_name + ", 0(" + addr_reg + ")\n";
-        out += "lwl " + reg_name + ", 3(" + addr_reg + ")\n";
+        out += "lwl " + reg_name + ", 0(" + addr_reg + ")\n";
+        out += "lwr " + reg_name + ", 3(" + addr_reg + ")\n";
         out += "nop\n";
     }
         //Load 8 byte word
     else if (var_size  == 8) {
 
         //Load left word
-        out += "lwr " + reg_name + ", 4(" + addr_reg + ")\n";
-        out += "lwl " + reg_name + ", 7(" + addr_reg + ")\n";
+        out += "lwl " + reg_name + ", 4(" + addr_reg + ")\n";
+        out += "lwr " + reg_name + ", 7(" + addr_reg + ")\n";
         out += "nop\n";
 
         //Load right word
-        out += "lwr " + get_next_register(reg_name) + ", 0(" + addr_reg + ")\n";
-        out += "lwl " + get_next_register(reg_name) + ", 3(" + addr_reg + ")\n";
+        out += "lwl " + get_next_register(reg_name) + ", 0(" + addr_reg + ")\n";
+        out += "lwr " + get_next_register(reg_name) + ", 3(" + addr_reg + ")\n";
         out += "nop\n";
 
         //Load byte
@@ -263,8 +263,8 @@ std::string store_mapped_variable(const Scope *scope, const Node *_var, std::str
         if (offset % 4 == 0) {
             out += "sw " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
         } else { //Storing in unaligned memory addresses
-            out += "swr " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
-            out += "swl " + reg_name + ", " + std::to_string(offset + 3) + "($sp)\n";
+            out += "swl " + reg_name + ", " + std::to_string(offset) + "($sp)\n";
+            out += "swr " + reg_name + ", " + std::to_string(offset + 3) + "($sp)\n";
         }
         out += "nop\n";
 
@@ -275,8 +275,8 @@ std::string store_mapped_variable(const Scope *scope, const Node *_var, std::str
             if (offset % 4 == 0) {
                 out = "sw " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
             } else { //Load from unaligned memory addresses
-                out += "swr " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
-                out += "swl " + reg_name + ", " + std::to_string(offset + 3 + 4) + "($sp)\n";
+                out += "swl " + reg_name + ", " + std::to_string(offset + 4) + "($sp)\n";
+                out += "swr " + reg_name + ", " + std::to_string(offset + 3 + 4) + "($sp)\n";
             }
             out += "nop\n";
 
@@ -284,8 +284,8 @@ std::string store_mapped_variable(const Scope *scope, const Node *_var, std::str
             if (offset % 4 == 0) {
                 out = "sw " + get_next_register(reg_name) + ", " + std::to_string(offset) + "($sp)\n";
             } else { //Load from unaligned memory addresses
-                out += "swr " + get_next_register(reg_name) + ", " + std::to_string(offset) + "($sp)\n";
-                out += "swl " + get_next_register(reg_name) + ", " + std::to_string(offset + 3) + "($sp)\n";
+                out += "swl " + get_next_register(reg_name) + ", " + std::to_string(offset) + "($sp)\n";
+                out += "swr " + get_next_register(reg_name) + ", " + std::to_string(offset + 3) + "($sp)\n";
             }
             out += "nop\n";
     }else if (var_size == 1){
@@ -302,21 +302,21 @@ std::string store_raw_variable(const Scope* scope, std::string addr_reg, std::st
     //Load 4 byte word
     if (var_size == 4) {
         //Load first word
-        out += "swr " + reg_name + ", 0(" + addr_reg + ")\n";
-        out += "swl " + reg_name + ", 3(" + addr_reg + ")\n";
+        out += "swl " + reg_name + ", 0(" + addr_reg + ")\n";
+        out += "swr " + reg_name + ", 3(" + addr_reg + ")\n";
         out += "nop\n";
     }
         //Load 8 byte word
     else if (var_size  == 8) {
 
         //Load left word
-        out += "swr " + reg_name + ", 4(" + addr_reg + ")\n";
-        out += "swl " + reg_name + ", 7(" + addr_reg + ")\n";
+        out += "swl " + reg_name + ", 4(" + addr_reg + ")\n";
+        out += "swr " + reg_name + ", 7(" + addr_reg + ")\n";
         out += "nop\n";
 
         //Load right word
-        out += "swr " + get_next_register(reg_name) + ", 0(" + addr_reg + ")\n";
-        out += "swl " + get_next_register(reg_name) + ", 3(" + addr_reg + ")\n";
+        out += "swl " + get_next_register(reg_name) + ", 0(" + addr_reg + ")\n";
+        out += "swr " + get_next_register(reg_name) + ", 3(" + addr_reg + ")\n";
         out += "nop\n";
 
         //Load byte
