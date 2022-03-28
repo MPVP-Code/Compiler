@@ -63,9 +63,6 @@ void try_replace_variable(Node *&varptr, Node *inscope) {
         varptr->generate_var_maps(scope);
     } else if (varptr->type == "UnaryOperator" && (varptr->subtype == "PostIncOp" || varptr->subtype == "PostDecOp")) {
         auto temp = (PostIncOp *) varptr;
-    } else if (varptr->type == "Identifier") {
-        auto identifier = (Identifier *) varptr;
-        varptr = resolve_variable_name(identifier->identifier, scope);
     } else {
         varptr->generate_var_maps(scope);
     }

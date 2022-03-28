@@ -53,5 +53,11 @@ public:
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
 };
 
+class CompoundStatement : public Scope{
+public:
+    CompoundStatement(std::vector<Node*> _statements);
+    virtual std::string compileToMIPS(const Node *parent_scope) const override;
+};
+
 #endif
 

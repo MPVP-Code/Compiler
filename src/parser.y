@@ -18,7 +18,7 @@ void yyerror(const char *);
   char character;
 }
 
-%token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF NEW_TYPE_NAME CONSTANT_FLOAT
+%token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF NEW_TYPE_NAME
 %token PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
 %token AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
 %token SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
@@ -35,7 +35,7 @@ void yyerror(const char *);
 %type <node>  expression function_definition constant_expression
 %type <node>  labeled_statement expression_statement selection_statement parameter_declaration
 %type <node> primary_expression postfix_expression unary_expression jump_statement iteration_statement declarator direct_declarator
-%type <string> CONSTANT CONSTANT_FLOAT
+%type <string> CONSTANT
 %type <string> IDENTIFIER
 %type <string> type_specifier declaration_specifiers specifier_qualifier_list type_name pointer NEW_TYPE_NAME storage_class_specifier
 %type <statements> compound_statement statement_list external_declaration declaration init_declarator_list init_declarator
@@ -46,7 +46,9 @@ void yyerror(const char *);
 %%
 
 primary_expression
-	: IDENTIFIER { $$ = new Identifier(*$1); std::cerr << "found identifier\n" << *$1 << std::endl;}
+	: IDENTIFIER { //$$ = new Identifier(*$1); std::cerr << "found identifier\n" << *$1 << std::endl;
+			$$ = new Variable ("", *$1, false);
+			}
 	| CONSTANT { $$ = new Constant(std::stoi(*$1)); $$->data_type = "int"; std::cerr<<"Found int const\n" << *$1 << std::endl;}
 	| CONSTANT_FLOAT {  $$ = new ConstantFloat(std::stof(*$1)); $$->data_type = "float"; std::cerr<<"Found float const\n" << *$1 << std::endl; }
 //	| STRING_LITERAL {}
@@ -57,12 +59,12 @@ postfix_expression
 	: primary_expression {$$ = $1; }
 
 	| postfix_expression '(' ')' {
-				auto id = (Identifier*) $1;
+				auto id = (Variable*) $1;
 				auto empty  = new std::vector<Node*>();
-				$$ = new FunctionCall(id->identifier, empty);}
+				$$ = new FunctionCall(id->name, empty);}
 	| postfix_expression '(' argument_expression_list ')' {
-				auto id = (Identifier*) $1;
-				$$ = new FunctionCall(id->identifier, $3);
+				auto id = (Variable*) $1;
+				$$ = new FunctionCall(id->name, $3);
 	}
 //	| postfix_expression '[' expression ']' {}
 //	| postfix_expression '.' IDENTIFIER {}
@@ -83,13 +85,7 @@ argument_expression_list
 	;
 
 unary_expression
-	: postfix_expression {
-				if($1->type == "Identifier"){
-					$$ = new Variable ("", ((Identifier*)$1)->identifier, false);
-				}else{
-					$$ = $1;
-				}
-				}
+	: postfix_expression { $$ = $1;	}
 	| INC_OP unary_expression {$$ = new PreIncOp ($2);}
 	| DEC_OP unary_expression {$$ = new PreDecOp ($2);}
 	| unary_operator unary_expression {
@@ -195,14 +191,7 @@ assignment_expression
 
 		std::cerr<<"assignmentexpression" <<" assop = "<< $2 << "Unexp type" << $1->type << std::endl;
 
-		if ($1->type == "UnaryOperator"){
-			std::cerr<<"detected unaryoperator";
-			temp = new Variable("", ((Identifier*)(((UnaryOperator*)$1)->in))->identifier, false);
-			((UnaryOperator*)$1)->in = temp;
-			temp = $1;
-		}else{
-			temp = new Variable("", ((Identifier*)$1)->identifier, false);
-		}
+		temp = $1;
 
 		if ($2 == '='){
 			$$ = new Assign(temp, $3);
@@ -316,24 +305,24 @@ init_declarator
 			std::cerr<< $1->type;
 			std::cerr<< $1->subtype;
 
-			if ($1->type == "Identifier"){
-				auto id = (Identifier*)$1;
-				std::cerr<< "ID pointer:" << id->pointer;
-				auto temp = new Variable(id->pointer, id->identifier, true);
-				$$-> push_back(temp);
-			}else if ($1->subtype == "FunctionDeclaration"){
+
+			if ($1->subtype == "FunctionDeclaration"){
 				auto func = (FunctionDeclaration*)$1;
 				//If a function declaration got here it is a fwd declaration
 				func->forward_declaration = true;
 				$$->push_back(func);
+			} else {
+				auto var  = (Variable*) $1;
+				var->declaration = true;
+				$$-> push_back(var);
 			}
 	}
 	| declarator '=' initializer {
 			$$ = new std::vector<Node*>;
-			auto id = (Identifier*)$1;
-			auto temp = new Variable(id->pointer, id->identifier, true);
-			$$-> push_back(temp);
-			auto temp2 = new Assign(temp, $3);
+			auto var = (Variable*)$1;
+			var->declaration = true;
+			$$-> push_back(var);
+			auto temp2 = new Assign($1, $3);
 			$$-> push_back(temp2);
 
 	}
@@ -405,27 +394,27 @@ enumerator
 declarator
 	: direct_declarator { $$ = $1; }
 	|  pointer direct_declarator {
-		auto ptr= (Identifier*) $2;
+		auto var= (Variable*) $2;
 		std::cerr<<"Pointer value" << $1;
-		ptr->pointer = *$1;
-		$$ = $2;
+		var->data_type = *$1;
+		$$ = var;
 
 		}
 	;
 
 direct_declarator
-	: IDENTIFIER { $$ = new Identifier(*$1);	}
+	: IDENTIFIER { $$ = new Variable("", *$1, false);	}
 	| direct_declarator '(' ')' {
-		auto id = (Identifier*)$1;
+		auto var = (Variable*)$1;
 		auto func =  new FunctionDeclaration();
 		func->arguments = new std::vector<Variable*>();
-		func->name = id->identifier;
+		func->name = var->name;
 		$$ = func;
 	}
 	| direct_declarator '(' parameter_type_list ')' {
-			auto id = (Identifier*)$1;
+			auto var = (Variable*)$1;
         		auto func =  new FunctionDeclaration();
-        		func->name = id->identifier;
+        		func->name = var->name;
 
         		//Copy with cast to var
         		func->arguments = new std::vector<Variable*>();
@@ -465,8 +454,10 @@ parameter_list
 
 parameter_declaration
 	: declaration_specifiers declarator {
-		auto id = (Identifier*) $2;
-		$$ = new Variable(*$1 + id->pointer, id->identifier, true);
+		auto var = (Variable*) $2;
+		var->declaration = true;
+		var->data_type = *$1 + var->data_type;
+		$$ = var;
 	 }
 	//| declaration_specifiers abstract_declarator {}
 	//| declaration_specifiers {}
@@ -514,7 +505,10 @@ initializer_list
 statement
 	: expression_statement { $$ = new std::vector<Node*>();
 				$$->push_back($1); }
-	| compound_statement {	$$ = $1;}
+	| compound_statement {	 $$ = new std::vector<Node*>();
+				auto temp = new CompoundStatement(*$1);
+				$$->push_back(temp);
+				}
 
 	| labeled_statement {$$ = new std::vector<Node*>();
                             	$$->push_back($1);}
@@ -529,8 +523,20 @@ statement
 	;
 
 labeled_statement
-	: CASE constant_expression ':' statement { $$ = new Case($2, *$4); }
-	| IDENTIFIER ':' statement { $$ = new DefaultCase(*$3); }
+	: CASE constant_expression ':' statement {
+				if ($4->size() != 0 && $4->at(0)->type == "Scope" && $4->at(0)->subtype == "CompoundStatement" ){
+					$$ = new Case($2, ((CompoundStatement*)($4->at(0)))->statements);
+				}else{
+					$$ = new Case($2, *$4);}
+				 }
+	| IDENTIFIER ':' statement {
+				if ($3->size() != 0 && $3->at(0)->type == "Scope" && $3->at(0)->subtype == "CompoundStatement" ){
+					$$ = new DefaultCase( ((CompoundStatement*)($3->at(0)))->statements);
+				}else{
+					$$ = new DefaultCase(*$3); }
+
+
+	$$ = new DefaultCase(*$3); }
 	//| DEFAULT ':' statement { $$ = new DefaultCase(*$3); }
 	;
 
@@ -564,16 +570,68 @@ expression_statement
 	;
 
 selection_statement
-	: IF '(' expression ')' statement { $$ = new If($3, $5, NULL);}
-	| IF '(' expression ')' statement ELSE statement {$$ = new If($3, $5, $7); /*TODO: could be problematic, because passing pointers*/}
-	| SWITCH '(' expression ')' statement {$$ = new Switch($3, *$5); }
+	: IF '(' expression ')' statement {
+				if ($5->size() != 0 && $5->at(0)->type == "Scope" && $5->at(0)->subtype == "CompoundStatement" ){
+					$$ = new If($3, &(((CompoundStatement*)($5->at(0)))->statements), NULL);
+				}else{
+					$$ = new If($3, $5, NULL);
+				}
+	 }
+	| IF '(' expression ')' statement ELSE statement {
+				std::vector<Node*>* stat1;
+				if ($5->size() != 0 && $5->at(0)->type == "Scope" && $5->at(0)->subtype == "CompoundStatement" ){
+					stat1 = &(((CompoundStatement*)($5->at(0)))->statements);
+				}else{
+					stat1 = $5;
+				}
+
+				std::vector<Node*>* stat2;
+				if ($7->size() != 0 && $7->at(0)->type == "Scope" && $7->at(0)->subtype == "CompoundStatement" ){
+					stat2 = &(((CompoundStatement*)($7->at(0)))->statements);
+				}else{
+					stat2 = $7;
+				}
+
+				$$ = new If($3, stat1, stat2); /*TODO: could be problematic, because passing pointers*/
+				}
+	| SWITCH '(' expression ')' statement {
+				if ($5->size() != 0 && $5->at(0)->type == "Scope" && $5->at(0)->subtype == "CompoundStatement" ){
+					$$ = new Switch($3, (((CompoundStatement*)($5->at(0)))->statements));
+				}else{
+					$$ = new Switch($3, *$5);
+				}
+				}
 	;
 
 iteration_statement
-	: WHILE '(' expression ')' statement { $$ = new While($3, *$5);	}
-	| DO statement WHILE '(' expression ')' ';' {$$ = new DoWhile($5, *$2);	}
-	| FOR '(' expression_statement expression_statement ')' statement { $$ = new For($3, $4, NULL, *$6); }
-	| FOR '(' expression_statement expression_statement expression ')' statement { $$ = new For($3, $4, $5, *$7); }
+	: WHILE '(' expression ')' statement {
+				if ($5->size() != 0 && $5->at(0)->type == "Scope" && $5->at(0)->subtype == "CompoundStatement" ){
+					$$ = new While($3, (((CompoundStatement*)($5->at(0)))->statements));
+				}else{
+					$$ = new While($3, *$5);
+				}
+				}
+	| DO statement WHILE '(' expression ')' ';' {
+				if ($2->size() != 0 && $2->at(0)->type == "Scope" && $2->at(0)->subtype == "CompoundStatement" ){
+					$$ = new DoWhile($5, (((CompoundStatement*)($2->at(0)))->statements));
+				}else{
+					$$ = new DoWhile($5, *$2);
+				}
+				}
+	| FOR '(' expression_statement expression_statement ')' statement {
+				if ($6->size() != 0 && $6->at(0)->type == "Scope" && $6->at(0)->subtype == "CompoundStatement" ){
+					$$ = new For($3, $4, NULL, (((CompoundStatement*)($6->at(0)))->statements));
+				}else{
+					$$ = new For($3, $4, NULL, *$6);
+				}
+				}
+	| FOR '(' expression_statement expression_statement expression ')' statement {
+				if ($7->size() != 0 && $7->at(0)->type == "Scope" && $7->at(0)->subtype == "CompoundStatement" ){
+					$$ = new For($3, $4, $5, (((CompoundStatement*)($7->at(0)))->statements));
+				}else{
+					$$ = new For($3, $4, $5, *$7);
+				}
+		 		}
 	;
 
 jump_statement
