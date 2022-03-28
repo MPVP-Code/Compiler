@@ -345,6 +345,7 @@ type_specifier
 	| VOID {$$ = new std::string("void");}
 	| FLOAT {$$ = new std::string("float");}
 	| DOUBLE {$$ = new std::string("double");}
+	| UNSIGNED {$$ = new std::string("unsigned");}
 //	| struct_specifier {}
 //	| enum_specifier {}
 //	| TYPE_NAME {}
