@@ -10,13 +10,27 @@ std::string Addition::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
     //Resolve wether to use temp variable or actual variable
     if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+
         //Finds temporary / constant/ normal variables in which results have been previously stored
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
+
         result += load_mapped_variable((Scope *) parent_scope, LVar, "$15") + "\n";
         result += load_mapped_variable((Scope *) parent_scope, RVar, "$14") + "\n";
+
+        //Pointer arithmetic fix
+        if (L->data_type.at(L->data_type.size()-1) == '*' ^ R->data_type.at(R->data_type.size()-1) == '*') {
+            if (L->data_type.at(L->data_type.size() - 1) == '*') {
+                result += "sll $14, $14, " + std::to_string(get_log_ptr_element(L->data_type, (Scope *) parent_scope)) +   " # Pointer arithmetic bodge\n";
+            }
+            if (R->data_type.at(R->data_type.size() - 1) == '*') {
+                result += "sll $15, $15, " + std::to_string(get_log_ptr_element(R->data_type, (Scope *) parent_scope)) +  "\n";
+            }
+        }
+
         result += "add $13, $14, $15\n";
+
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
     }
     if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "float") {

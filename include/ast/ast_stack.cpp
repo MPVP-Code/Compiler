@@ -17,6 +17,17 @@ Variable *resolve_variable_name(std::string name, Scope *current) {
     return NULL;
 };
 
+Variable_type *resolve_type(std::string name, Scope *current) {
+    while (current != NULL) {
+        if (current->type_map.contains(name)) {
+            return current->type_map.at(name);
+        } else {
+            current = current->parent_scope;
+        }
+    }
+    return NULL;
+};
+
 
 //Tries to replace variable pointer with mapped variables
 
@@ -26,12 +37,19 @@ void try_replace_variable(Node *&varptr, Node *inscope) {
         auto temp = (Variable *) varptr;
         if (temp->declaration) {
 
-            //If pointer try adding to type map
+            //If pointer try adding subpointer to type map
             if (varptr->data_type.at(varptr->data_type.length()-1) == '*'){
-                auto type = new Variable_type(varptr->data_type, "int", 4);
-                add_to_global_typemap(type, scope);
+
+                std::string ptr_name = varptr->data_type;
+                while (resolve_type(ptr_name, scope) == NULL) {
+                    auto type = new Variable_type(ptr_name, "int", 4);
+                    add_to_global_typemap(type, scope);
+
+                    //Cut down until arrive at base type
+                    ptr_name = ptr_name.substr(0, ptr_name.size()-1);
+                }
             }
-            //Else just resolve type
+            //just resolve type
             scope->var_map[temp->name] = temp;
         } else {
             varptr = resolve_variable_name(temp->name, scope);
@@ -424,4 +442,31 @@ std::string resolve_base_type(std::string alias, Scope* scope) {
 
     }
     return base;
+}
+
+std::string get_ptr_base(std::string ptr_type){
+    std::string base = "";
+    for(char c : ptr_type){
+        if (c != '*'){
+            base = base + c;
+        }
+    }
+    return base;
+}
+
+int get_log_ptr_element(std::string ptr_type, Scope* scope){
+    std::string base =  ptr_type.substr(0, ptr_type.size()-1);
+    int size = resolve_variable_size(base, scope);
+
+    switch (size) {
+        case 1:
+            return 0;
+        case 2:
+            return 1;
+        case 4:
+            return 2;
+        case 8:
+            return 3;
+    }
+
 }
