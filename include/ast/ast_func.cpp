@@ -33,8 +33,11 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
         int intIdx = 4;
         int floatIdx = 12;
         for (auto param: *arguments) {
-            if (resolve_base_type(param->data_type, (Scope*) parent_scope) == "float") {
+            if (resolve_base_type(param->data_type, (Scope*) parent_scope) == "float" && floatIdx <= 14) {
                 result += store_mapped_variable_coprocessor((Scope *) this, param, "$f" + std::to_string(floatIdx));
+                if (floatIdx == 14) {
+                    intIdx = 6;
+                }
                 floatIdx += 2;
             } else {
                 result += store_mapped_variable((Scope *) this, param, "$" + std::to_string(intIdx));
