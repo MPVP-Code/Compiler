@@ -117,12 +117,24 @@ std::string FunctionCall::compileToMIPS(const Node *parent_scope) const {
     //Load parameters into registers
     int idx = 4; // First arg register
 
-    for (auto param: *arguments) {
-        //Compile code in parameters
+    //Save return address
+    Variable *ra = ((Scope *) parent_scope)->var_map["!ra"];
+    result += store_mapped_variable((Scope *) parent_scope, ra, "$ra");
+
+    // Allocate more stack space to prevent memory violation accesses
+    int offset = (arguments->size() + 1) * 4;
+    result += "addiu $sp, $sp, " + std::to_string(-1 * offset) + "\n";
+
+    for (unsigned int i = 0; i < (*arguments).size(); i++) {
+        Node* param = (*arguments)[i];
         result += param->compileToMIPS(parent_scope);
 
-        result += load_mapped_variable((Scope *) parent_scope, param->get_intermediate_variable(),
-                                       "$" + std::to_string(idx));
+        std::string regname = "$" + std::to_string(idx);
+        result += load_mapped_variable((Scope *) parent_scope, param->get_intermediate_variable(), regname);
+
+        if (i >= 4) {
+            result += "sw " + regname + ", " + std::to_string(offset - 4 * (arguments->size() + 1 - i)) + "($sp)\n";
+        }
 
         //Two word load - skip register
         if (resolve_variable_size(((Variable *) param->get_intermediate_variable())->name, (Scope *) parent_scope) >
@@ -131,22 +143,13 @@ std::string FunctionCall::compileToMIPS(const Node *parent_scope) const {
         } else {
             idx++;
         }
-
     }
-
-    //Save return address
-    Variable *ra = ((Scope *) parent_scope)->var_map["!ra"];
-    result += store_mapped_variable((Scope *) parent_scope, ra, "$ra");
-
-    // Allocate more stack space to prevent memory violation accesses
-    int offset = arguments->size() * 4;
-    result += "addi $sp, $sp, " + std::to_string(-1 * offset) + "\n";
 
     //Jump
     result += "jal " + declaration->generate_function_signature() + "\n";
     result += "nop\n";
 
-    result += "addi $sp, $sp, " + std::to_string(offset) + "\n";
+    result += "addiu $sp, $sp, " + std::to_string(offset) + "\n";
 
     //Restore return address
     result += load_mapped_variable((Scope *) parent_scope, ra, "$ra");
