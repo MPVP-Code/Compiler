@@ -150,3 +150,25 @@ int Global::getIdForLogicOr() {
 int Global::getIdForSwitch() {
     return switchCount++;
 }
+
+CompoundStatement::CompoundStatement(std::vector<Node*> _statements) {
+    statements = _statements;
+    type = "Scope";
+    subtype = "CompoundStatement";
+}
+
+std::string CompoundStatement::compileToMIPS(const Node *parent_scope) const {
+    std::string result = "";
+    result += allocate_stack_frame((Scope *) this);
+
+
+    for (Node *statement: statements) {
+        std::string generatedCode = statement->compileToMIPS(this);
+        if (generatedCode.length() != 0) {
+            result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
+        }
+    }
+    result += deallocate_stack_frame((Scope *) this);
+
+    return result.substr(0, result.length() - 1);
+}

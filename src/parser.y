@@ -513,7 +513,10 @@ initializer_list
 statement
 	: expression_statement { $$ = new std::vector<Node*>();
 				$$->push_back($1); }
-	| compound_statement {	$$ = $1;}
+	| compound_statement {	 $$ = new std::vector<Node*>();
+				auto temp = new CompoundStatement(*$1);
+				$$->push_back(temp);
+				}
 
 	| labeled_statement {$$ = new std::vector<Node*>();
                             	$$->push_back($1);}
@@ -528,8 +531,20 @@ statement
 	;
 
 labeled_statement
-	: CASE constant_expression ':' statement { $$ = new Case($2, *$4); }
-	| IDENTIFIER ':' statement { $$ = new DefaultCase(*$3); }
+	: CASE constant_expression ':' statement {
+				if ($4->size() != 0 && $4->at(0)->type == "Scope" && $4->at(0)->subtype == "CompoundStatement" ){
+					$$ = new Case($2, ((CompoundStatement*)($4->at(0)))->statements);
+				}else{
+					$$ = new Case($2, *$4);}
+				 }
+	| IDENTIFIER ':' statement {
+				if ($3->size() != 0 && $3->at(0)->type == "Scope" && $3->at(0)->subtype == "CompoundStatement" ){
+					$$ = new DefaultCase( ((CompoundStatement*)($3->at(0)))->statements);
+				}else{
+					$$ = new DefaultCase(*$3); }
+
+
+	$$ = new DefaultCase(*$3); }
 	//| DEFAULT ':' statement { $$ = new DefaultCase(*$3); }
 	;
 
@@ -563,16 +578,68 @@ expression_statement
 	;
 
 selection_statement
-	: IF '(' expression ')' statement { $$ = new If($3, $5, NULL);}
-	| IF '(' expression ')' statement ELSE statement {$$ = new If($3, $5, $7); /*TODO: could be problematic, because passing pointers*/}
-	| SWITCH '(' expression ')' statement {$$ = new Switch($3, *$5); }
+	: IF '(' expression ')' statement {
+				if ($5->size() != 0 && $5->at(0)->type == "Scope" && $5->at(0)->subtype == "CompoundStatement" ){
+					$$ = new If($3, &(((CompoundStatement*)($5->at(0)))->statements), NULL);
+				}else{
+					$$ = new If($3, $5, NULL);
+				}
+	 }
+	| IF '(' expression ')' statement ELSE statement {
+				std::vector<Node*>* stat1;
+				if ($5->size() != 0 && $5->at(0)->type == "Scope" && $5->at(0)->subtype == "CompoundStatement" ){
+					stat1 = &(((CompoundStatement*)($5->at(0)))->statements);
+				}else{
+					stat1 = $5;
+				}
+
+				std::vector<Node*>* stat2;
+				if ($7->size() != 0 && $7->at(0)->type == "Scope" && $7->at(0)->subtype == "CompoundStatement" ){
+					stat2 = &(((CompoundStatement*)($7->at(0)))->statements);
+				}else{
+					stat2 = $7;
+				}
+
+				$$ = new If($3, stat1, stat2); /*TODO: could be problematic, because passing pointers*/
+				}
+	| SWITCH '(' expression ')' statement {
+				if ($5->size() != 0 && $5->at(0)->type == "Scope" && $5->at(0)->subtype == "CompoundStatement" ){
+					$$ = new Switch($3, (((CompoundStatement*)($5->at(0)))->statements));
+				}else{
+					$$ = new Switch($3, *$5);
+				}
+				}
 	;
 
 iteration_statement
-	: WHILE '(' expression ')' statement { $$ = new While($3, *$5);	}
-	| DO statement WHILE '(' expression ')' ';' {$$ = new DoWhile($5, *$2);	}
-	| FOR '(' expression_statement expression_statement ')' statement { $$ = new For($3, $4, NULL, *$6); }
-	| FOR '(' expression_statement expression_statement expression ')' statement { $$ = new For($3, $4, $5, *$7); }
+	: WHILE '(' expression ')' statement {
+				if ($5->size() != 0 && $5->at(0)->type == "Scope" && $5->at(0)->subtype == "CompoundStatement" ){
+					$$ = new While($3, (((CompoundStatement*)($5->at(0)))->statements));
+				}else{
+					$$ = new While($3, *$5);
+				}
+				}
+	| DO statement WHILE '(' expression ')' ';' {
+				if ($2->size() != 0 && $2->at(0)->type == "Scope" && $2->at(0)->subtype == "CompoundStatement" ){
+					$$ = new DoWhile($5, (((CompoundStatement*)($2->at(0)))->statements));
+				}else{
+					$$ = new DoWhile($5, *$2);
+				}
+				}
+	| FOR '(' expression_statement expression_statement ')' statement {
+				if ($6->size() != 0 && $6->at(0)->type == "Scope" && $6->at(0)->subtype == "CompoundStatement" ){
+					$$ = new For($3, $4, NULL, (((CompoundStatement*)($6->at(0)))->statements));
+				}else{
+					$$ = new For($3, $4, NULL, *$6);
+				}
+				}
+	| FOR '(' expression_statement expression_statement expression ')' statement {
+				if ($7->size() != 0 && $7->at(0)->type == "Scope" && $7->at(0)->subtype == "CompoundStatement" ){
+					$$ = new For($3, $4, $5, (((CompoundStatement*)($7->at(0)))->statements));
+				}else{
+					$$ = new For($3, $4, $5, *$7);
+				}
+		 		}
 	;
 
 jump_statement
