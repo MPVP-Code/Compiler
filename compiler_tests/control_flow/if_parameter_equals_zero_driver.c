@@ -3,5 +3,5 @@ int f();
 
 int main()
 {
-    return f();
+    return !(f(0)==11);
 }

@@ -27,7 +27,7 @@ void try_replace_variable(Node *&varptr, Node *inscope) {
         if (temp->declaration) {
 
             //If pointer try adding to type map
-            if (varptr->data_type.at(varptr->data_type.length()-1) == '*'){
+            if (varptr->data_type.at(varptr->data_type.length() - 1) == '*') {
                 auto type = new Variable_type(varptr->data_type, "int", 4);
                 add_to_global_typemap(type, scope);
             }
@@ -84,7 +84,7 @@ int resolve_variable_size(std::string name, Scope *child_scope) {
     return -1000;
 };
 
-int resolve_variable_offset(std::string name, const Scope* current) {
+int resolve_variable_offset(std::string name, const Scope *current) {
     int total_offset = 0;
     while (current != NULL) {
         if (current->var_map.contains(name)) {
@@ -131,7 +131,7 @@ std::string get_next_register(std::string reg) {
 
 }
 
-std::string load_mapped_variable(const Scope *scope, const Node *_var, std::string reg_name) {
+std::string load_mapped_variable_with_offset(const Scope *scope, const Node *_var, std::string reg_name, int additionalOffset) {
     auto var = (Variable *) _var;
     std::string out = "";
     int var_size = resolve_variable_size(var->data_type, (Scope *) scope);
@@ -148,7 +148,7 @@ std::string load_mapped_variable(const Scope *scope, const Node *_var, std::stri
         }
 
     } else {
-        int offset = resolve_variable_offset(var->name, scope);
+        int offset = resolve_variable_offset(var->name, scope) + additionalOffset;
 
         //Load 4 byte word
         if (var_size == 4) {
@@ -191,7 +191,11 @@ std::string load_mapped_variable(const Scope *scope, const Node *_var, std::stri
     return out;
 }
 
-std::string load_raw_variable(const Scope* scope, std::string addr_reg, std::string reg_name, std::string type_name) {
+std::string load_mapped_variable(const Scope *scope, const Node *var, std::string reg_name) {
+    return load_mapped_variable_with_offset(scope, var, reg_name, 0);
+}
+
+std::string load_raw_variable(const Scope *scope, std::string addr_reg, std::string reg_name, std::string type_name) {
     std::string out = "#Raw variable load\n";
     int var_size = resolve_variable_size(type_name, (Scope *) scope);
 
@@ -205,7 +209,7 @@ std::string load_raw_variable(const Scope* scope, std::string addr_reg, std::str
         out += "nop\n";
     }
         //Load 8 byte word
-    else if (var_size  == 8) {
+    else if (var_size == 8) {
 
         //Load left word
         out += "lwr " + reg_name + ", 4(" + addr_reg + ")\n";
@@ -218,7 +222,7 @@ std::string load_raw_variable(const Scope* scope, std::string addr_reg, std::str
         out += "nop\n";
 
         //Load byte
-    } else if (var_size == 1){
+    } else if (var_size == 1) {
         out += "lb " + reg_name + ", 0(" + addr_reg + ")\n";
     }
 
@@ -345,8 +349,8 @@ std::string deallocate_stack_frame(Scope *scope) {
     return out;
 }
 
-void add_to_global_typemap(Variable_type* var, Scope* scope){
-    while(scope->parent_scope != NULL){
+void add_to_global_typemap(Variable_type *var, Scope *scope) {
+    while (scope->parent_scope != NULL) {
         scope = scope->parent_scope;
     }
     if (!scope->type_map.contains(var->name)) {
@@ -381,7 +385,7 @@ Node *resolve_function_call(std::string name, Scope *current) {
     return global->declaration_map[name];
 }
 
-std::string resolve_base_type(std::string alias, Scope* scope) {
+std::string resolve_base_type(std::string alias, Scope *scope) {
     Scope *current_scope = scope;
     std::string current_alias = alias;
     std::string base;

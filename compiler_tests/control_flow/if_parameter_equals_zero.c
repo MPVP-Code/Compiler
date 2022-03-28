@@ -1,5 +1,6 @@
-int f() {
-    if (0) {
+int f(int n)
+{
+    if(n == 0) {
         return 11;
     }
     return 10;
