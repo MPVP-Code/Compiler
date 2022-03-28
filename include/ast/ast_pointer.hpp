@@ -12,7 +12,7 @@ public:
 
     AddressOf(Node *in);
     std::string compileToMIPS(const Node *parent_scope) const override;
-
+    void generate_var_maps(Node *parent);
 };
 
 class Dereference : public UnaryOperator {
@@ -20,6 +20,7 @@ public:
 
     Dereference(Node *in);
     std::string compileToMIPS(const Node *parent_scope) const override;
+    void generate_var_maps(Node *parent);
 
 };
 #endif

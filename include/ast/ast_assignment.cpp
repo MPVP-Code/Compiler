@@ -38,7 +38,6 @@ Assign::Assign(Variable *_destination, Node *_source) : destination(_destination
 }
 
 void Assign::generate_var_maps(Node *parent) {
-    Scope *parentScope = (Scope *) parent;
 
     //Destination var mapping
     auto temp = (Node *) this->destination;

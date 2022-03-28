@@ -1,5 +1,6 @@
 int f(){
     int** a;
-    int b = &a;
-    int c = *a;
+    int*** b = &a;
+    int* c = *a;
+    int d = *c;
 }
