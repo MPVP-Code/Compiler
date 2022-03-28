@@ -19,6 +19,7 @@ typedef union {
 
 std::string load_mapped_variable(const Scope* scope, const Node* var, std::string reg_name);
 std::string load_mapped_variable_with_offset(const Scope* scope, const Node* _var, std::string reg_name, int offset);
+std::string load_mapped_variable_coprocessor(const Scope *scope, const Node *_var, std::string reg_name);
 std::string load_raw_variable(const Scope* scope, std::string addr_reg, std::string reg_name, std::string type_name);
 std::string store_mapped_variable(const Scope* scope, const Node* var, std::string reg_name);
 std::string store_raw_variable(const Scope* scope, std::string addr_reg, std::string reg_name, std::string type_name);

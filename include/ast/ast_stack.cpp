@@ -244,7 +244,6 @@ std::string load_raw_variable(const Scope *scope, std::string addr_reg, std::str
     return out;
 }
 
-
 std::string load_mapped_variable_coprocessor(const Scope *scope, const Node *_var, std::string reg_name) {
     auto var = (Variable *) _var;
     std::string out = "";
@@ -253,8 +252,10 @@ std::string load_mapped_variable_coprocessor(const Scope *scope, const Node *_va
     if (var->name != "!return") {
         int offset = resolve_variable_offset(var->name, scope);
         //Only spports aligned offsets
-        if (offset % 4 == 0) {
+        if (offset % 4 == 0 && var->data_type == "float") {
             out = "lwc1 " + reg_name + ", " + std::to_string(offset) + "($sp) \n";
+        } else if (var->data_type == "double") {
+            out = "ldc1 " + reg_name + ", " + std::to_string(offset) + "($sp) \n";
         }
         out += "nop\n";
     } else {
@@ -363,7 +364,9 @@ std::string store_mapped_variable_coprocessor(const Scope *scope, const Node *_v
     if (var->name != "!return") {
         int offset = resolve_variable_offset(var->name, scope);
         //Only spports aligned offsets
-        if (offset % 4 == 0) {
+        if (offset % 4 == 0 && var->data_type == "double") {
+            out = "sdc1 " + reg_name + ", " + std::to_string(offset) + "($sp) \n";
+        } else {
             out = "swc1 " + reg_name + ", " + std::to_string(offset) + "($sp) \n";
         }
         out += "nop\n";
