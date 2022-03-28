@@ -270,6 +270,7 @@ declaration
 				auto temp = (Variable*) statement;
 				if (temp->declaration){
 					if (temp->data_type != "None"){
+						std::cerr<<"Merging type:" + *$1 << ": " << temp->data_type;
 						temp->data_type = *$1 + temp->data_type;
 					}else {
 					temp->data_type = *$1;
@@ -313,6 +314,7 @@ init_declarator
 
 			if ($1->type == "Identifier"){
 				auto id = (Identifier*)$1;
+				std::cerr<< "ID pointer:" << id->pointer;
 				auto temp = new Variable(id->pointer, id->identifier, true);
 				$$-> push_back(temp);
 			}else if ($1->subtype == "FunctionDeclaration"){
@@ -399,6 +401,7 @@ declarator
 	: direct_declarator { $$ = $1; }
 	|  pointer direct_declarator {
 		auto ptr= (Identifier*) $2;
+		std::cerr<<"Pointer value" << $1;
 		ptr->pointer = *$1;
 		$$ = $2;
 
@@ -438,8 +441,10 @@ direct_declarator
 pointer
 	: '*' {$$ = new std::string("*");}
 	| '*' pointer {
-		auto str = (*$2 + "*");
-		$$ = &str; }
+		auto str = *$2 + "*";
+		$$ = new std::string(str);
+		std::cerr<<str;
+		}
 	;
 
 parameter_type_list

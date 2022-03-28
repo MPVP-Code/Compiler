@@ -25,6 +25,13 @@ void try_replace_variable(Node *&varptr, Node *inscope) {
     if (varptr->type == "Variable") {
         auto temp = (Variable *) varptr;
         if (temp->declaration) {
+
+            //If pointer try adding to type map
+            if (varptr->data_type.at(varptr->data_type.length()-1) == '*'){
+                auto type = new Variable_type(varptr->data_type, "int", 4);
+                add_to_global_typemap(type, scope);
+            }
+            //Else just resolve type
             scope->var_map[temp->name] = temp;
         } else {
             varptr = resolve_variable_name(temp->name, scope);
@@ -74,7 +81,7 @@ int resolve_variable_size(std::string name, Scope *child_scope) {
     return -1000;
 };
 
-int resolve_variable_offset(std::string name, const Scope *current) {
+int resolve_variable_offset(std::string name, const Scope* current) {
     int total_offset = 0;
     while (current != NULL) {
         if (current->var_map.contains(name)) {
@@ -178,6 +185,41 @@ std::string load_mapped_variable(const Scope* scope, const Node* _var, std::stri
         }
 
     }
+    return out;
+}
+
+std::string load_raw_variable(const Scope* scope, std::string addr_reg, std::string reg_name, std::string type_name) {
+    std::string out = "#Raw variable load\n";
+    int var_size = resolve_variable_size(type_name, (Scope *) scope);
+
+//Check if variable refers to function return
+
+    //Load 4 byte word
+    if (var_size == 4) {
+        //Load first word
+        out += "lwr " + reg_name + ", 0(" + addr_reg + ")\n";
+        out += "lwl " + reg_name + ", 3(" + addr_reg + ")\n";
+        out += "nop\n";
+    }
+        //Load 8 byte word
+    else if (var_size  == 8) {
+
+        //Load left word
+        out += "lwr " + reg_name + ", 4(" + addr_reg + ")\n";
+        out += "lwl " + reg_name + ", 7(" + addr_reg + ")\n";
+        out += "nop\n";
+
+        //Load right word
+        out += "lwr " + get_next_register(reg_name) + ", 0(" + addr_reg + ")\n";
+        out += "lwl " + get_next_register(reg_name) + ", 3(" + addr_reg + ")\n";
+        out += "nop\n";
+
+        //Load byte
+    } else if (var_size == 1){
+        out += "lb " + reg_name + ", 0(" + addr_reg + ")\n";
+    }
+
+
     return out;
 }
 
@@ -298,6 +340,15 @@ std::string deallocate_stack_frame(Scope *scope) {
     //fp operations
     //out += "addiu $fp, $fp, " + std::to_string(frame_size) + "\n";
     return out;
+}
+
+void add_to_global_typemap(Variable_type* var, Scope* scope){
+    while(scope->parent_scope != NULL){
+        scope = scope->parent_scope;
+    }
+    if (!scope->type_map.contains(var->name)) {
+        scope->type_map[var->name] = var;
+    }
 }
 
 std::string intToHex(int value) {
