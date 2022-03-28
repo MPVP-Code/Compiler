@@ -46,7 +46,9 @@ void yyerror(const char *);
 %%
 
 primary_expression
-	: IDENTIFIER { $$ = new Identifier(*$1); std::cerr << "found identifier\n" << *$1 << std::endl;}
+	: IDENTIFIER { //$$ = new Identifier(*$1); std::cerr << "found identifier\n" << *$1 << std::endl;
+			$$ = new Variable ("", *$1, false);
+			}
 	| CONSTANT { $$ = new Constant(std::stoi(*$1)); $$->data_type = "int"; std::cerr<<"Found const\n" << *$1 << std::endl;}
 //	| STRING_LITERAL {}
 	| '(' expression ')' {$$ = $2;}
@@ -56,12 +58,12 @@ postfix_expression
 	: primary_expression {$$ = $1; }
 
 	| postfix_expression '(' ')' {
-				auto id = (Identifier*) $1;
+				auto id = (Variable*) $1;
 				auto empty  = new std::vector<Node*>();
-				$$ = new FunctionCall(id->identifier, empty);}
+				$$ = new FunctionCall(id->name, empty);}
 	| postfix_expression '(' argument_expression_list ')' {
-				auto id = (Identifier*) $1;
-				$$ = new FunctionCall(id->identifier, $3);
+				auto id = (Variable*) $1;
+				$$ = new FunctionCall(id->name, $3);
 	}
 //	| postfix_expression '[' expression ']' {}
 //	| postfix_expression '.' IDENTIFIER {}
@@ -82,13 +84,7 @@ argument_expression_list
 	;
 
 unary_expression
-	: postfix_expression {
-				if($1->type == "Identifier"){
-					$$ = new Variable ("", ((Identifier*)$1)->identifier, false);
-				}else{
-					$$ = $1;
-				}
-				}
+	: postfix_expression { $$ = $1;	}
 	| INC_OP unary_expression {$$ = new PreIncOp ($2);}
 	| DEC_OP unary_expression {$$ = new PreDecOp ($2);}
 	| unary_operator unary_expression {
@@ -194,14 +190,7 @@ assignment_expression
 
 		std::cerr<<"assignmentexpression" <<" assop = "<< $2 << "Unexp type" << $1->type << std::endl;
 
-		if ($1->type == "UnaryOperator"){
-			std::cerr<<"detected unaryoperator";
-			temp = new Variable("", ((Identifier*)(((UnaryOperator*)$1)->in))->identifier, false);
-			((UnaryOperator*)$1)->in = temp;
-			temp = $1;
-		}else{
-			temp = new Variable("", ((Identifier*)$1)->identifier, false);
-		}
+		temp = $1;
 
 		if ($2 == '='){
 			$$ = new Assign(temp, $3);
@@ -315,24 +304,24 @@ init_declarator
 			std::cerr<< $1->type;
 			std::cerr<< $1->subtype;
 
-			if ($1->type == "Identifier"){
-				auto id = (Identifier*)$1;
-				std::cerr<< "ID pointer:" << id->pointer;
-				auto temp = new Variable(id->pointer, id->identifier, true);
-				$$-> push_back(temp);
-			}else if ($1->subtype == "FunctionDeclaration"){
+
+			if ($1->subtype == "FunctionDeclaration"){
 				auto func = (FunctionDeclaration*)$1;
 				//If a function declaration got here it is a fwd declaration
 				func->forward_declaration = true;
 				$$->push_back(func);
+			} else {
+				auto var  = (Variable*) $1;
+				var->declaration = true;
+				$$-> push_back(var);
 			}
 	}
 	| declarator '=' initializer {
 			$$ = new std::vector<Node*>;
-			auto id = (Identifier*)$1;
-			auto temp = new Variable(id->pointer, id->identifier, true);
-			$$-> push_back(temp);
-			auto temp2 = new Assign(temp, $3);
+			auto var = (Variable*)$1;
+			var->declaration = true;
+			$$-> push_back(var);
+			auto temp2 = new Assign($1, $3);
 			$$-> push_back(temp2);
 
 	}
@@ -404,27 +393,27 @@ enumerator
 declarator
 	: direct_declarator { $$ = $1; }
 	|  pointer direct_declarator {
-		auto ptr= (Identifier*) $2;
+		auto var= (Variable*) $2;
 		std::cerr<<"Pointer value" << $1;
-		ptr->pointer = *$1;
-		$$ = $2;
+		var->data_type = *$1;
+		$$ = var;
 
 		}
 	;
 
 direct_declarator
-	: IDENTIFIER { $$ = new Identifier(*$1);	}
+	: IDENTIFIER { $$ = new Variable("", *$1, false);	}
 	| direct_declarator '(' ')' {
-		auto id = (Identifier*)$1;
+		auto var = (Variable*)$1;
 		auto func =  new FunctionDeclaration();
 		func->arguments = new std::vector<Variable*>();
-		func->name = id->identifier;
+		func->name = var->name;
 		$$ = func;
 	}
 	| direct_declarator '(' parameter_type_list ')' {
-			auto id = (Identifier*)$1;
+			auto var = (Variable*)$1;
         		auto func =  new FunctionDeclaration();
-        		func->name = id->identifier;
+        		func->name = var->name;
 
         		//Copy with cast to var
         		func->arguments = new std::vector<Variable*>();
@@ -464,8 +453,10 @@ parameter_list
 
 parameter_declaration
 	: declaration_specifiers declarator {
-		auto id = (Identifier*) $2;
-		$$ = new Variable(*$1 + id->pointer, id->identifier, true);
+		auto var = (Variable*) $2;
+		var->declaration = true;
+		var->data_type = *$1 + var->data_type;
+		$$ = var;
 	 }
 	//| declaration_specifiers abstract_declarator {}
 	//| declaration_specifiers {}

@@ -5,14 +5,6 @@
 #include "ast_operator.hpp"
 #include <string>
 
-class Identifier : public Node {
-public:
-    std::string identifier;
-    std::string pointer;
-
-    Identifier(std::string id);
-
-};
 
 class SizeOf : public UnaryOperator {
 public:
