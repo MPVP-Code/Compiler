@@ -1,12 +1,17 @@
 %code requires{
 #include "../include/ast.hpp"
 #include <cassert>
+#include <iostream>
+#include <sstream>
 
 extern Global* global_root; // A way of getting the AST out
 
 int yylex(void);
 void yyerror(const char *);
 
+bool check_map_contains(std::map<std::string, bool> type_map, std::string alias);
+
+ extern std::map<std::string, bool> lexer_type_map;
 }
 
 
@@ -18,7 +23,7 @@ void yyerror(const char *);
   char character;
 }
 
-%token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF NEW_TYPE_NAME CONSTANT_FLOAT STRING_LITERAL CONSTANT_CHAR
+%token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF NEW_TYPE_NAME CONSTANT_FLOAT STRING_LITERAL CONSTANT_CHAR TYPE_NAME
 %token PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
 %token AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
 %token SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
@@ -36,7 +41,7 @@ void yyerror(const char *);
 %type <node>  labeled_statement expression_statement selection_statement parameter_declaration
 %type <node> specifier_qualifier_list primary_expression postfix_expression unary_expression jump_statement iteration_statement declarator direct_declarator type_specifier declaration_specifiers
 %type <string> CONSTANT CONSTANT_FLOAT STRING_LITERAL CONSTANT_CHAR
-%type <string> IDENTIFIER
+%type <string> IDENTIFIER TYPE_NAME
 %type <string> type_name pointer NEW_TYPE_NAME storage_class_specifier
 %type <statements> compound_statement statement_list external_declaration declaration init_declarator_list init_declarator enumerator_list
 %type <statements> declaration_list statement parameter_list parameter_type_list argument_expression_list
@@ -303,8 +308,32 @@ declaration
 
 declaration_specifiers
 	: type_specifier {$$ = $1;}
-	| type_specifier declaration_specifiers {$$ = $1;}
-	//| storage_class_specifier declaration_specifiers  {$$ = new TypeDef(*$1, *$2);}
+	| type_specifier declaration_specifiers {
+				auto ts = (TypeSpecifier*) $1;
+				auto ts2 = (TypeSpecifier*) $2;
+				ts-> typeName = new std::string(*ts->typeName + ";" + *ts2->typeName);
+				$$ = ts;
+				}
+	| storage_class_specifier declaration_specifiers  {
+		auto ts = (TypeSpecifier*) $2;
+                std::istringstream ss(*(ts->typeName));
+                std::string token;
+                std::vector<std::string> types;
+
+                while(std::getline(ss, token, ';')) {
+                    types.push_back(token);
+                    std::cerr<< "split: " << token << "\n";
+                }
+                //std::string alias = types[1];
+
+		//Correct typedef modifiers
+		while (types[1].at(types[1].size() -1) == '*'){
+			types[0] += "*";
+			types[1] = types[1].substr(0,types[1].size()-1 );
+		}
+		$$ = new TypeDef(types[0], types[1]);
+		lexer_type_map[types[1]] = true;
+		}
 	//| storage_class_specifier {$$ = $1;}
 	;
 
@@ -346,7 +375,7 @@ init_declarator
 	;
 
 storage_class_specifier
-	: TYPEDEF { $$ = new std::string("typedef");}
+	: TYPEDEF {}
 	;
 
 type_specifier
@@ -358,7 +387,7 @@ type_specifier
 	| UNSIGNED {$$ = new TypeSpecifier(new std::string("unsigned"));}
 //	| struct_specifier {}
 	| enum_specifier {$$ = $1; }
-//	| TYPE_NAME {}
+	| TYPE_NAME {$$ = new TypeSpecifier($1);}
 	;
 
 struct_specifier
@@ -742,3 +771,9 @@ void yyerror(char *s){
 	fflush(stdout);
 	printf("\n%*s\n%*s\n", "^", s);
 }
+
+bool check_map_contains(std::map<std::string, bool> type_map, std::string alias){
+	 return (type_map.find(alias) != type_map.end());
+
+}
+

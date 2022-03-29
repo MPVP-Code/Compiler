@@ -5,9 +5,9 @@
 #include <vector>
 
 class TypeSpecifier: public Node {
-protected:
-    std::string* typeName;
 public:
+    std::string* typeName;
+
     TypeSpecifier(std::string* typeName);
 
     std::string* getTypeName();
