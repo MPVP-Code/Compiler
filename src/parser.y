@@ -289,7 +289,7 @@ declaration
 			} else if (statement->subtype == "FunctionDeclaration"){
 				//Forward function declarations parsed through here
 				auto temp = (FunctionDeclaration*) statement;
-				temp->return_type = $1;
+				temp->return_type = *$1;
 				std::cerr << "Found fwd declaration\n";
 
 
@@ -426,12 +426,14 @@ direct_declarator
 		auto func =  new FunctionDeclaration();
 		func->arguments = new std::vector<Variable*>();
 		func->name = var->name;
+		func->return_type = var->data_type;
 		$$ = func;
 	}
 	| direct_declarator '(' parameter_type_list ')' {
 			auto var = (Variable*)$1;
         		auto func =  new FunctionDeclaration();
         		func->name = var->name;
+			func->return_type = var->data_type;
 
         		//Copy with cast to var
         		func->arguments = new std::vector<Variable*>();
@@ -707,9 +709,10 @@ external_declaration
 
 function_definition
 	: declaration_specifiers declarator compound_statement {
-	std::cerr<<"found function";
+	std::cerr<<"found function function_definition";
 	auto func = (FunctionDeclaration*) $2;
-	func->return_type = $1;
+	std::cerr << "return_type: " << $1 << std::endl;
+	func->return_type = *$1;
 	func->statements = *$3;
 	$$ = (Node*) func;
 	}

@@ -9,8 +9,9 @@ Addition::Addition(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 std::string Addition::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
     //Resolve wether to use temp variable or actual variable
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    std::string basicDataType = resolve_base_type(this->data_type, (Scope*) parent_scope);
 
+    if (basicDataType == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
@@ -32,7 +33,7 @@ std::string Addition::compileToMIPS(const Node *parent_scope) const {
         result += "add $13, $14, $15\n";
 
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
-    } else if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "float") {
+    } else if (basicDataType == "float") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
@@ -44,6 +45,13 @@ std::string Addition::compileToMIPS(const Node *parent_scope) const {
         result += "add.s $f2, $f4, $f6\n";
         result += "mfc1 $13, $f2\n";
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
+    } else if (basicDataType == "double") {
+        result += compileLandRNodesToMIPS(parent_scope);
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable_coprocessor((Scope *) parent_scope, LVar, "$f6") + "\n";
+        result += load_mapped_variable_coprocessor((Scope *) parent_scope, RVar, "$f4") + "\n";
+        result += "add.d $f0, $f4, $f6\n";
     }
     return result;
 };
@@ -54,8 +62,9 @@ Subtraction::Subtraction(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string Subtraction::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_type(this->data_type, (Scope*) parent_scope);
     //Resolve wether to use temp variable or actual variable
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
@@ -76,7 +85,7 @@ std::string Subtraction::compileToMIPS(const Node *parent_scope) const {
 
         result += "sub $13, $15, $14\n";
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
-    } else if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "float") { /*might cause segmentation faults*/
+    } else if (basicDataType == "float") { /*might cause segmentation faults*/
         //Finds temporary / constant/ normal variables in which results have been previously stored
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
@@ -88,6 +97,13 @@ std::string Subtraction::compileToMIPS(const Node *parent_scope) const {
         result += "sub.s $f2, $f4, $f6\n";
         result += "mfc1 $13, $f2\n";
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
+    } else if (basicDataType == "double") {
+        result += compileLandRNodesToMIPS(parent_scope);
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable_coprocessor((Scope *) parent_scope, LVar, "$f4") + "\n";
+        result += load_mapped_variable_coprocessor((Scope *) parent_scope, RVar, "$f6") + "\n";
+        result += "sub.d $f0, $f4, $f6\n";
     }
     return result;
 };
@@ -99,8 +115,9 @@ Multiplication::Multiplication(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string Multiplication::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_type(this->data_type, (Scope*) parent_scope);
 
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
@@ -108,7 +125,7 @@ std::string Multiplication::compileToMIPS(const Node *parent_scope) const {
         result += load_mapped_variable((Scope *) parent_scope, RVar, "$14") + "\n";
         result += "mult $15, $14\nmflo $13\n";
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
-    } else if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "float") {
+    } else if (basicDataType == "float") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
@@ -120,6 +137,13 @@ std::string Multiplication::compileToMIPS(const Node *parent_scope) const {
         result += "mul.s $f2, $f4, $f6\n";
         result += "mfc1 $13, $f2\n";
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
+    } else if (basicDataType == "double") {
+        result += compileLandRNodesToMIPS(parent_scope);
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable_coprocessor((Scope *) parent_scope, LVar, "$f6") + "\n";
+        result += load_mapped_variable_coprocessor((Scope *) parent_scope, RVar, "$f4") + "\n";
+        result += "mul.d $f0, $f4, $f6\n";
     }
 
     return result;
@@ -132,8 +156,9 @@ Division::Division(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string Division::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_type(this->data_type, (Scope*) parent_scope);
 
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
@@ -141,7 +166,7 @@ std::string Division::compileToMIPS(const Node *parent_scope) const {
         result += load_mapped_variable((Scope *) parent_scope, RVar, "$14") + "\n";
         result += "div $15, $14\nmflo $13\n";
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
-    } else if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "float") {
+    } else if (basicDataType == "float") {
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
@@ -152,6 +177,13 @@ std::string Division::compileToMIPS(const Node *parent_scope) const {
         result += "div.s $f2, $f4, $f6\n";
         result += "mfc1 $13, $f2\n";
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
+    } else if (basicDataType == "double") {
+        result += compileLandRNodesToMIPS(parent_scope);
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable_coprocessor((Scope *) parent_scope, LVar, "$f4") + "\n";
+        result += load_mapped_variable_coprocessor((Scope *) parent_scope, RVar, "$f6") + "\n";
+        result += "div.d $f0, $f4, $f6\n";
     }
 
     return result;

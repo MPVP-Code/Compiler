@@ -19,6 +19,7 @@ typedef union {
 
 std::string load_mapped_variable(const Scope* scope, const Node* var, std::string reg_name);
 std::string load_mapped_variable_with_offset(const Scope* scope, const Node* _var, std::string reg_name, int offset);
+std::string load_mapped_variable_coprocessor(const Scope *scope, const Node *_var, std::string reg_name);
 std::string load_raw_variable(const Scope* scope, std::string addr_reg, std::string reg_name, std::string type_name);
 std::string store_mapped_variable(const Scope* scope, const Node* var, std::string reg_name);
 std::string store_raw_variable(const Scope* scope, std::string addr_reg, std::string reg_name, std::string type_name);
@@ -35,6 +36,7 @@ int resolve_variable_offset(std::string name, const Scope* current);
 std::string intToHex(int value);
 std::string convertFloatToBinary(float f);
 Variable* allocate_temp_var(Node* current, std::string type);
+Variable* resolve_ra_variable(const Node* parent_scope);
 
 Node* resolve_function_call(std::string name, Scope* current);
 std::string resolve_base_type(std::string alias, Scope* scope);

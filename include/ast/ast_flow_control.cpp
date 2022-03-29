@@ -37,7 +37,27 @@ DoWhile::DoWhile(Node *_condition, std::vector<Node *> _statements) : Scope(), c
     this->statements = _statements;
 }
 
-std::string DoWhile::compileToMIPS(const Node *parent_scope) const {}
+std::string DoWhile::compileToMIPS(const Node *parent_scope) const {
+    std::string result = "";
+    int whileId = Global::getIdForWhile();
+    result += allocate_stack_frame((Scope *) this);
+    std::string whileStart = "$WHILE" + std::to_string(whileId) + "START";
+    result += whileStart + ":\n";
+
+    for (Node *statement: statements) {
+        std::string generatedCode = statement->compileToMIPS(this);
+        if (generatedCode.length() != 0) {
+            result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
+        }
+    }
+
+    result += condition->compileToMIPS((Scope *) this) + "\n";
+    result += load_mapped_variable((Scope *) this, condition->get_intermediate_variable(), "$15");
+    result += "bne $15, $0, " + whileStart + "\nnop\n";
+    result += deallocate_stack_frame((Scope *) this);
+
+    return result;
+}
 
 
 If::If(Node *_condition, std::vector<Node *> *_truestatements, std::vector<Node *> *_falsestatements)
