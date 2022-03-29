@@ -3,6 +3,7 @@
 #include "ast_flow_control.hpp"
 #include "ast_stack.hpp"
 #include "ast_typedef.hpp"
+#include "ast_type_specifier.hpp"
 #include <string>
 #include <cctype>
 
@@ -51,7 +52,16 @@ void Scope::generate_var_maps(Node *parent) {
 
 
     for (auto &node: this->statements) {
-        try_replace_variable(node, this);
+        if (node->subtype == "Enum") {
+            Enum* nodeEnum = (Enum*) node;
+            std::vector<Node*>* elements = nodeEnum->getElements();
+            for (auto &node: *elements) {
+                EnumElement* enumElement = (EnumElement*) node;
+                this->enum_elements[enumElement->getName()] = enumElement->getValue();
+            }
+        } else {
+            try_replace_variable(node, this);
+        }
     }
 
     if (this->subtype == "If") {

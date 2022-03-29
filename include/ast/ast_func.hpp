@@ -41,7 +41,6 @@ public:
 
     Node* get_intermediate_variable() override;
 
-
 };
 
 #endif
