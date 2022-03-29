@@ -32,13 +32,13 @@ void yyerror(const char *);
 %type <node>  multiplicative_expression additive_expression shift_expression relational_expression equality_expression
 %type <node> and_expression exclusive_or_expression inclusive_or_expression logical_and_expression conditional_expression
 %type <node> assignment_expression logical_or_expression initializer translation_unit
-%type <node>  expression function_definition constant_expression
-%type <node>  labeled_statement expression_statement selection_statement parameter_declaration
-%type <node> primary_expression postfix_expression unary_expression jump_statement iteration_statement declarator direct_declarator
+%type <node>  expression function_definition constant_expression enum_specifier
+%type <node>  labeled_statement expression_statement selection_statement parameter_declaration enumerator
+%type <node> specifier_qualifier_list primary_expression postfix_expression unary_expression jump_statement iteration_statement declarator direct_declarator type_specifier declaration_specifiers
 %type <string> CONSTANT CONSTANT_FLOAT
 %type <string> IDENTIFIER
-%type <string> type_specifier declaration_specifiers specifier_qualifier_list type_name pointer NEW_TYPE_NAME storage_class_specifier
-%type <statements> compound_statement statement_list external_declaration declaration init_declarator_list init_declarator
+%type <string> type_name pointer NEW_TYPE_NAME storage_class_specifier
+%type <statements> compound_statement statement_list external_declaration declaration init_declarator_list init_declarator enumerator_list
 %type <statements> declaration_list statement parameter_list parameter_type_list argument_expression_list
 %type <character> unary_operator assignment_operator
 
@@ -261,30 +261,30 @@ constant_expression
 
 declaration
 	: declaration_specifiers init_declarator_list ';' { // Set type of all assignments
+		TypeSpecifier* typeSpecifier = (TypeSpecifier*) $1;
+		std::string typeName = *(typeSpecifier->getTypeName());
 		for (auto statement : *$2){
 			if(statement -> type == "Variable"){
 				auto temp = (Variable*) statement;
 				if (temp->declaration){
 					if (temp->data_type != ""){
-						std::cerr<<"Merging type:" + *$1 << ": " << temp->data_type;
-						temp->data_type = *$1 + temp->data_type;
+						std::cerr<<"Merging type:" + typeName << ": " << temp->data_type;
+						temp->data_type = typeName + temp->data_type;
 					}else {
-					temp->data_type = *$1;
+					temp->data_type = typeName;
 					}
 				}
 			} else if (statement->subtype == "FunctionDeclaration"){
 				//Forward function declarations parsed through here
 				auto temp = (FunctionDeclaration*) statement;
-				temp->return_type = *$1;
+				temp->return_type = typeName;
 				std::cerr << "Found fwd declaration\n";
-
-
 			}
 		}
 		$$ = $2;
 
 	}
-	| declaration_specifiers ';' {}
+	| declaration_specifiers ';' {$$ = new std::vector<Node*>; $$->push_back($1);}
 	;
 
 declaration_specifiers
@@ -336,14 +336,14 @@ storage_class_specifier
 	;
 
 type_specifier
-	: INT { $$ = new std::string("int");}
-	| CHAR {$$ = new std::string("char");}
-	| VOID {$$ = new std::string("void");}
-	| FLOAT {$$ = new std::string("float");}
-	| DOUBLE {$$ = new std::string("double");}
-	| UNSIGNED {$$ = new std::string("unsigned");}
+	: INT { $$ = new TypeSpecifier(new std::string("int"));}
+	| CHAR {$$ = new TypeSpecifier(new std::string("char"));}
+	| VOID {$$ = new TypeSpecifier(new std::string("void"));}
+	| FLOAT {$$ = new TypeSpecifier(new std::string("float"));}
+	| DOUBLE {$$ = new TypeSpecifier(new std::string("double"));}
+	| UNSIGNED {$$ = new TypeSpecifier(new std::string("unsigned"));}
 //	| struct_specifier {}
-//	| enum_specifier {}
+	| enum_specifier {$$ = $1; }
 //	| TYPE_NAME {}
 	;
 
@@ -379,19 +379,19 @@ struct_declarator
 	;
 
 enum_specifier
-	: ENUM '{' enumerator_list '}' {}
-	| ENUM IDENTIFIER '{' enumerator_list '}' {}
-	| ENUM IDENTIFIER {}
+	: ENUM '{' enumerator_list '}' { $$ = new Enum($3); }
+	| ENUM IDENTIFIER '{' enumerator_list '}' { $$ = new Enum($2, $4); }
+	//| ENUM IDENTIFIER {}
 	;
 
 enumerator_list
-	: enumerator {}
-	| enumerator_list ',' enumerator {}
+	: enumerator { $$ = new std::vector<Node*>(); $$->push_back($1); }
+	| enumerator_list ',' enumerator { $1->push_back($3); $$ = $1; }
 	;
 
 enumerator
-	: IDENTIFIER {}
-	| IDENTIFIER '=' constant_expression {}
+	: IDENTIFIER { $$ = new EnumElement($1); }
+	| IDENTIFIER '=' constant_expression { $$ = new EnumElement($1, $3); }
 	;
 
 declarator
@@ -474,7 +474,8 @@ parameter_declaration
 	: declaration_specifiers declarator {
 		auto var = (Variable*) $2;
 		var->declaration = true;
-		var->data_type = *$1 + var->data_type;
+		TypeSpecifier* temp = (TypeSpecifier*) $1;
+		var->data_type = *(temp->getTypeName()) + var->data_type;
 		$$ = var;
 	 }
 	//| declaration_specifiers abstract_declarator {}
@@ -487,7 +488,7 @@ identifier_list
 	;
 
 type_name
-	: specifier_qualifier_list {$$ = $1;}
+	: specifier_qualifier_list {TypeSpecifier* typeSpecifier = (TypeSpecifier*) $1; $$ = typeSpecifier->getTypeName();}
 //	| specifier_qualifier_list abstract_declarator {}
 	;
 
@@ -698,7 +699,8 @@ function_definition
 	std::cerr<<"found function function_definition";
 	auto func = (FunctionDeclaration*) $2;
 	std::cerr << "return_type: " << $1 << std::endl;
-	func->return_type = *$1;
+	TypeSpecifier* temp = (TypeSpecifier*) $1;
+	func->return_type = *(temp->getTypeName());
 	func->statements = *$3;
 	$$ = (Node*) func;
 	}
