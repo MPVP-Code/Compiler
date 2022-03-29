@@ -103,7 +103,7 @@ std::string If::compileStatementsToMIPS(std::vector<Node *> *statements, const N
         if (statement->type == "Break") {
             result += deallocate_stack_frame((Scope *) this);
             Scope* tmp = (Scope*) parent_scope;
-            while (tmp != NULL && tmp->subtype != "While" &&  tmp->subtype != "DoWhile") {
+            while (tmp != NULL && tmp->subtype != "While" && tmp->subtype != "DoWhile" &&  tmp->subtype != "For") {
                 result += deallocate_stack_frame(tmp);
                 tmp = tmp->parent_scope;
             }
@@ -113,11 +113,14 @@ std::string If::compileStatementsToMIPS(std::vector<Node *> *statements, const N
             } else if (tmp != NULL && tmp->subtype == "DoWhile") {
                 DoWhile* whileScope = (DoWhile*) tmp;
                 result += "b " + whileScope->getEndLabel() + "\nnop\n";
+            } else if (tmp != NULL && tmp->subtype == "For") {
+                For* forScope = (For*) tmp;
+                result += "b " + forScope->getEndLabel() + "\nnop\n";
             }
         } else if (statement->type == "Continue") {
             result += deallocate_stack_frame((Scope *) this);
             Scope* tmp = (Scope*) parent_scope;
-            while (tmp != NULL && tmp->subtype != "While" &&  tmp->subtype != "DoWhile") {
+            while (tmp != NULL && tmp->subtype != "While" &&  tmp->subtype != "DoWhile" &&  tmp->subtype != "For") {
                 result += deallocate_stack_frame(tmp);
                 tmp = tmp->parent_scope;
             }
@@ -127,6 +130,9 @@ std::string If::compileStatementsToMIPS(std::vector<Node *> *statements, const N
             } else if (tmp != NULL && tmp->subtype == "DoWhile") {
                 DoWhile* whileScope = (DoWhile*) tmp;
                 result += "b " + whileScope->getConditionLabel() + "\nnop\n";
+            } else if (tmp != NULL && tmp->subtype == "For") {
+                For* forScope = (For*) tmp;
+                result += "b " + forScope->getConditionLabel() + "\nnop\n";
             }
         } else {
             std::string generatedCode = statement->compileToMIPS(this);
@@ -168,33 +174,47 @@ For::For(Node *_initialization, Node *_condition, Node *_update, std::vector<Nod
         : Scope(), initialization(_initialization), condition(_condition), update(_update) {
     this->subtype = "For";
     this->statements = _statements;
+    int forId = Global::getIdForForLoop();
+    this->forConditionLabel = "$FORCOND" + std::to_string(forId);
+    this->forStatementsLabel = "$FORSTATEMENTS" + std::to_string(forId);
+    this->forEndLabel = "$FOREND" + std::to_string(forId);
 }
 
 std::string For::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
-    int forId = Global::getIdForForLoop();
-    std::string forCondLabel = "$FORCOND" + std::to_string(forId);
-    std::string forStatementLabel = "$FORSTATEMENTS" + std::to_string(forId);
 
     result += allocate_stack_frame((Scope *) this);
     result += initialization->compileToMIPS((Scope *) this) + "\n";
-    result += "b " + forCondLabel + "\n";
-    result += forStatementLabel + ":\n";
+    result += "b " + forConditionLabel + "\nnop\n";
+    result += forStatementsLabel + ":\n";
 
     for (Node *statement: statements) {
-        std::string generatedCode = statement->compileToMIPS(this);
-        if (generatedCode.length() != 0) {
-            result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
+        if (statement->type == "Break") {
+            result += "b " + forEndLabel + "\nnop\n";
+        } else {
+            std::string generatedCode = statement->compileToMIPS(this);
+            if (generatedCode.length() != 0) {
+                result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
+            }
         }
     }
     result += update->compileToMIPS((Scope *) this) + "\n";
-    result += forCondLabel + ":\n";
+    result += forConditionLabel + ":\n";
     result += condition->compileToMIPS((Scope *) this) + "\n";
     result += load_mapped_variable((Scope *) this, condition->get_intermediate_variable(), "$15") + "\n";
-    result += "bne $15, $0, " + forStatementLabel + "\n";
+    result += "bne $15, $0, " + forStatementsLabel + "\n";
     result += "nop\n";
+    result += forEndLabel + ":\n";
     result += deallocate_stack_frame((Scope *) this);
     return result;
+}
+
+std::string For::getEndLabel() {
+    return forEndLabel;
+}
+
+std::string For::getConditionLabel() {
+    return forConditionLabel;
 }
 
 Switch::Switch(Node *_condition, std::vector<Node *> _statements) : condition(_condition), statements(_statements) {

@@ -688,6 +688,7 @@ iteration_statement
 				}
 				}
 	| FOR '(' expression_statement expression_statement expression ')' statement {
+				std::cerr << "for parsing" << std::endl;
 				if ($7->size() != 0 && $7->at(0)->type == "Scope" && $7->at(0)->subtype == "CompoundStatement" ){
 					$$ = new For($3, $4, $5, (((CompoundStatement*)($7->at(0)))->statements));
 				}else{
@@ -702,7 +703,7 @@ jump_statement
 				std::cerr << "Found return expression;\n";
 				}
 	| RETURN ';' { $$ = new Return(NULL);}
-	| BREAK ';' { $$ = new Break(); };
+	| BREAK ';' { std::cerr << "break parsing" << std::endl; $$ = new Break(); };
 	| CONTINUE ';' {$$ = new Continue(); }
 
 

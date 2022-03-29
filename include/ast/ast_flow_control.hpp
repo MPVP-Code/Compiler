@@ -53,6 +53,10 @@ public:
 };
 
 class For: public Scope {
+private:
+    std::string forStatementsLabel;
+    std::string forEndLabel;
+    std::string forConditionLabel;
 public:
     Node* initialization;
     Node* condition;
@@ -61,6 +65,10 @@ public:
     For(Node* _initialization, Node* _condition, Node* _update, std::vector<Node*> _statements);
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
+
+    std::string getEndLabel();
+
+    std::string getConditionLabel();
 };
 
 class Switch: public Node {
