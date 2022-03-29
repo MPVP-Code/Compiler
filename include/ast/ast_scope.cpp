@@ -20,7 +20,6 @@ void Scope::generate_var_maps(Node *parent) {
     if (this->subtype == "While") {
         While *flow = (While *) this;
         try_replace_variable(flow->condition, this);
-
     }
     if (this->subtype == "DoWhile") {
         auto flow = (DoWhile *) this;

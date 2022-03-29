@@ -76,10 +76,9 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
         //Deallocate scope if not already returned
         result += deallocate_stack_frame((Scope *) this);
 
-        if (*return_type == "void") {
+        if (return_type == "void") {
             result += "\njr $31\nnop\n\n";
-        }
-        if (*return_type == "int") {
+        } else if (return_type == "int") {
             //implicit error code 0
             result += "\nli $v0, 0\n";
             result += "\njr $31\nnop\n\n";
@@ -110,6 +109,7 @@ std::string FunctionDeclaration::generate_function_signature() const {
 
 FunctionCall::FunctionCall(std::string _function_name, std::vector<Node *> *_arguments) : function_name(
         _function_name) {
+    this->type = "FunctionCall";
     this->arguments = _arguments;
 };
 
@@ -117,6 +117,10 @@ void FunctionCall::generate_var_maps(Node *parent) {
 
     //Applies varmapping to parameters
     auto scope = (Scope *) parent;
+    this->declaration = (FunctionDeclaration *) resolve_function_call(function_name, ((Scope *) parent));
+    this->data_type = declaration->return_type;
+    this->result_var = allocate_temp_var(parent, this->data_type);
+
     for (unsigned int i = 0; i < this->arguments->size(); i++) {
         try_replace_variable((*arguments)[i], scope);
     }
@@ -125,12 +129,6 @@ void FunctionCall::generate_var_maps(Node *parent) {
 
 std::string FunctionCall::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
-
-    //Get corresponding function declaration
-    auto declaration = (FunctionDeclaration *) resolve_function_call(function_name, ((Scope *) parent_scope));
-
-    //Link types :(
-    const_cast<FunctionCall *> (this)->data_type = *(declaration->return_type);
 
     //Load parameters into registers
     int idx = 4; // First arg register
@@ -171,14 +169,16 @@ std::string FunctionCall::compileToMIPS(const Node *parent_scope) const {
 
     result += "addiu $sp, $sp, " + std::to_string(offset) + "\n";
 
+    //const Node* constIntermediate = get_intermediate_variable();
+    result += store_mapped_variable((Scope*) parent_scope, result_var, "$v0");
+
     //Restore return address
     result += load_mapped_variable((Scope *) parent_scope, ra, "$ra");
     return result;
 }
 
 Node *FunctionCall::get_intermediate_variable() {
-    //Crate "false", load mapped variable will be moving from function return registers instead
-    return new Variable(this->data_type, "!return", true);
+    return result_var;
 }
 
 

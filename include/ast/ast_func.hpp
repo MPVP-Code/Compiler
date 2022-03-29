@@ -8,7 +8,7 @@
 
 class FunctionDeclaration : public Scope{
 public:
-    std::string* return_type;
+    std::string return_type;
     std::string name;
     std::vector<Variable*>* arguments;
     bool forward_declaration;
@@ -26,9 +26,12 @@ public:
 };
 
 class FunctionCall : public Node {
+private:
+    Node* result_var;
 public:
     std::string function_name;
     std::vector<Node*>* arguments;
+    FunctionDeclaration* declaration;
 
     FunctionCall(std::string _function_name, std::vector<Node*>* arguments);
 

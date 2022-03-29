@@ -10,8 +10,8 @@ std::string Addition::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
     //Resolve wether to use temp variable or actual variable
     std::string basicDataType = resolve_base_type(this->data_type, (Scope*) parent_scope);
-    if (basicDataType == "int") {
 
+    if (basicDataType == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
