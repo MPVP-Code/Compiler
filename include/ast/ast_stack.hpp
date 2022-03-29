@@ -36,6 +36,7 @@ int resolve_variable_offset(std::string name, const Scope* current);
 std::string intToHex(int value);
 std::string convertFloatToBinary(float f);
 Variable* allocate_temp_var(Node* current, std::string type);
+Variable* resolve_ra_variable(const Node* parent_scope);
 
 Node* resolve_function_call(std::string name, Scope* current);
 std::string resolve_base_type(std::string alias, Scope* scope);

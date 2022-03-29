@@ -134,7 +134,7 @@ std::string FunctionCall::compileToMIPS(const Node *parent_scope) const {
     int idx = 4; // First arg register
 
     //Save return address
-    Variable *ra = ((Scope *) parent_scope)->var_map["!ra"];
+    Variable *ra = resolve_ra_variable(parent_scope);
     result += store_mapped_variable((Scope *) parent_scope, ra, "$ra");
 
     // Allocate more stack space to prevent memory violation accesses

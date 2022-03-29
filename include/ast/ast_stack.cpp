@@ -314,6 +314,14 @@ std::string store_mapped_variable(const Scope *scope, const Node *_var, std::str
     return out;
 }
 
+Variable* resolve_ra_variable(const Node* parent_scope) {
+    Scope* scope = (Scope*) parent_scope;
+    while (scope->subtype != "FunctionDeclaration") {
+        scope = scope->parent_scope;
+    }
+    return scope->var_map["!ra"];
+}
+
 /*std::string store_mapped_variable_argument(const Scope *scope, const Node *_var, std::string reg_name) {
     if (_var->data_type == "float") {
         Variable* var = (Variable*) _var;
