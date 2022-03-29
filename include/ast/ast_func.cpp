@@ -66,12 +66,12 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
             std::cerr << "Compiling statement " << statement->get_type() << std::endl;
 
             //Tells array pointer to initialize
-            if (statement->type == "Variable" && ((Variable*) statement)->array_size > 0) ((FunctionDeclaration*) this)->array_init_flag = true;
+            if (statement->type == "Variable" && ((Variable*) statement)->array_size > 0) ((Scope*) this)->array_init_flag = true;
 
             std::string compiledCode = statement->compileToMIPS(this);
 
             //Prevents other calls to variable to compile themselves
-            ((FunctionDeclaration*) this)->array_init_flag = false;
+            ((Scope*) this)->array_init_flag = false;
 
             if (compiledCode.length() > 0) {
                 result += compiledCode + "\n";

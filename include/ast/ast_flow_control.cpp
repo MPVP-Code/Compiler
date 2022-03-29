@@ -22,7 +22,14 @@ std::string While::compileToMIPS(const Node *parent_scope) const {
         if (statement->type == "Break") {
             result += "b " + whileEndLabel + "\nnop\n";
         } else {
+            //Tells array pointer to initialize
+            if (statement->type == "Variable" && ((Variable*) statement)->array_size > 0) ((Scope*) this)->array_init_flag = true;
+
             std::string generatedCode = statement->compileToMIPS(this);
+
+            //Prevents other calls to variable to compile themselves
+            ((Scope*) this)->array_init_flag = false;
+
             if (generatedCode.length() != 0) {
                 result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
             }
@@ -64,7 +71,14 @@ std::string DoWhile::compileToMIPS(const Node *parent_scope) const {
         if (statement->type == "Break") {
             result += "b " + doWhileEndLabel + "\nnop\n";
         } else {
+            //Tells array pointer to initialize
+            if (statement->type == "Variable" && ((Variable*) statement)->array_size > 0) ((Scope*) this)->array_init_flag = true;
+
             std::string generatedCode = statement->compileToMIPS(this);
+
+            //Prevents other calls to variable to compile themselves
+            ((Scope*) this)->array_init_flag = false;
+
             if (generatedCode.length() != 0) {
                 result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
             }
@@ -135,7 +149,15 @@ std::string If::compileStatementsToMIPS(std::vector<Node *> *statements, const N
                 result += "b " + forScope->getConditionLabel() + "\nnop\n";
             }
         } else {
+
+            //Tells array pointer to initialize
+            if (statement->type == "Variable" && ((Variable*) statement)->array_size > 0) ((Scope*) this)->array_init_flag = true;
+
             std::string generatedCode = statement->compileToMIPS(this);
+
+            //Prevents other calls to variable to compile themselves
+            ((Scope*) this)->array_init_flag = false;
+
             if (generatedCode.length() != 0) {
                 result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
             }
@@ -192,7 +214,15 @@ std::string For::compileToMIPS(const Node *parent_scope) const {
         if (statement->type == "Break") {
             result += "b " + forEndLabel + "\nnop\n";
         } else {
+            //Tells array pointer to initialize
+            if (statement->type == "Variable" && ((Variable *) statement)->array_size > 0)
+                ((Scope *) this)->array_init_flag = true;
+
             std::string generatedCode = statement->compileToMIPS(this);
+
+            //Prevents other calls to variable to compile themselves
+            ((Scope *) this)->array_init_flag = false;
+
             if (generatedCode.length() != 0) {
                 result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
             }
