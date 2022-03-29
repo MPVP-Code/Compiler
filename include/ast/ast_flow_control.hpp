@@ -6,19 +6,37 @@
 #include <vector>
 
 class While: public Scope {
+private:
+    std::string whileEndLabel;
+    std::string whileStartLabel;
+    std::string whileConditionLabel;
+
 public:
     Node* condition;
     While(Node* _condition, std::vector<Node*> _statements);
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
+
+    std::string getEndLabel();
+
+    std::string getConditionLabel();
 };
 
 class DoWhile: public Scope {
+private:
+    std::string doWhileEndLabel;
+    std::string doWhileStartLabel;
+    std::string doWhileConditionLabel;
+
 public:
     Node* condition;
     DoWhile(Node* _condition, std::vector<Node*> _statements);
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
+
+    std::string getEndLabel();
+
+    std::string getConditionLabel();
 };
 
 class If: public Scope {
@@ -31,7 +49,7 @@ public:
     If(Node* _condition, std::vector<Node*>* _truestatements, std::vector<Node*>* _falsestatements);
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
-    std::string compileStatementsToMIPS(std::vector<Node*>* statements) const;
+    std::string compileStatementsToMIPS(std::vector<Node*>* statements, const Node *parent_scope) const;
 };
 
 class For: public Scope {
@@ -91,4 +109,14 @@ public:
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
 };
+
+class Continue: public Node {
+public:
+    Continue();
+
+    virtual void generate_var_maps(Node *parent) override;
+
+    virtual std::string compileToMIPS(const Node *parent_scope) const override;
+};
+
 #endif

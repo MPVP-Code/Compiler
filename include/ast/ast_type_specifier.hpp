@@ -16,15 +16,18 @@ public:
 class EnumElement: public Node {
 private:
     std::string name;
-    Node* value;
+    Node* constant;
+    int value;
 public:
     EnumElement(std::string *_name);
 
-    EnumElement(std::string *_name, Node* _value);
+    EnumElement(std::string *_name, Node* _constant);
 
     std::string getName();
 
-    Node* getValue();
+    Node* getConstant();
+
+    int getValue();
 };
 
 class Enum: public TypeSpecifier {

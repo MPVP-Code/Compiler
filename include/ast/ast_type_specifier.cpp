@@ -1,4 +1,5 @@
 #include "ast_type_specifier.hpp"
+#include "ast_arithmetic.hpp"
 #include "ast_scope.hpp"
 
 TypeSpecifier::TypeSpecifier(std::string *_typeName) : typeName(_typeName) {
@@ -13,15 +14,21 @@ EnumElement::EnumElement(std::string* _name): name(*_name) {
     this->type = "EnumElement";
 }
 
-EnumElement::EnumElement(std::string* _name, Node* _value): name(*_name), value(_value) {
+EnumElement::EnumElement(std::string* _name, Node* _constant): name(*_name), constant(_constant) {
     this->type = "EnumElement";
+    Constant* constant = (Constant*) _constant;
+    this->value = constant->getValue();
 }
 
 std::string EnumElement::getName() {
     return name;
 }
 
-Node* EnumElement::getValue() {
+Node* EnumElement::getConstant() {
+    return constant;
+}
+
+int EnumElement::getValue() {
     return value;
 }
 

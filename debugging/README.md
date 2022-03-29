@@ -304,7 +304,7 @@ fyquah@olaf: debugging $ valgrind ./example-leak
     5
         8
 10
-==7892== Conditional jump or move depends on uninitialised value(s)
+==7892== Conditional jump or move depends on uninitialised constant(s)
 ==7892==    at 0x40082A: inorder_print (example-leak.c:50)
 ==7892==    by 0x400843: inorder_print (example-leak.c:54)
 ==7892==    by 0x400843: inorder_print (example-leak.c:54)
@@ -312,7 +312,7 @@ fyquah@olaf: debugging $ valgrind ./example-leak
 ==7892==    by 0x4008C7: main (example-leak.c:67)
 ==7892==
         9
-==7892== Conditional jump or move depends on uninitialised value(s)
+==7892== Conditional jump or move depends on uninitialised constant(s)
 ==7892==    at 0x40082A: inorder_print (example-leak.c:50)
 ==7892==    by 0x400894: inorder_print (example-leak.c:59)
 ==7892==    by 0x400843: inorder_print (example-leak.c:54)
@@ -339,7 +339,7 @@ fyquah@olaf: debugging $ valgrind ./example-leak
 ```
 
 Here, the conditional statement in line 50 of `example-leak.c` is dependent
-on an uninitialised value. This problem is admitedly harder to debug with
+on an uninitialised constant. This problem is admitedly harder to debug with
 valgrind alone and it is more likely that gdb will be more useful
 (when it crashes).
 

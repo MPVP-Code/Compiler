@@ -4,61 +4,90 @@
 While::While(Node *_condition, std::vector<Node *> _statements) : Scope(), condition(_condition) {
     this->subtype = "While";
     this->statements = _statements;
+    int whileId = Global::getIdForWhile();
+    this->whileStartLabel = "$WHILE" + std::to_string(whileId) + "START";
+    this->whileEndLabel = "$WHILE" + std::to_string(whileId) + "END";
+    this->whileConditionLabel = "$WHILE" + std::to_string(whileId) + "CONDITION";
 }
 
 std::string While::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
     result += allocate_stack_frame((Scope *) this);
     result += condition->compileToMIPS((Scope *) this) + "\n";
-    int whileId = Global::getIdForWhile();
-    std::string whileStart = "$WHILE" + std::to_string(whileId) + "START";
-    std::string whileEnd = "$WHILE" + std::to_string(whileId) + "END";
-    result += whileStart + ":\n";
+    result += whileStartLabel + ":\n";
     result += load_mapped_variable((Scope *) this, condition->get_intermediate_variable(), "$15");
-    result += "beq $15, $0, " + whileEnd + "\nnop\n";
+    result += "beq $15, $0, " + whileEndLabel + "\nnop\n";
 
     for (Node *statement: statements) {
-        std::string generatedCode = statement->compileToMIPS(this);
-        if (generatedCode.length() != 0) {
-            result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
+        if (statement->type == "Break") {
+            result += "b " + whileEndLabel + "\nnop\n";
+        } else {
+            std::string generatedCode = statement->compileToMIPS(this);
+            if (generatedCode.length() != 0) {
+                result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
+            }
         }
     }
+    result += whileConditionLabel + ":\n";
     result += condition->compileToMIPS((Scope *) this) + "\n";
-    result += "b " + whileStart + "\nnop\n";
-    result += whileEnd + ":" + "\n";
+    result += "b " + whileStartLabel + "\nnop\n";
+    result += whileEndLabel + ":\n";
 
     result += deallocate_stack_frame((Scope *) this);
 
     return result.substr(0, result.length() - 1);
 }
 
+std::string While::getEndLabel() {
+    return whileEndLabel;
+}
+
+std::string While::getConditionLabel() {
+    return whileConditionLabel;
+}
+
 DoWhile::DoWhile(Node *_condition, std::vector<Node *> _statements) : Scope(), condition(_condition) {
     this->subtype = "DoWhile";
     this->statements = _statements;
+    int whileId = Global::getIdForWhile();
+    this->doWhileStartLabel = "$WHILE" + std::to_string(whileId) + "START";
+    this->doWhileEndLabel = "$WHILE" + std::to_string(whileId) + "END";
+    this->doWhileConditionLabel = "$WHILE" + std::to_string(whileId) + "CONDITION";
 }
 
 std::string DoWhile::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
-    int whileId = Global::getIdForWhile();
     result += allocate_stack_frame((Scope *) this);
-    std::string whileStart = "$WHILE" + std::to_string(whileId) + "START";
-    result += whileStart + ":\n";
+    result += doWhileStartLabel + ":\n";
 
     for (Node *statement: statements) {
-        std::string generatedCode = statement->compileToMIPS(this);
-        if (generatedCode.length() != 0) {
-            result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
+        if (statement->type == "Break") {
+            result += "b " + doWhileEndLabel + "\nnop\n";
+        } else {
+            std::string generatedCode = statement->compileToMIPS(this);
+            if (generatedCode.length() != 0) {
+                result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
+            }
         }
     }
 
+    result += doWhileConditionLabel + ":\n";
     result += condition->compileToMIPS((Scope *) this) + "\n";
     result += load_mapped_variable((Scope *) this, condition->get_intermediate_variable(), "$15");
-    result += "bne $15, $0, " + whileStart + "\nnop\n";
+    result += "bne $15, $0, " + doWhileStartLabel + "\nnop\n";
+    result += doWhileEndLabel + ":\n";
     result += deallocate_stack_frame((Scope *) this);
 
     return result;
 }
 
+std::string DoWhile::getEndLabel() {
+    return doWhileEndLabel;
+}
+
+std::string DoWhile::getConditionLabel() {
+    return doWhileConditionLabel;
+}
 
 If::If(Node *_condition, std::vector<Node *> *_truestatements, std::vector<Node *> *_falsestatements)
         : Scope(), condition(_condition) {
@@ -67,13 +96,43 @@ If::If(Node *_condition, std::vector<Node *> *_truestatements, std::vector<Node 
     this->falsestatements = _falsestatements;
 }
 
-std::string If::compileStatementsToMIPS(std::vector<Node *> *statements) const {
+std::string If::compileStatementsToMIPS(std::vector<Node *> *statements, const Node *parent_scope) const {
     std::string result = "";
 
     for (Node *statement: *statements) {
-        std::string generatedCode = statement->compileToMIPS(this);
-        if (generatedCode.length() != 0) {
-            result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
+        if (statement->type == "Break") {
+            result += deallocate_stack_frame((Scope *) this);
+            Scope* tmp = (Scope*) parent_scope;
+            while (tmp != NULL && tmp->subtype != "While" &&  tmp->subtype != "DoWhile") {
+                result += deallocate_stack_frame(tmp);
+                tmp = tmp->parent_scope;
+            }
+            if (tmp != NULL && tmp->subtype == "While") {
+                While* whileScope = (While*) tmp;
+                result += "b " + whileScope->getEndLabel() + "\nnop\n";
+            } else if (tmp != NULL && tmp->subtype == "DoWhile") {
+                DoWhile* whileScope = (DoWhile*) tmp;
+                result += "b " + whileScope->getEndLabel() + "\nnop\n";
+            }
+        } else if (statement->type == "Continue") {
+            result += deallocate_stack_frame((Scope *) this);
+            Scope* tmp = (Scope*) parent_scope;
+            while (tmp != NULL && tmp->subtype != "While" &&  tmp->subtype != "DoWhile") {
+                result += deallocate_stack_frame(tmp);
+                tmp = tmp->parent_scope;
+            }
+            if (tmp != NULL && tmp->subtype == "While") {
+                While* whileScope = (While*) tmp;
+                result += "b " + whileScope->getConditionLabel() + "\nnop\n";
+            } else if (tmp != NULL && tmp->subtype == "DoWhile") {
+                DoWhile* whileScope = (DoWhile*) tmp;
+                result += "b " + whileScope->getConditionLabel() + "\nnop\n";
+            }
+        } else {
+            std::string generatedCode = statement->compileToMIPS(this);
+            if (generatedCode.length() != 0) {
+                result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
+            }
         }
     }
 
@@ -90,14 +149,14 @@ std::string If::compileToMIPS(const Node *parent_scope) const {
     result += "beq $15, $0, " + elseLabel + "\nnop\n";
 
     if (truestatements != nullptr) {
-        result += this->compileStatementsToMIPS(this->truestatements) + "\n";
+        result += this->compileStatementsToMIPS(this->truestatements, parent_scope) + "\n";
         result += "b " + ifEndLabel + "\nnop\n";
     }
 
     result += elseLabel + ":\n";
 
     if (falsestatements != nullptr) {
-        result += this->compileStatementsToMIPS(this->falsestatements) + "\n";
+        result += this->compileStatementsToMIPS(this->falsestatements, parent_scope) + "\n";
     }
     result += ifEndLabel + ":\n";
     result += deallocate_stack_frame((Scope *) this);
@@ -243,5 +302,17 @@ std::string Break::compileToMIPS(const Node *parent_scope) const {
 }
 
 void Break::generate_var_maps(Node *parent) {
+    return;
+}
+
+Continue::Continue() {
+    this->type = "Continue";
+}
+
+std::string Continue::compileToMIPS(const Node *parent_scope) const {
+    return "";
+}
+
+void Continue::generate_var_maps(Node *parent) {
     return;
 }

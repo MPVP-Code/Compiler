@@ -18,6 +18,25 @@ Variable *resolve_variable_name(std::string name, Scope *current) {
     return NULL;
 };
 
+Node* assign_constant_with_value(int value, Scope* scope) {
+    Constant* constant = new Constant(value);
+    return constant;
+}
+
+Node* resolve_enum_constant(std::string name, Scope* current) {
+    Scope* targetScope = (Scope*) current;
+    while (current != NULL) {
+        if (current->enum_elements.find(name) != current->enum_elements.end()) {
+            Constant* constant = new Constant(current->enum_elements.at(name));
+            constant->generate_var_maps(targetScope);
+            return constant;
+        } else {
+            current = current->parent_scope;
+        }
+    }
+    return NULL;
+}
+
 Variable_type *resolve_type(std::string name, Scope *current) {
     while (current != NULL) {
         if (current->type_map.find(name) != current->type_map.end()) {
@@ -54,6 +73,9 @@ void try_replace_variable(Node *&varptr, Node *inscope) {
             scope->var_map[temp->name] = temp;
         } else {
             varptr = resolve_variable_name(temp->name, scope);
+            if (varptr == NULL) {
+                varptr = resolve_enum_constant(temp->name, scope);
+            }
         }
     } else if (varptr->type == "UnaryOperator" && varptr->subtype == "SizeOf") {
         auto temp = (SizeOf *) varptr;
