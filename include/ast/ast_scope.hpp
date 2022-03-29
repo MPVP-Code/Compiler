@@ -14,6 +14,7 @@ public:
     Scope *parent_scope;
     std::map<std::string, Variable*> var_map;
     std::map<std::string, Variable_type*> type_map;
+    std::map<std::string, Node*> enum_elements;
     int stack_frame_size;
     int tmp_var_counter;
     bool l_dereference_flag;

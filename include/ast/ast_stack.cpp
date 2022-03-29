@@ -9,7 +9,7 @@
 
 Variable *resolve_variable_name(std::string name, Scope *current) {
     while (current != NULL) {
-        if (current->var_map.contains(name)) {
+        if (current->var_map.find(name) != current->var_map.end()) {
             return current->var_map.at(name);
         } else {
             current = current->parent_scope;
@@ -20,7 +20,7 @@ Variable *resolve_variable_name(std::string name, Scope *current) {
 
 Variable_type *resolve_type(std::string name, Scope *current) {
     while (current != NULL) {
-        if (current->type_map.contains(name)) {
+        if (current->type_map.find(name) != current->type_map.end()) {
             return current->type_map.at(name);
         } else {
             current = current->parent_scope;
@@ -76,7 +76,7 @@ int resolve_variable_size(std::string name, Scope *child_scope) {
     std::string type_name = "none";
 
     while (current != NULL) {
-        if (current->var_map.contains(name)) {
+        if (current->var_map.find(name) != current->var_map.end()) {
             type_name = current->var_map.at(name)->data_type;
             break;
         } else {
@@ -91,7 +91,7 @@ int resolve_variable_size(std::string name, Scope *child_scope) {
     if (type_name == "none") type_name = name;
 
     while (current != NULL) {
-        if (current->type_map.contains(type_name)) {
+        if (current->type_map.find(name) != current->type_map.end()) {
             return (current->type_map.at(type_name))->size;
         } else {
             current = current->parent_scope;
@@ -103,7 +103,7 @@ int resolve_variable_size(std::string name, Scope *child_scope) {
 int resolve_variable_offset(std::string name, const Scope *current) {
     int total_offset = 0;
     while (current != NULL) {
-        if (current->var_map.contains(name)) {
+        if (current->var_map.find(name) != current->var_map.end()) {
             return total_offset + current->var_map.at(name)->offset;
         } else {
             total_offset += current->stack_frame_size;
@@ -416,7 +416,7 @@ void add_to_global_typemap(Variable_type *var, Scope *scope) {
     while (scope->parent_scope != NULL) {
         scope = scope->parent_scope;
     }
-    if (!scope->type_map.contains(var->name)) {
+    if (!(scope->type_map.find(var->name) != scope->type_map.end())) {
         scope->type_map[var->name] = var;
     }
 }
@@ -467,8 +467,7 @@ std::string resolve_base_type(std::string alias, Scope *scope) {
     std::string base;
 
     while (current_alias != "none") {
-        int a = current_scope->type_map.contains(alias);
-        while (!(current_scope->type_map.contains(alias))) {
+        while (!(current_scope->type_map.find(alias) != current_scope->type_map.end())) {
             current_scope = current_scope->parent_scope;
         }
         base = current_alias;

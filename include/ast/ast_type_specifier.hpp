@@ -21,6 +21,10 @@ public:
     EnumElement(std::string *_name);
 
     EnumElement(std::string *_name, Node* _value);
+
+    std::string getName();
+
+    Node* getValue();
 };
 
 class Enum: public TypeSpecifier {
@@ -36,6 +40,7 @@ public:
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
 
+    std::vector<Node*>* getElements();
 };
 
 #endif
