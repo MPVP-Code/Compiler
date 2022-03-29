@@ -9,6 +9,7 @@ class While: public Scope {
 private:
     std::string whileEndLabel;
     std::string whileStartLabel;
+    std::string whileConditionLabel;
 
 public:
     Node* condition;
@@ -17,12 +18,15 @@ public:
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
 
     std::string getEndLabel();
+
+    std::string getConditionLabel();
 };
 
 class DoWhile: public Scope {
 private:
     std::string doWhileEndLabel;
     std::string doWhileStartLabel;
+    std::string doWhileConditionLabel;
 
 public:
     Node* condition;
@@ -31,6 +35,8 @@ public:
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
 
     std::string getEndLabel();
+
+    std::string getConditionLabel();
 };
 
 class If: public Scope {
@@ -103,4 +109,14 @@ public:
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
 };
+
+class Continue: public Node {
+public:
+    Continue();
+
+    virtual void generate_var_maps(Node *parent) override;
+
+    virtual std::string compileToMIPS(const Node *parent_scope) const override;
+};
+
 #endif

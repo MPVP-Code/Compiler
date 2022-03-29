@@ -7,6 +7,7 @@ While::While(Node *_condition, std::vector<Node *> _statements) : Scope(), condi
     int whileId = Global::getIdForWhile();
     this->whileStartLabel = "$WHILE" + std::to_string(whileId) + "START";
     this->whileEndLabel = "$WHILE" + std::to_string(whileId) + "END";
+    this->whileConditionLabel = "$WHILE" + std::to_string(whileId) + "CONDITION";
 }
 
 std::string While::compileToMIPS(const Node *parent_scope) const {
@@ -27,6 +28,7 @@ std::string While::compileToMIPS(const Node *parent_scope) const {
             }
         }
     }
+    result += whileConditionLabel + ":\n";
     result += condition->compileToMIPS((Scope *) this) + "\n";
     result += "b " + whileStartLabel + "\nnop\n";
     result += whileEndLabel + ":\n";
@@ -36,16 +38,21 @@ std::string While::compileToMIPS(const Node *parent_scope) const {
     return result.substr(0, result.length() - 1);
 }
 
+std::string While::getEndLabel() {
+    return whileEndLabel;
+}
+
+std::string While::getConditionLabel() {
+    return whileConditionLabel;
+}
+
 DoWhile::DoWhile(Node *_condition, std::vector<Node *> _statements) : Scope(), condition(_condition) {
     this->subtype = "DoWhile";
     this->statements = _statements;
     int whileId = Global::getIdForWhile();
     this->doWhileStartLabel = "$WHILE" + std::to_string(whileId) + "START";
     this->doWhileEndLabel = "$WHILE" + std::to_string(whileId) + "END";
-}
-
-std::string While::getEndLabel() {
-    return whileEndLabel;
+    this->doWhileConditionLabel = "$WHILE" + std::to_string(whileId) + "CONDITION";
 }
 
 std::string DoWhile::compileToMIPS(const Node *parent_scope) const {
@@ -64,6 +71,7 @@ std::string DoWhile::compileToMIPS(const Node *parent_scope) const {
         }
     }
 
+    result += doWhileConditionLabel + ":\n";
     result += condition->compileToMIPS((Scope *) this) + "\n";
     result += load_mapped_variable((Scope *) this, condition->get_intermediate_variable(), "$15");
     result += "bne $15, $0, " + doWhileStartLabel + "\nnop\n";
@@ -75,6 +83,10 @@ std::string DoWhile::compileToMIPS(const Node *parent_scope) const {
 
 std::string DoWhile::getEndLabel() {
     return doWhileEndLabel;
+}
+
+std::string DoWhile::getConditionLabel() {
+    return doWhileConditionLabel;
 }
 
 If::If(Node *_condition, std::vector<Node *> *_truestatements, std::vector<Node *> *_falsestatements)
@@ -101,6 +113,20 @@ std::string If::compileStatementsToMIPS(std::vector<Node *> *statements, const N
             } else if (tmp != NULL && tmp->subtype == "DoWhile") {
                 DoWhile* whileScope = (DoWhile*) tmp;
                 result += "b " + whileScope->getEndLabel() + "\nnop\n";
+            }
+        } else if (statement->type == "Continue") {
+            result += deallocate_stack_frame((Scope *) this);
+            Scope* tmp = (Scope*) parent_scope;
+            while (tmp != NULL && tmp->subtype != "While" &&  tmp->subtype != "DoWhile") {
+                result += deallocate_stack_frame(tmp);
+                tmp = tmp->parent_scope;
+            }
+            if (tmp != NULL && tmp->subtype == "While") {
+                While* whileScope = (While*) tmp;
+                result += "b " + whileScope->getConditionLabel() + "\nnop\n";
+            } else if (tmp != NULL && tmp->subtype == "DoWhile") {
+                DoWhile* whileScope = (DoWhile*) tmp;
+                result += "b " + whileScope->getConditionLabel() + "\nnop\n";
             }
         } else {
             std::string generatedCode = statement->compileToMIPS(this);
@@ -276,5 +302,17 @@ std::string Break::compileToMIPS(const Node *parent_scope) const {
 }
 
 void Break::generate_var_maps(Node *parent) {
+    return;
+}
+
+Continue::Continue() {
+    this->type = "Continue";
+}
+
+std::string Continue::compileToMIPS(const Node *parent_scope) const {
+    return "";
+}
+
+void Continue::generate_var_maps(Node *parent) {
     return;
 }

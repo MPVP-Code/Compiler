@@ -673,9 +673,8 @@ jump_statement
 				std::cerr << "Found return expression;\n";
 				}
 	| RETURN ';' { $$ = new Return(NULL);}
-	;
-//	: CONTINUE ';' {}
-	| BREAK ';' { $$ = new Break(); }
+	| BREAK ';' { $$ = new Break(); };
+	| CONTINUE ';' {$$ = new Continue(); }
 
 
 translation_unit
