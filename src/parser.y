@@ -32,7 +32,7 @@ void yyerror(const char *);
 %type <node>  multiplicative_expression additive_expression shift_expression relational_expression equality_expression
 %type <node> and_expression exclusive_or_expression inclusive_or_expression logical_and_expression conditional_expression
 %type <node> assignment_expression logical_or_expression initializer translation_unit
-%type <node>  expression function_definition constant_expression
+%type <node>  expression function_definition constant_expression enumerator enum_specifier
 %type <node>  labeled_statement expression_statement selection_statement parameter_declaration
 %type <node> specifier_qualifier_list primary_expression postfix_expression unary_expression jump_statement iteration_statement declarator direct_declarator type_specifier declaration_specifiers
 %type <string> CONSTANT CONSTANT_FLOAT STRING_LITERAL CONSTANT_CHAR
