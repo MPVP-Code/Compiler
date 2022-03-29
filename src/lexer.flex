@@ -49,17 +49,11 @@ std::string typedef_modifiers = "";
 
 
 
-{L}({L}|{D})*		    {
-                            if (typedef_token_count > 0    ){ //||  check_map_contains(lexer_type_map , *yylval.string)
-
+{L}({L}|{D})*		    {   yylval.string = new std::string(yytext);
+                            if (typedef_token_count > 0   ||  check_map_contains(lexer_type_map , *yylval.string) ){ //
                                 typedef_token_count--;
-                                std::cerr << "Let through identifier\n";
-                                std::string name = std::string(yytext);
-                                yylval.string = new std::string(name + typedef_modifiers);
-                                typedef_modifiers = "";
                                 return(TYPE_NAME);
                             }else {
-                                yylval.string = new std::string(yytext);
                                 return(IDENTIFIER);
                             }
                         }
@@ -107,24 +101,12 @@ L?\"(\\.|[^\\"])*\"	    {yylval.string =  new std::string(yytext); return(STRING
 ("["|"<:")		{return('['); }
 ("]"|":>")		{return(']'); }
 "."			    {return('.'); }
-"&"			    {
-                    if(typedef_token_count > 0){
-                         typedef_modifiers += "&";
-                     } else {
-                         return('&');
-                     }
-                 }
+"&"			    {return('&'); }
 "!"			    {return('!'); }
 "~"			    {return('~'); }
 "-"			    {return('-'); }
 "+"			    {return('+'); }
-"*"			    {
-                    if(typedef_token_count > 0){
-                        typedef_modifiers += "*";
-                    } else {
-                        return('*');
-                    }
-                }
+"*"			    {return('*'); }
 "/"			    {return('/'); }
 "%"			    {return('%'); }
 "<"			    {return('<'); }

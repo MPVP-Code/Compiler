@@ -324,13 +324,14 @@ declaration_specifiers
                     types.push_back(token);
                     std::cerr<< "split: " << token << "\n";
                 }
-                //std::string alias = types[1];
+//                //std::string alias = types[1];
+//
+//		//Correct typedef modifiers
+//		while (types[1].at(types[1].size() -1) == '*'){
+//			types[0] += "*";
+//			types[1] = types[1].substr(0,types[1].size()-1 );
+//		}
 
-		//Correct typedef modifiers
-		while (types[1].at(types[1].size() -1) == '*'){
-			types[0] += "*";
-			types[1] = types[1].substr(0,types[1].size()-1 );
-		}
 		$$ = new TypeDef(types[0], types[1]);
 		lexer_type_map[types[1]] = true;
 		}
