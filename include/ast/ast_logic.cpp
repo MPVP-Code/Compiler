@@ -117,6 +117,18 @@ std::string LogicEQ::compileToMIPS(const Node *parent_scope) const {
         result += "sltu $13, $15, $12\n";
         result += "andi $13, $13, 0x00ff\n";
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
+    } else if (basicDataType == "float") {
+        //Finds temporary / constant/ normal variables in which results have been previously stored
+        result += compileLandRNodesToMIPS(parent_scope);
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable((Scope *) parent_scope, LVar, "$15") + "\n";
+        result += load_mapped_variable((Scope *) parent_scope, RVar, "$14") + "\n";
+        result += "mtc1 $15, $f4\n";
+        result += "mtc1 $14, $f6\n";
+        result += "sub.s $f2, $f4, $f6\n";
+        result += "mfc1 $13, $f2\n";
+        result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
     }
 
     return result;

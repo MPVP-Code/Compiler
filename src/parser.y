@@ -1,6 +1,7 @@
 %code requires{
 #include "../include/ast.hpp"
 #include <cassert>
+#include <sstream>
 
 extern Global* global_root; // A way of getting the AST out
 
@@ -298,13 +299,26 @@ declaration
 		$$ = $2;
 
 	}
-	| declaration_specifiers ';' {}
+	| declaration_specifiers ';' {
+			auto out = new std::vector<Node*>();
+			//Split string
+			std::vector<std::string> result;
+			    std::istringstream stream (*$1);
+			    std::string token;
+
+			    while (getline (stream, token, ';')) {
+				result.push_back (token);
+			    }
+			auto typedf = new TypeDef(result[1], result[2]);
+			out->push_back(typedf);
+			$$ = out;
+			}
 	;
 
 declaration_specifiers
 	: type_specifier {$$ = $1;}
-	| type_specifier declaration_specifiers {$$ = $1;}
-	//| storage_class_specifier declaration_specifiers  {$$ = new TypeDef(*$1, *$2);}
+	| type_specifier declaration_specifiers {$$ = new std::string( *$1 + ";" + *$2);}
+	| storage_class_specifier declaration_specifiers  {$$ = new std::string( *$1 + ";" + *$2);}
 	//| storage_class_specifier {$$ = $1;}
 	;
 
@@ -358,7 +372,7 @@ type_specifier
 	| UNSIGNED {$$ = new std::string("unsigned");}
 //	| struct_specifier {}
 //	| enum_specifier {}
-//	| TYPE_NAME {}
+	//| IDENTIFIER {$$ = new std::string(*$1);}
 	;
 
 struct_specifier
