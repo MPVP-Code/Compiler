@@ -27,9 +27,11 @@ Node* Constant::get_intermediate_variable(){
 
 std::string Constant::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
-    if (resolve_base_type(data_type, (Scope*)parent_scope) == "int") {
+    if (resolve_base_codepath(data_type, (Scope*)parent_scope) == "int") {
+
         std::string hexValue = intToHex(value);
-        result = "li $15, " + hexValue + "\n";
+        result += "li $15, " + hexValue + "\n";
+
         result += store_mapped_variable((Scope *) parent_scope, const_var, "$15");
     }
     return result;

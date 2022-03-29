@@ -18,7 +18,12 @@ void BinaryOperator::generate_var_maps(Node *parent) {
     try_replace_variable(this->R, parent);
 
     //Propagate types
-    data_type = L->data_type;
+    if(L->data_type == "unsigned" || R->data_type == "unsigned"){
+        data_type = "unsigned";
+    }else {
+        data_type = L->data_type;
+    }
+
 
     //Generate temporary variable
     std::string tmpname = "!tmp" + std::to_string(((Scope*) parent)->tmp_var_counter++);

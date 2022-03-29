@@ -1,3 +1,5 @@
+
+  
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
@@ -38,24 +40,13 @@ Vagrant.configure(2) do |config|
   # documentation for more information about their specific syntax and use.
    config.vm.provision "shell", inline: <<-SHELL
       sudo apt-get update
-
       # Standard build tools
       sudo apt-get -y install g++ gdb make dos2unix git
-
-      # Timeout util
-      sudo apt-get -y install timeout
-
       # Compiler build tools
       sudo apt-get -y install bison flex
-
       # MIPS cross-compiler stuff
       sudo apt-get -y install g++-mips-linux-gnu gdb-multiarch
-
       # QEMU run-time emulator
-      sudo apt-get -y install qemu qemu-user qemu-system-mips
-
-      # CMake for unit tests
-      sudo apt-get -y install cmake
-
+      sudo apt-get -y install qemu qemu-user
    SHELL
 end

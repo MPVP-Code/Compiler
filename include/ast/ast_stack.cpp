@@ -111,7 +111,7 @@ int resolve_variable_size(std::string name, Scope *child_scope) {
     if (type_name == "none") type_name = name;
 
     while (current != NULL) {
-        if (current->type_map.find(name) != current->type_map.end()) {
+        if (current->type_map.find(type_name) != current->type_map.end()) {
             return (current->type_map.at(type_name))->size;
         } else {
             current = current->parent_scope;
