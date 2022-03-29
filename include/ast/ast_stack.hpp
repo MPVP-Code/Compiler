@@ -39,5 +39,6 @@ Variable* allocate_temp_var(Node* current, std::string type);
 Node* resolve_function_call(std::string name, Scope* current);
 std::string resolve_base_type(std::string alias, Scope* scope);
 int get_log_ptr_element(std::string ptr_type, Scope* scope);
+std::string copy_str_literal(std::string ptr_reg, std::string string);
 
 #endif

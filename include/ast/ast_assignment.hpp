@@ -25,6 +25,19 @@ public:
 
 };
 
+class StringLiteral : public Constant {
+public:
+
+    std::string str_value;
+
+    StringLiteral(int value, std::string _in);
+
+    virtual void generate_var_maps(Node *parent) override;
+
+    std::string compileToMIPS(const Node *parent_scope) const override;
+
+};
+
 class ConstantFloat : public Node {
 private:
     float value;

@@ -493,3 +493,18 @@ int get_log_ptr_element(std::string ptr_type, Scope *scope) {
     }
 
 }
+
+std::string copy_str_literal(std::string ptr_reg, std::string literal){
+    std::string result = "#String literal direct load\n";
+    int offset = 0;
+    for(char c : literal){
+        int ic =  (int) c;
+
+        result+= "li $14, "+ std::to_string(ic) + "\n";
+        result+= "sb $14, " + std::to_string(offset) + "(" + ptr_reg + ")\n";
+        offset++;
+    }
+    result+= "sb $0, " + std::to_string(offset) + "(" + ptr_reg + ")\n";
+
+    return result;
+}

@@ -49,7 +49,7 @@ extern "C" int fileno(FILE *stream);
 0[xX]{H}+{IS}?		    {std::cerr<< "lexmatch 1\n"; yylval.string = new std::string(yytext); return(CONSTANT);  }
 0{D}+{IS}?		        { std::cerr<< "lexmatch 2\n"; yylval.string = new std::string(yytext); return(CONSTANT);}
 {D}+{IS}?		        { std::cerr<< "lexmatch 3\n"; yylval.string = new std::string(yytext); return(CONSTANT);}
-L?'(\\.|[^\\'])+'	    { std::cerr<< "lexmatch 4\n"; yylval.string = new std::string(yytext); return(CONSTANT);}
+L?'(\\.|[^\\'])+'	    { std::cerr<< "lexmatch 4\n"; yylval.string = new std::string(yytext); return(CONSTANT_CHAR);}
 
 {D}+{E}{FS}?		    { std::cerr<< "float constant 1\n"; yylval.string = new std::string(yytext); return(CONSTANT_FLOAT); }
 {D}*"."{D}+({E})?{FS}?	{ std::cerr<< "float constant 2\n"; yylval.string = new std::string(yytext); return(CONSTANT_FLOAT); }

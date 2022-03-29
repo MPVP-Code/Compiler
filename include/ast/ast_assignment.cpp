@@ -18,6 +18,7 @@ int Constant::getValue() {
 
 void Constant::generate_var_maps(Node *parent) {
     const_var = allocate_temp_var(parent, data_type);
+
 }
 
 Node* Constant::get_intermediate_variable(){
@@ -26,7 +27,7 @@ Node* Constant::get_intermediate_variable(){
 
 std::string Constant::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
-    if (data_type == "int") {
+    if (resolve_base_type(data_type, (Scope*)parent_scope) == "int") {
         std::string hexValue = intToHex(value);
         result = "li $15, " + hexValue + "\n";
         result += store_mapped_variable((Scope *) parent_scope, const_var, "$15");
@@ -53,7 +54,7 @@ void ConstantFloat::generate_var_maps(Node *parent) {
 
 std::string ConstantFloat::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
-    if (data_type == "float") {
+    if (resolve_base_type(data_type, (Scope*)parent_scope) == "float") {
         std::string binaryValue = convertFloatToBinary(value);
         result = "li $15, " + binaryValue + "\n";
         result += store_mapped_variable((Scope *) parent_scope, const_var, "$15");
@@ -72,15 +73,21 @@ Assign::Assign(Node *_destination, Node *_source) : destination(_destination), s
 void Assign::generate_var_maps(Node *parent) {
 
     //Destination var mapping
-    auto temp = (Node *) this->destination;
-    try_replace_variable(temp, parent);
-    this->destination = (Variable *) temp;
+    try_replace_variable(destination, parent);
 
     //Source varmapping
     try_replace_variable(source, parent);
 
     //type propagation
     this->data_type = destination->data_type;
+
+    //Try set pointer size from string literal
+    if(this->source->type == "Constant" && this->source->subtype == "StringLiteral"){
+        int size = ((StringLiteral* )this->source)->str_value.size() +1;
+        if(size > ((Variable*) this->destination)->array_size) {
+            ((Variable *) this->destination)->array_size = size;
+        }
+    }
 }
 
 std::string Assign::compileToMIPS(const Node *parent_scope) const {
@@ -91,7 +98,12 @@ std::string Assign::compileToMIPS(const Node *parent_scope) const {
     Node *src_var = source->get_intermediate_variable();
 
 
-    if (destination->type == "Variable") {
+    if(source->type == "Constant" && source->subtype == "StringLiteral" ){
+        //Array load for raw pointers
+        result += load_mapped_variable((Scope *) parent_scope, destination->get_intermediate_variable(), "$13");
+        result += copy_str_literal("$13", ((StringLiteral*) source)->str_value);
+
+    }else if (destination->type == "Variable") {
         result += load_mapped_variable((Scope *) parent_scope, src_var, "$14");
         result += store_mapped_variable((Scope *) parent_scope, destination, "$14");
 
@@ -100,15 +112,106 @@ std::string Assign::compileToMIPS(const Node *parent_scope) const {
         //So not dereference, just grab address
         result += ((UnaryOperator *)destination)->in->compileToMIPS(parent_scope);
 
-        //Load Rvalue
-        result += load_mapped_variable((Scope *) parent_scope, src_var, "$14");
+        //Array load for strings from dereferenced pointer
+        if(source->type == "Constant" && source->subtype == "StringLiteral" ){
 
-        //Load pointer address
-        result += load_mapped_variable((Scope *) parent_scope, ((UnaryOperator *) destination)-> in ->get_intermediate_variable(), "$13");
+            result += load_mapped_variable((Scope *) parent_scope, ((UnaryOperator *) destination)->in->get_intermediate_variable(), "$13");
+            result += copy_str_literal("$13", ((StringLiteral*) source)->str_value);
 
-        //Store at pointer address
-        result += store_raw_variable((Scope*) parent_scope, "$13", "$14", destination->data_type);
+        }else {
+            //Load Rvalue
+            result += load_mapped_variable((Scope *) parent_scope, src_var, "$14");
+
+            //Load pointer address
+            result += load_mapped_variable((Scope *) parent_scope, ((UnaryOperator *) destination)->in->get_intermediate_variable(), "$13");
+
+            //Store at pointer address
+            result += store_raw_variable((Scope *) parent_scope, "$13", "$14", destination->data_type);
+        }
+
     }
     return result;
 };
 
+
+StringLiteral::StringLiteral(int value, std::string _in) : Constant(value) {
+    this->type = "Constant";
+    this->subtype = "StringLiteral";
+    //Strip quotes
+    std::string intermediate = _in.substr(1, _in.size()-2);
+    std::string out = "";
+
+    //and resolve escape characters
+    int is_escaped = 0;
+    for (char c : intermediate){
+        if (c == '\\' && !is_escaped){
+            is_escaped = 1;
+        }else if (is_escaped){
+            switch (c) {
+                case 'a' :{
+                    out+= '\a';
+                    break;
+                }
+                case 'b' :{
+                    out+= '\b';
+                    break;
+                }
+                case 'f' :{
+                    out+= '\f';
+                    break;
+                }
+                case 'n' :{
+                    out+= '\n';
+                    break;
+                }case 'r' :{
+                    out+= '\r';
+                    break;
+                }
+                case 't' :{
+                    out+= '\t';
+                    break;
+                }
+                case 'v' :{
+                    out+= '\v';
+                    break;
+                }
+                case '\\' :{
+                    out+= '\\';
+                    break;
+                }case '\'' :{
+                    out+= '\'';
+                    break;
+                }
+                case '\"' :{
+                    out+= '\"';
+                    break;
+                }
+                case '\?' :{
+                    out+= '\?';
+                    break;
+                }
+
+            }
+            is_escaped--;
+        }
+        else{
+            out+=c;
+        }
+    }
+    str_value = out;
+}
+
+void StringLiteral::generate_var_maps(Node *parent) {
+    const_var = allocate_temp_var(parent, data_type);
+    const_var->array_size = this->str_value.size()+1;
+    const_var->data_type = "char*";
+}
+
+std::string StringLiteral::compileToMIPS(const Node *parent_scope) const {
+    std::string result ="# Stack string pointer generation\n";
+    result += "addiu $13, $sp, " + std::to_string(resolve_variable_offset(const_var->name, (Scope*) parent_scope)+4) + "\n";
+    result+= store_mapped_variable((Scope *) parent_scope, const_var, "$13");
+    result += "#Stack string load (Sometimes redundant)\n";
+    result += copy_str_literal("$13", str_value);
+    return result;
+}

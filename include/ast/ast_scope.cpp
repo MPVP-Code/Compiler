@@ -9,6 +9,7 @@
 Scope::Scope() {
     this->type = "Scope";
     array_init_flag = false;
+    l_dereference_flag = false;
 }
 
 void Scope::generate_var_maps(Node *parent) {
@@ -111,8 +112,8 @@ Global::Global() {
     this->type_map["int"] = new Variable_type("int", "none", 4);
     this->type_map["double"] = new Variable_type("double", "none", 8);
     this->type_map["float"] = new Variable_type("float", "none", 4);
-    this->type_map["char"] = new Variable_type("char", "none", 1);
-    this->type_map["unsigned"] = new Variable_type("unsigned", "none", 4);
+    this->type_map["char"] = new Variable_type("char", "int", 1);
+    this->type_map["unsigned"] = new Variable_type("unsigned", "int", 4);
 }
 
 std::string Global::compileToMIPS(const Node *parent_scope) const {
