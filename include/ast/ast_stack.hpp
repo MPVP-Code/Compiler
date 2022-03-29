@@ -29,6 +29,8 @@ std::string allocate_stack_frame(Scope* scope);
 std::string deallocate_stack_frame(Scope* scope);
 void add_to_global_typemap(Variable_type *var, Scope* scope);
 
+Node* assign_constant_with_value(int value, Scope* scope);
+Node* resolve_enum_constant(std::string name, Scope* current);
 Variable* resolve_variable_name(std::string name, Scope* current);
 void try_replace_variable(Node* &varptr, Node* scope);
 int resolve_variable_size(std::string name, Scope* child_scope);

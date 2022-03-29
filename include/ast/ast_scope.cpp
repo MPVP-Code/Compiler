@@ -37,13 +37,13 @@ void Scope::generate_var_maps(Node *parent) {
     } else if (this->subtype == "FunctionDeclaration") {
         //Applies varmapping to declared variables
         auto func = (FunctionDeclaration *) this;
-        for (Variable* arg: *(func->arguments)) {
+        for (Variable *arg: *(func->arguments)) {
             try_replace_variable(reinterpret_cast<Node *&>(arg), this);
         }
     }
 
     if (this->type == "TypeDef") {
-        TypeDef* typeDef = (TypeDef*) this;
+        TypeDef *typeDef = (TypeDef *) this;
         auto basicType = parent_scope->type_map.find(typeDef->getBasicType());
         if (basicType != parentScope->type_map.end()) {
             parentScope->type_map[typeDef->getBasicType()] = basicType->second;
@@ -53,13 +53,26 @@ void Scope::generate_var_maps(Node *parent) {
 
     for (auto &node: this->statements) {
         if (node->subtype == "Enum") {
-            Enum* nodeEnum = (Enum*) node;
-            std::vector<Node*>* elements = nodeEnum->getElements();
+            Enum *nodeEnum = (Enum *) node;
+            std::vector<Node *> *elements = nodeEnum->getElements();
+            int elementsCounter = 0;
             for (auto &node: *elements) {
-                EnumElement* enumElement = (EnumElement*) node;
-                this->enum_elements[enumElement->getName()] = enumElement->getValue();
+                EnumElement *enumElement = (EnumElement *) node;
+                Node *elementValue = enumElement->getValue();
+                if (elementValue == NULL) {
+                    this->enum_elements[enumElement->getName()] = assign_constant_with_value(elementsCounter, this);
+                    elementsCounter++;
+                } else {
+                    Node *assignedConstant = enumElement->getValue();
+                    assignedConstant->generate_var_maps(parent);
+                    this->enum_elements[enumElement->getName()] = assignedConstant;
+                }
             }
-        } else {
+        }
+    }
+
+    for (auto &node: this->statements) {
+        if (node->subtype != "Enum") {
             try_replace_variable(node, this);
         }
     }
@@ -87,9 +100,9 @@ void Scope::generate_var_maps(Node *parent) {
         var.second->offset = offset;
         offset += resolve_variable_size(var.second->name, scp);
         //Array allocation
-        if(var.second->array_size>0){
-            std::string subtype = var.second->data_type.substr(0, var.second->data_type.size()-1);
-            offset+= var.second->array_size * resolve_variable_size(subtype, scp);
+        if (var.second->array_size > 0) {
+            std::string subtype = var.second->data_type.substr(0, var.second->data_type.size() - 1);
+            offset += var.second->array_size * resolve_variable_size(subtype, scp);
         }
     }
 
@@ -167,7 +180,7 @@ int Global::getIdForSwitch() {
     return switchCount++;
 }
 
-CompoundStatement::CompoundStatement(std::vector<Node*> _statements) {
+CompoundStatement::CompoundStatement(std::vector<Node *> _statements) {
     statements = _statements;
     type = "Scope";
     subtype = "CompoundStatement";
