@@ -6,11 +6,17 @@
 #include <vector>
 
 class While: public Scope {
+private:
+    std::string whileEndLabel;
+    std::string whileStartLabel;
+
 public:
     Node* condition;
     While(Node* _condition, std::vector<Node*> _statements);
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
+
+    std::string getEndLabel();
 };
 
 class DoWhile: public Scope {
@@ -31,7 +37,7 @@ public:
     If(Node* _condition, std::vector<Node*>* _truestatements, std::vector<Node*>* _falsestatements);
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
-    std::string compileStatementsToMIPS(std::vector<Node*>* statements) const;
+    std::string compileStatementsToMIPS(std::vector<Node*>* statements, const Node *parent_scope) const;
 };
 
 class For: public Scope {
