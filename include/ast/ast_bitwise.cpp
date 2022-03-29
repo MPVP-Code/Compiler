@@ -96,16 +96,7 @@ BitASR::BitASR(Node *_L, Node* _R) : BinaryOperator(_L, _R){
 std::string BitASR::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
 
-    if (this->data_type == "int") {
-        result += compileLandRNodesToMIPS(parent_scope);
-        Node *LVar = L->get_intermediate_variable();
-        Node *RVar = R->get_intermediate_variable();
-        result += load_mapped_variable((Scope*) parent_scope, LVar, "$14") + "\n";
-        result += load_mapped_variable((Scope*) parent_scope, RVar, "$15") + "\n";
-        result += "srav $13, $14, $15\n";
-        result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
-
-    }else if (this->data_type == "unsigned") {
+    if (this->data_type == "unsigned") {
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
@@ -113,6 +104,15 @@ std::string BitASR::compileToMIPS(const Node *parent_scope) const {
         result += load_mapped_variable((Scope*) parent_scope, RVar, "$15") + "\n";
         result += "srlv $13, $14, $15\n";
         result += store_mapped_variable((Scope*) parent_scope, temp_variable, "$13");
+    }else if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+        result += compileLandRNodesToMIPS(parent_scope);
+        Node *LVar = L->get_intermediate_variable();
+        Node *RVar = R->get_intermediate_variable();
+        result += load_mapped_variable((Scope *) parent_scope, LVar, "$14") + "\n";
+        result += load_mapped_variable((Scope *) parent_scope, RVar, "$15") + "\n";
+        result += "srav $13, $14, $15\n";
+        result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
+
     }
 
     return result;

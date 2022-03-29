@@ -9,7 +9,7 @@ LogicAnd::LogicAnd(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 std::string LogicAnd::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
     //Resolve wether to use temp variable or actual variable
-    if (this->data_type == "int") {
+    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
@@ -44,7 +44,7 @@ LogicOr::LogicOr(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 std::string LogicOr::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
     //Resolve wether to use temp variable or actual variable
-    if (this->data_type == "int") {
+    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
@@ -82,7 +82,7 @@ LogicNot::LogicNot(Node *_source) : UnaryOperator(_source) {
 std::string LogicNot::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
 
-    if (this->data_type == "int") {
+    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
         result += in->compileToMIPS(parent_scope);
         Node *inVar = in->get_intermediate_variable();
         result += load_mapped_variable((Scope *) parent_scope, inVar, "$15") + "\n";
@@ -102,7 +102,7 @@ LogicEQ::LogicEQ(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 std::string LogicEQ::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
 
-    if (this->data_type == "int") {
+    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
@@ -125,7 +125,7 @@ LogicNE::LogicNE(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 std::string LogicNE::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
 
-    if (this->data_type == "int") {
+    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
@@ -147,7 +147,7 @@ LogicLT::LogicLT(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 std::string LogicLT::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
 
-    if (this->data_type == "int") {
+    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
@@ -171,7 +171,7 @@ LogicGT::LogicGT(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 std::string LogicGT::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
 
-    if (this->data_type == "int") {
+    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
