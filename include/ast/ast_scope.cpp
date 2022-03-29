@@ -182,7 +182,15 @@ std::string CompoundStatement::compileToMIPS(const Node *parent_scope) const {
 
 
     for (Node *statement: statements) {
+
+        //Tells array pointer to initialize
+        if (statement->type == "Variable" && ((Variable*) statement)->array_size > 0) ((Scope*) this)->array_init_flag = true;
+
         std::string generatedCode = statement->compileToMIPS(this);
+
+        //Prevents other calls to variable to compile themselves
+        ((Scope*) this)->array_init_flag = false;
+
         if (generatedCode.length() != 0) {
             result += generatedCode + (generatedCode.substr(generatedCode.length() - 1, 1) != "\n" ? "\n" : "");
         }
