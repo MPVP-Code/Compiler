@@ -9,7 +9,7 @@ Addition::Addition(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 std::string Addition::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
     //Resolve wether to use temp variable or actual variable
-    std::string basicDataType = resolve_base_type(this->data_type, (Scope*) parent_scope);
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
 
     if (basicDataType == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
@@ -62,7 +62,7 @@ Subtraction::Subtraction(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string Subtraction::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
-    std::string basicDataType = resolve_base_type(this->data_type, (Scope*) parent_scope);
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
     //Resolve wether to use temp variable or actual variable
     if (basicDataType == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
@@ -115,7 +115,7 @@ Multiplication::Multiplication(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string Multiplication::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
-    std::string basicDataType = resolve_base_type(this->data_type, (Scope*) parent_scope);
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
 
     if (basicDataType == "int") {
         result += compileLandRNodesToMIPS(parent_scope);
@@ -156,7 +156,7 @@ Division::Division(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string Division::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
-    std::string basicDataType = resolve_base_type(this->data_type, (Scope*) parent_scope);
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
 
     if (basicDataType == "int") {
         result += compileLandRNodesToMIPS(parent_scope);
@@ -196,8 +196,9 @@ Modulo::Modulo(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string Modulo::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
 
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
@@ -216,8 +217,10 @@ UnaryMinus::UnaryMinus(Node *in) : UnaryOperator(in) {
 
 std::string UnaryMinus::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
+
     //Resolve wether to use temp variable or actual variable
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
         result += in->compileToMIPS(parent_scope);
         Node *InVar = in->get_intermediate_variable();
@@ -234,8 +237,9 @@ PostIncOp::PostIncOp(Node *in) : UnaryOperator(in) {
 
 std::string PostIncOp::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
     //Resolve wether to use temp variable or actual variable
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
 
         //Finds temporary / constant/ normal variables in which results have been previously stored
         result += in->compileToMIPS(parent_scope);
@@ -257,8 +261,9 @@ std::string PostIncOp::compileToMIPS(const Node *parent_scope) const {
 
 std::string PreIncOp::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
     //Resolve wether to use temp variable or actual variable
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
 
         //Finds temporary / constant/ normal variables in which results have been previously stored
         result += in->compileToMIPS(parent_scope);
@@ -284,8 +289,9 @@ PostDecOp::PostDecOp(Node *in) : UnaryOperator(in) {
 
 std::string PostDecOp::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
     //Resolve wether to use temp variable or actual variable
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
         result += in->compileToMIPS(parent_scope);
         Node *InVar = in->get_intermediate_variable();
@@ -310,8 +316,9 @@ PreDecOp::PreDecOp(Node *in) : UnaryOperator(in) {
 
 std::string PreDecOp::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
     //Resolve wether to use temp variable or actual variable
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
         result += in->compileToMIPS(parent_scope);
         Node *InVar = in->get_intermediate_variable();

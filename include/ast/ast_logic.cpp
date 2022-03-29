@@ -8,8 +8,9 @@ LogicAnd::LogicAnd(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string LogicAnd::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
     //Resolve wether to use temp variable or actual variable
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
@@ -43,8 +44,9 @@ LogicOr::LogicOr(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string LogicOr::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
     //Resolve wether to use temp variable or actual variable
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
@@ -81,8 +83,9 @@ LogicNot::LogicNot(Node *_source) : UnaryOperator(_source) {
 
 std::string LogicNot::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
 
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
         result += in->compileToMIPS(parent_scope);
         Node *inVar = in->get_intermediate_variable();
         result += load_mapped_variable((Scope *) parent_scope, inVar, "$15") + "\n";
@@ -101,8 +104,9 @@ LogicEQ::LogicEQ(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string LogicEQ::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
 
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
@@ -124,8 +128,9 @@ LogicNE::LogicNE(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string LogicNE::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
 
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
@@ -146,14 +151,16 @@ LogicLT::LogicLT(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string LogicLT::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
+    std::string specificDataType = resolve_base_type(this->data_type, (Scope*) parent_scope);
 
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
         result += load_mapped_variable((Scope *) parent_scope, LVar, "$14") + "\n";
         result += load_mapped_variable((Scope *) parent_scope, RVar, "$15") + "\n";
-        if (this->data_type == "unsigned") {
+        if (specificDataType == "unsigned") {
             result += "sltu $13, $14, $15\n";
         } else {
             result += "slt $13, $14, $15\n";
@@ -170,14 +177,16 @@ LogicGT::LogicGT(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string LogicGT::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
+    std::string specificDataType = resolve_base_type(this->data_type, (Scope*) parent_scope);
 
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
         result += load_mapped_variable((Scope *) parent_scope, LVar, "$14") + "\n";
         result += load_mapped_variable((Scope *) parent_scope, RVar, "$15") + "\n";
-        if (this->data_type == "unsigned") {
+        if (specificDataType == "unsigned") {
             result += "sltu $13, $15, $14\n";
         } else {
             result += "slt $13, $15, $14\n";
@@ -194,14 +203,16 @@ LogicGE::LogicGE(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string LogicGE::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
+    std::string specificDataType = resolve_base_type(this->data_type, (Scope*) parent_scope);
 
-    if (this->data_type == "int" || this->data_type == "unsigned") {
+    if (basicDataType == "int") {
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
         result += load_mapped_variable((Scope *) parent_scope, LVar, "$15") + "\n";
         result += load_mapped_variable((Scope *) parent_scope, RVar, "$14") + "\n";
-        if (this->data_type == "unsigned") {
+        if (specificDataType == "unsigned") {
             result += "sltu $13, $15, $14\n";
         } else {
             result += "slt $13, $15, $14\n";
@@ -220,14 +231,16 @@ LogicLE::LogicLE(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string LogicLE::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
+    std::string specificDataType = resolve_base_type(this->data_type, (Scope*) parent_scope);
 
-    if (this->data_type == "int" || this->data_type == "unsigned") {
+    if (basicDataType == "int") {
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
         result += load_mapped_variable((Scope *) parent_scope, LVar, "$15") + "\n";
         result += load_mapped_variable((Scope *) parent_scope, RVar, "$14") + "\n";
-        if (this->data_type == "unsigned") {
+        if (specificDataType == "unsigned") {
             result += "sltu $13, $14, $15\n";
         } else {
             result += "slt $13, $14, $15\n";

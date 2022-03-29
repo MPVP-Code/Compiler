@@ -478,6 +478,14 @@ std::string resolve_base_type(std::string alias, Scope *scope) {
     return base;
 }
 
+std::string resolve_base_codepath(std::string alias, Scope *scope) {
+    std::string type = resolve_base_type(alias, scope);
+    if (type == "unsigned") return "int";
+    else if (type == "char") return "int";
+    else if (type == "int") return "int";
+    else return type;
+}
+
 std::string get_ptr_base(std::string ptr_type) {
     std::string base = "";
     for (char c: ptr_type) {
