@@ -58,14 +58,12 @@ void Scope::generate_var_maps(Node *parent) {
             int elementsCounter = 0;
             for (auto &node: *elements) {
                 EnumElement *enumElement = (EnumElement *) node;
-                Node *elementValue = enumElement->getValue();
+                Node *elementValue = enumElement->getConstant();
                 if (elementValue == NULL) {
-                    this->enum_elements[enumElement->getName()] = assign_constant_with_value(elementsCounter, this);
+                    this->enum_elements[enumElement->getName()] = elementsCounter;
                     elementsCounter++;
                 } else {
-                    Node *assignedConstant = enumElement->getValue();
-                    assignedConstant->generate_var_maps(parent);
-                    this->enum_elements[enumElement->getName()] = assignedConstant;
+                    this->enum_elements[enumElement->getName()] = enumElement->getValue();
                 }
             }
         }

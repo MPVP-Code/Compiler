@@ -20,14 +20,16 @@ Variable *resolve_variable_name(std::string name, Scope *current) {
 
 Node* assign_constant_with_value(int value, Scope* scope) {
     Constant* constant = new Constant(value);
-    constant->generate_var_maps(scope);
     return constant;
 }
 
 Node* resolve_enum_constant(std::string name, Scope* current) {
+    Scope* targetScope = (Scope*) current;
     while (current != NULL) {
         if (current->enum_elements.find(name) != current->enum_elements.end()) {
-            return current->enum_elements.at(name);
+            Constant* constant = new Constant(current->enum_elements.at(name));
+            constant->generate_var_maps(targetScope);
+            return constant;
         } else {
             current = current->parent_scope;
         }
