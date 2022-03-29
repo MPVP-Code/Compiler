@@ -16,7 +16,7 @@ public:
     std::map<std::string, Variable_type*> type_map;
     int stack_frame_size;
     int tmp_var_counter;
-
+    bool l_dereference_flag;
     Scope();
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;

@@ -49,6 +49,7 @@ std::string FunctionDeclaration::compileToMIPS(const Node *parent_scope) const {
                 }
                 floatIdx += 2;
             } else {
+
                 result += store_mapped_variable((Scope *) this, param, "$" + std::to_string(intIdx));
 
                 //Two word store - skip register

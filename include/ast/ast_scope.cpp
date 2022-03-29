@@ -9,6 +9,7 @@
 Scope::Scope() {
     this->type = "Scope";
     array_init_flag = false;
+    l_dereference_flag = false;
 }
 
 void Scope::generate_var_maps(Node *parent) {

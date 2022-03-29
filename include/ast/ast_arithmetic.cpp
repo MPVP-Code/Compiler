@@ -9,7 +9,7 @@ Addition::Addition(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 std::string Addition::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
     //Resolve wether to use temp variable or actual variable
-    std::string basicDataType = resolve_base_type(this->data_type, (Scope*) parent_scope);
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
 
     if (basicDataType == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
@@ -62,7 +62,7 @@ Subtraction::Subtraction(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string Subtraction::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
-    std::string basicDataType = resolve_base_type(this->data_type, (Scope*) parent_scope);
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
     //Resolve wether to use temp variable or actual variable
     if (basicDataType == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
@@ -72,6 +72,17 @@ std::string Subtraction::compileToMIPS(const Node *parent_scope) const {
 
         result += load_mapped_variable((Scope *) parent_scope, LVar, "$15") + "\n";
         result += load_mapped_variable((Scope *) parent_scope, RVar, "$14") + "\n";
+
+        //Pointer arithmetic fix
+        if (L->data_type.at(L->data_type.size()-1) == '*' ^ R->data_type.at(R->data_type.size()-1) == '*') {
+            if (L->data_type.at(L->data_type.size() - 1) == '*') {
+                result += "sll $14, $14, " + std::to_string(get_log_ptr_element(L->data_type, (Scope *) parent_scope)) +   " # Pointer arithmetic bodge\n";
+            }
+            if (R->data_type.at(R->data_type.size() - 1) == '*') {
+                result += "sll $15, $15, " + std::to_string(get_log_ptr_element(R->data_type, (Scope *) parent_scope)) +  "\n";
+            }
+        }
+
         result += "sub $13, $15, $14\n";
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
     } else if (basicDataType == "float") { /*might cause segmentation faults*/
@@ -104,7 +115,7 @@ Multiplication::Multiplication(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string Multiplication::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
-    std::string basicDataType = resolve_base_type(this->data_type, (Scope*) parent_scope);
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
 
     if (basicDataType == "int") {
         result += compileLandRNodesToMIPS(parent_scope);
@@ -145,7 +156,7 @@ Division::Division(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string Division::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
-    std::string basicDataType = resolve_base_type(this->data_type, (Scope*) parent_scope);
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
 
     if (basicDataType == "int") {
         result += compileLandRNodesToMIPS(parent_scope);
@@ -185,8 +196,9 @@ Modulo::Modulo(Node *_L, Node *_R) : BinaryOperator(_L, _R) {
 
 std::string Modulo::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
 
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
         result += compileLandRNodesToMIPS(parent_scope);
         Node *LVar = L->get_intermediate_variable();
         Node *RVar = R->get_intermediate_variable();
@@ -205,8 +217,10 @@ UnaryMinus::UnaryMinus(Node *in) : UnaryOperator(in) {
 
 std::string UnaryMinus::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
+
     //Resolve wether to use temp variable or actual variable
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
         result += in->compileToMIPS(parent_scope);
         Node *InVar = in->get_intermediate_variable();
@@ -223,16 +237,48 @@ PostIncOp::PostIncOp(Node *in) : UnaryOperator(in) {
 
 std::string PostIncOp::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
     //Resolve wether to use temp variable or actual variable
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
+
         //Finds temporary / constant/ normal variables in which results have been previously stored
         result += in->compileToMIPS(parent_scope);
         Node *InVar = in->get_intermediate_variable();
-        result += load_mapped_variable((Scope *) parent_scope, InVar, "$15") + "\n";
-        result += "li $14, 1\n";
+        result += load_mapped_variable((Scope *) parent_scope, InVar, "$14") + "\n";
+        result += "li $15, 1\n";
+
+        //Pointer arithmetic fix
+        if (in->data_type.at(in->data_type.size()-1) == '*' ) {
+            result += "sll $15, $15, " + std::to_string(get_log_ptr_element(in->data_type, (Scope *) parent_scope)) +   " # Pointer arithmetic bodge\n";
+        }
+
         result += "add $13, $14, $15\n";
         result += store_mapped_variable((Scope *) parent_scope, InVar, "$13");
-        result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$15");
+        result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$14");
+    }
+    return result;
+}
+
+std::string PreIncOp::compileToMIPS(const Node *parent_scope) const {
+    std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
+    //Resolve wether to use temp variable or actual variable
+    if (basicDataType == "int") {
+
+        //Finds temporary / constant/ normal variables in which results have been previously stored
+        result += in->compileToMIPS(parent_scope);
+        Node *InVar = in->get_intermediate_variable();
+        result += "li $15, 1\n";
+        result += load_mapped_variable((Scope *) parent_scope, InVar, "$14") + "\n";
+
+        //Pointer arithmetic fix
+        if (in->data_type.at(in->data_type.size()-1) == '*' ) {
+            result += "sll $15, $15, " + std::to_string(get_log_ptr_element(in->data_type, (Scope *) parent_scope)) +   " # Pointer arithmetic bodge\n";
+        }
+
+        result += "add $13, $14, $15\n";
+        result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
+        result += store_mapped_variable((Scope *) parent_scope, InVar, "$13");
     }
     return result;
 }
@@ -243,13 +289,20 @@ PostDecOp::PostDecOp(Node *in) : UnaryOperator(in) {
 
 std::string PostDecOp::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
     //Resolve wether to use temp variable or actual variable
-    if (resolve_base_type(this->data_type, (Scope*) parent_scope) == "int") {
+    if (basicDataType == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
         result += in->compileToMIPS(parent_scope);
         Node *InVar = in->get_intermediate_variable();
         result += "li $15, 1\n";
         result += load_mapped_variable((Scope *) parent_scope, InVar, "$14") + "\n";
+
+        //Pointer arithmetic fix
+        if (in->data_type.at(in->data_type.size()-1) == '*' ) {
+            result += "sll $15, $15, " + std::to_string(get_log_ptr_element(in->data_type, (Scope *) parent_scope)) +   " # Pointer arithmetic bodge\n";
+        }
+
         result += "sub $13, $14, $15\n";
         result += store_mapped_variable((Scope *) parent_scope, InVar, "$13");
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$14");
@@ -263,13 +316,19 @@ PreDecOp::PreDecOp(Node *in) : UnaryOperator(in) {
 
 std::string PreDecOp::compileToMIPS(const Node *parent_scope) const {
     std::string result = "";
+    std::string basicDataType = resolve_base_codepath(this->data_type, (Scope*) parent_scope);
     //Resolve wether to use temp variable or actual variable
-    if (this->data_type == "int") {
+    if (basicDataType == "int") {
         //Finds temporary / constant/ normal variables in which results have been previously stored
         result += in->compileToMIPS(parent_scope);
         Node *InVar = in->get_intermediate_variable();
         result += "li $15, 1\n";
         result += load_mapped_variable((Scope *) parent_scope, InVar, "$14") + "\n";
+
+        //Pointer arithmetic fix
+        if (in->data_type.at(in->data_type.size()-1) == '*' ) {
+            result += "sll $15, $15, " + std::to_string(get_log_ptr_element(in->data_type, (Scope *) parent_scope)) +   " # Pointer arithmetic bodge\n";
+        }
         result += "sub $13, $14, $15\n";
         result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
         result += store_mapped_variable((Scope *) parent_scope, InVar, "$13");
@@ -282,18 +341,3 @@ PreIncOp::PreIncOp(Node *in) : UnaryOperator(in) {
     this->subtype = "PreInc";
 }
 
-std::string PreIncOp::compileToMIPS(const Node *parent_scope) const {
-    std::string result = "";
-    //Resolve wether to use temp variable or actual variable
-    if (this->data_type == "int") {
-        //Finds temporary / constant/ normal variables in which results have been previously stored
-        result += in->compileToMIPS(parent_scope);
-        Node *InVar = in->get_intermediate_variable();
-        result += "li $15, 1\n";
-        result += load_mapped_variable((Scope *) parent_scope, InVar, "$14") + "\n";
-        result += "add $13, $14, $15\n";
-        result += store_mapped_variable((Scope *) parent_scope, temp_variable, "$13");
-        result += store_mapped_variable((Scope *) parent_scope, InVar, "$13");
-    }
-    return result;
-}
