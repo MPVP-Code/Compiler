@@ -42,14 +42,6 @@ void Scope::generate_var_maps(Node *parent) {
         }
     }
 
-    if (this->type == "TypeDef") {
-        TypeDef *typeDef = (TypeDef *) this;
-        auto basicType = parent_scope->type_map.find(typeDef->getBasicType());
-        if (basicType != parentScope->type_map.end()) {
-            parentScope->type_map[typeDef->getBasicType()] = basicType->second;
-        }
-    }
-
 
     for (auto &node: this->statements) {
         if (node->subtype == "Enum") {

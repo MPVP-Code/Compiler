@@ -15,19 +15,24 @@ extern "C" int fileno(FILE *stream);
 
 #include <stdio.h>
 #include "parser.tab.hpp"
+
+int typedef_token_count = 0;
+std::string typedef_modifiers = "";
+
+ std::map<std::string, bool> lexer_type_map;
 //YYSTYPE yylval;
 %}
 
 %%
 
 "void"			{return(VOID); }
-"int"			{return(INT); }
+"int"			{typedef_token_count--; return(INT); }
 "enum"			{return(ENUM); }
-"double"		{return(DOUBLE); }
-"float"			{return(FLOAT); }
-"char"			{return(CHAR); }
-"unsigned"		{return(UNSIGNED); }
-"typedef"		{return(TYPEDEF); }
+"double"		{typedef_token_count--; return(DOUBLE); }
+"float"			{typedef_token_count--; return(FLOAT); }
+"char"			{typedef_token_count--; return(CHAR); }
+"unsigned"		{ typedef_token_count--; return(UNSIGNED); }
+"typedef"		{typedef_token_count = 2; std::cerr<< "Found typedef\n"; return(TYPEDEF); }
 "sizeof"		{return(SIZEOF); }
 "struct"		{return(STRUCT); }
 
@@ -44,7 +49,20 @@ extern "C" int fileno(FILE *stream);
 
 
 
-{L}({L}|{D})*		    { yylval.string = new std::string(yytext); return(IDENTIFIER); }
+{L}({L}|{D})*		    {
+                            if (typedef_token_count > 0    ){ //||  check_map_contains(lexer_type_map , *yylval.string)
+
+                                typedef_token_count--;
+                                std::cerr << "Let through identifier\n";
+                                std::string name = std::string(yytext);
+                                yylval.string = new std::string(name + typedef_modifiers);
+                                typedef_modifiers = "";
+                                return(TYPE_NAME);
+                            }else {
+                                yylval.string = new std::string(yytext);
+                                return(IDENTIFIER);
+                            }
+                        }
 
 0[xX]{H}+{IS}?		    {std::cerr<< "lexmatch 1\n"; yylval.string = new std::string(yytext); return(CONSTANT);  }
 0{D}+{IS}?		        { std::cerr<< "lexmatch 2\n"; yylval.string = new std::string(yytext); return(CONSTANT);}
@@ -89,12 +107,24 @@ L?\"(\\.|[^\\"])*\"	    {yylval.string =  new std::string(yytext); return(STRING
 ("["|"<:")		{return('['); }
 ("]"|":>")		{return(']'); }
 "."			    {return('.'); }
-"&"			    {return('&'); }
+"&"			    {
+                    if(typedef_token_count > 0){
+                         typedef_modifiers += "&";
+                     } else {
+                         return('&');
+                     }
+                 }
 "!"			    {return('!'); }
 "~"			    {return('~'); }
 "-"			    {return('-'); }
 "+"			    {return('+'); }
-"*"			    {return('*'); }
+"*"			    {
+                    if(typedef_token_count > 0){
+                        typedef_modifiers += "*";
+                    } else {
+                        return('*');
+                    }
+                }
 "/"			    {return('/'); }
 "%"			    {return('%'); }
 "<"			    {return('<'); }
@@ -112,21 +142,5 @@ L?\"(\\.|[^\\"])*\"	    {yylval.string =  new std::string(yytext); return(STRING
 void yyerror(char const* in){}
 
 
-//int check_type()
-//{
-///*
-//* pseudo code --- this is what it should check
-//*
-//*	if (yytext == type_name)
-//*		return(TYPE_NAME);
-//*
-//*	return(IDENTIFIER);
-//*/
-//
-///*
-//*	it actually will only return IDENTIFIER
-//*/
-//
-//	return(IDENTIFIER);
-//}
+
 
