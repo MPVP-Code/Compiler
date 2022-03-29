@@ -20,11 +20,17 @@ public:
 };
 
 class DoWhile: public Scope {
+private:
+    std::string doWhileEndLabel;
+    std::string doWhileStartLabel;
+
 public:
     Node* condition;
     DoWhile(Node* _condition, std::vector<Node*> _statements);
 
     virtual std::string compileToMIPS(const Node *parent_scope) const override;
+
+    std::string getEndLabel();
 };
 
 class If: public Scope {
